@@ -120,7 +120,7 @@ https://fontawesome.com/icons?d=gallery */
     },
     {
       skillName: "AI",
-      fontAwesomeClassname: "fab fa-microchip"
+      fontAwesomeClassname: "fa-solid fa-microchip"
     }
   ],
   display: true // Set false to hide this section, defaults to true
@@ -257,57 +257,107 @@ const achievementSection = {
 
   achievementsCards: [
     {
-      title: "Google Code-In Finalist",
+      title: "AZ-900",
       subtitle:
-        "First Pakistani to be selected as Google Code-in Finalist from 4000 students from 77 different countries.",
-      image: require("./assets/images/codeInLogo.webp"),
-      imageAlt: "Google Code-In Logo",
+        "AZ-900 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/be8fcaeb-c769-4858-b567-ffaaa73ce8cf/image.png"),
+      imageAlt: "Cert Logo",
       footerLink: [
         {
           name: "Certification",
-          url: "https://drive.google.com/file/d/0B7kazrtMwm5dYkVvNjdNWjNybWJrbndFSHpNY2NFV1p4YmU0/view?usp=sharing"
+          url: "https://www.credly.com/badges/c2d19134-47d4-4ded-a7cf-12e6455c29ff"
         },
+      ]
+    },
+     {
+      title: "DP-900",
+      subtitle:
+        "DP-900 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/70eb1e3f-d4de-4377-a062-b20fb29594ea/azure-data-fundamentals-600x600.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
         {
-          name: "Award Letter",
-          url: "https://drive.google.com/file/d/0B7kazrtMwm5dekxBTW5hQkg2WXUyR3QzQmR0VERiLXlGRVdF/view?usp=sharing"
+          name: "Certification",
+          url: "https://www.credly.com/badges/512c8f33-bace-4676-af29-2e7c0a027911"
         },
+      ]
+    },
+     {
+      title: "AI-900",
+      subtitle:
+        "AI-900 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/4136ced8-75d5-4afb-8677-40b6236e2672/azure-ai-fundamentals-600x600.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
         {
-          name: "Google Code-in Blog",
-          url: "https://opensource.googleblog.com/2019/01/google-code-in-2018-winners.html"
-        }
+          name: "Certification",
+          url: "https://www.credly.com/badges/008c2b1f-53e5-4548-9ceb-b1e7aac41d81"
+        },
+      ]
+    },
+     {
+      title: "SC-900",
+      subtitle:
+        "SC-900 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/fc1352af-87fa-4947-ba54-398a0e63322e/security-compliance-and-identity-fundamentals-600x600.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/42bb3fbe-91c7-4af9-af34-15e2d8d3662f"
+        },
+      ]
+    },
+     {
+      title: "PL-900",
+      subtitle:
+        "PL-900 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/2a6251f2-737b-4bf6-9190-d77570cc76fc/CERT-Fundamentals-Power-Platform.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/c1b54442-8027-4bf2-97d5-38b793281b9e"
+        },
+      ]
+    },
+     {
+      title: "PL-100",
+      subtitle:
+        "PL-100 Microsoft certification, 11 yo",
+      image: require("https://images.credly.com/size/680x680/images/60030167-ab95-46aa-8391-c069102e5602/power-platform-app-maker-600x600.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/b5c3ad33-0cb4-4496-9719-472ed6433d8c"
+        },
       ]
     },
     {
-      title: "Google Assistant Action",
+      title: "Pega Certified System Architect",
       subtitle:
-        "Developed a Google Assistant Action JavaScript Guru that is available on 2 Billion devices world wide.",
-      image: require("./assets/images/googleAssistantLogo.webp"),
-      imageAlt: "Google Assistant Action Logo",
+        "Pega's CSA exam passed at 11.",
+      image: require("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdsj2vh14GE0EBp-xrmRzD5e2O4SipTgNdPw&s"),
+      imageAlt: "Pega",
       footerLink: [
         {
-          name: "View Google Assistant Action",
-          url: "https://assistant.google.com/services/a/uid/000000100ee688ee?hl=en"
+          name: "Shoutout",
+          url: "https://www.linkedin.com/feed/update/urn:li:activity:6998310978840862720/"
         }
       ]
     },
 
     {
-      title: "PWA Web App Developer",
-      subtitle: "Completed Certifcation from SMIT for PWA Web App Development",
-      image: require("./assets/images/pwaLogo.webp"),
-      imageAlt: "PWA Logo",
-      footerLink: [
-        {name: "Certification", url: ""},
-        {
-          name: "Final Project",
-          url: "https://pakistan-olx-1.firebaseapp.com/"
-        }
-      ]
+      title: "Oracle Gen AI",
+      subtitle: "Oracle Gen AI certification",
+      image: require("./assets/images/e.png"),
+      imageAlt: "Certification",
+      footerLink: []
     }
   ],
   display: true // Set false to hide this section, defaults to true
 };
-
 // Blogs Section
 
 const blogSection = {
