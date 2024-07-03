@@ -260,7 +260,7 @@ const achievementSection = {
       title: "AZ-900",
       subtitle:
         "AZ-900 Microsoft certification, 11 yo",
-      image: require("https://images.credly.com/size/680x680/images/be8fcaeb-c769-4858-b567-ffaaa73ce8cf/image.png"),
+      image: require(""),
       imageAlt: "Cert Logo",
       footerLink: [
         {
