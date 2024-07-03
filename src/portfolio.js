@@ -33,37 +33,40 @@ const greeting = {
 // Social Media Links
 
 const socialMediaLinks = {
-  github: "https://github.com/saadpasta",
-  linkedin: "https://www.linkedin.com/in/saadpasta/",
-  gmail: "saadpasta70@gmail.com",
-  gitlab: "https://gitlab.com/saadpasta",
-  facebook: "https://www.facebook.com/saad.pasta7",
-  medium: "https://medium.com/@saadpasta",
-  stackoverflow: "https://stackoverflow.com/users/10422806/saad-pasta",
-  // Instagram, Twitter and Kaggle are also supported in the links!
-  // To customize icons and social links, tweak src/components/SocialMedia
+  github: "https://github.com/hridaya423",
+  gmail: "hridayahoney@gmail.com",
+  stackoverflow: "https://stackoverflow.com/users/15129164/hridaya-agrawal",
+  twitter: "https://x.com/AgrawalHridaya",
+  instagram: "https://www.instagram.com/hridayaagrawal2/",
   display: true // Set true to display this section, defaults to false
 };
 
 // Skills Section
 
 const skillsSection = {
-  title: "What I do",
-  subTitle: "CRAZY FULL STACK DEVELOPER WHO WANTS TO EXPLORE EVERY TECH STACK",
+  title: "What I Do",
+  subTitle: "Passionate Full Stack Developer Exploring Diverse Tech Stacks",
   skills: [
     emoji(
-      "⚡ Develop highly interactive Front end / User Interfaces for your web and mobile applications"
+      "⚡ Create highly interactive front-end/user interfaces for web and mobile applications"
     ),
-    emoji("⚡ Progressive Web Applications ( PWA ) in normal and SPA Stacks"),
     emoji(
-      "⚡ Integration of third party services such as Firebase/ AWS / Digital Ocean"
-    )
-  ],
+      "⚡ Integrate third-party services such as Firebase, AWS, Digital Ocean, OpenAI, Azure, Supabase, and Google Cloud"
+    ),
+    emoji("⚡ Develop robust backend architectures using Node.js, Express.js, and various RESTful and GraphQL APIs"),
+    emoji("⚡ Implement efficient database solutions with SQL and NoSQL databases, including MySQL, PostgreSQL, and MongoDB"),
+    emoji("⚡ Utilize version control systems like Git for streamlined and collaborative development"),
+    emoji("⚡ Ensure cross-platform optimization for seamless performance on different devices and browsers"),
+    emoji("⚡ Deploy and manage applications on cloud platforms, ensuring scalability and high availability"),
+    emoji("⚡ Follow agile methodologies for efficient project management and continuous delivery"),
+    emoji("⚡ Enhance user experience with responsive design and intuitive UI/UX principles")
+  ]
+};
 
   /* Make Sure to include correct Font Awesome Classname to view your icon
 https://fontawesome.com/icons?d=gallery */
 
-  softwareSkills: [
+softwareSkills: [
     {
       skillName: "html-5",
       fontAwesomeClassname: "fab fa-html5"
@@ -87,6 +90,14 @@ https://fontawesome.com/icons?d=gallery */
     {
       skillName: "nodejs",
       fontAwesomeClassname: "fab fa-node"
+    },
+        {
+      skillName: "nextjs",
+      fontAwesomeClassname: "fab fa-n"
+    },
+     {
+      skillName: "Flutter",
+      fontAwesomeClassname: "fab fa-dove"
     },
     {
       skillName: "swift",
@@ -115,7 +126,11 @@ https://fontawesome.com/icons?d=gallery */
     {
       skillName: "docker",
       fontAwesomeClassname: "fab fa-docker"
-    }
+    },
+    {
+      skillName: "AI",
+      fontAwesomeClassname: "fab fa-microchip"
+    },
   ],
   display: true // Set false to hide this section, defaults to true
 };
