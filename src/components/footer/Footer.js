@@ -11,7 +11,7 @@ export default function Footer() {
       <div className="footer-div">
         <p className={isDark ? "dark-mode footer-text" : "footer-text"}>
           {emoji("Made by Hridaya")}
-        </p
+        </p>
       </div>
     </Fade>
   );
