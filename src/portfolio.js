@@ -338,7 +338,7 @@ const achievementSection = {
       title: "Pega Certified System Architect",
       subtitle:
         "Pega's CSA exam passed at 11.",
-      image: require("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdsj2vh14GE0EBp-xrmRzD5e2O4SipTgNdPw&s"),
+      image: require("https://www.pega.com/sites/default/files/styles/1024/public/media/images/2021-10/pega-logo-vertical-prevcard.png"),
       imageAlt: "Pega",
       footerLink: [
         {
@@ -348,13 +348,13 @@ const achievementSection = {
       ]
     },
 
-    // {
-    //   title: "Oracle Gen AI",
-    //   subtitle: "Oracle Gen AI certification",
-    //   image: require("https://raw.githubusercontent.com/hridaya423/portfolio/master/src/assets/images/e.png"),
-    //   imageAlt: "Certification",
-    //   footerLink: []
-    // }
+    {
+      title: "Oracle Gen AI",
+      subtitle: "Oracle Gen AI certification",
+      image: require("https://raw.githubusercontent.com/hridaya423/portfolio/master/src/assets/images/e.png"),
+      imageAlt: "Certification",
+      footerLink: []
+    }
   ],
   display: true // Set false to hide this section, defaults to true
 };
