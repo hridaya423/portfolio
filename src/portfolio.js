@@ -118,10 +118,6 @@ https://fontawesome.com/icons?d=gallery */
       skillName: "docker",
       fontAwesomeClassname: "fab fa-docker"
     },
-    {
-      skillName: "AI",
-      fontAwesomeClassname: "fa-solid fa-microchip"
-    }
   ],
   display: true // Set false to hide this section, defaults to true
 };
@@ -433,7 +429,7 @@ const contactInfo = {
   title: emoji("Contact Me ☎️"),
   subtitle:
     "Discuss a project or just want to say hi? My Inbox is open for all.",
-  number: "+92-0000000000",
+  number: "",
   email_address: "hridayahoney@gmail.com"
 };
 
