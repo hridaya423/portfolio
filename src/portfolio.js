@@ -333,20 +333,20 @@ const achievementSection = {
           url: "https://www.credly.com/badges/b5c3ad33-0cb4-4496-9719-472ed6433d8c"
         },
       ]
-    },
-    {
-      title: "Pega Certified System Architect",
-      subtitle:
-        "Pega's CSA exam passed at 11.",
-      image: require("https://www.pega.com/sites/default/files/styles/1024/public/media/images/2021-10/pega-logo-vertical-prevcard.png"),
-      imageAlt: "Pega",
-      footerLink: [
-        {
-          name: "Shoutout",
-          url: "https://www.linkedin.com/feed/update/urn:li:activity:6998310978840862720/"
-        }
-      ]
-    },
+    }
+    // {
+    //   title: "Pega Certified System Architect",
+    //   subtitle:
+    //     "Pega's CSA exam passed at 11.",
+    //   image: require("https://www.pega.com/sites/default/files/styles/1024/public/media/images/2021-10/pega-logo-vertical-prevcard.png"),
+    //   imageAlt: "Pega",
+    //   footerLink: [
+    //     {
+    //       name: "Shoutout",
+    //       url: "https://www.linkedin.com/feed/update/urn:li:activity:6998310978840862720/"
+    //     }
+    //   ]
+    // },
 
     // {
     //   title: "Oracle Gen AI",
