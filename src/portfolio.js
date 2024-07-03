@@ -257,42 +257,113 @@ const achievementSection = {
 
   achievementsCards: [
     {
-      title: "Oracle Gen AI",
-      subtitle: "Oracle Gen AI certification",
-      image: require("./assets/images/e.png"),
-      imageAlt: "Certification",
-      footerLink: []
-    },
-    {
-      title: "Google Assistant Action",
+      title: "AZ-900",
       subtitle:
-        "Developed a Google Assistant Action JavaScript Guru that is available on 2 Billion devices world wide.",
-      image: require("./assets/images/googleAssistantLogo.webp"),
-      imageAlt: "Google Assistant Action Logo",
+        "AZ-900 Microsoft certification, 11 yo",
+      image: require("./assets/images/az-900.png"),
+      imageAlt: "Cert Logo",
       footerLink: [
         {
-          name: "View Google Assistant Action",
-          url: "https://assistant.google.com/services/a/uid/000000100ee688ee?hl=en"
+          name: "Certification",
+          url: "https://www.credly.com/badges/c2d19134-47d4-4ded-a7cf-12e6455c29ff"
+        },
+      ]
+    },
+     {
+      title: "DP-900",
+      subtitle:
+        "DP-900 Microsoft certification, 11 yo",
+      image: require("./assets/images/dp-900.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/512c8f33-bace-4676-af29-2e7c0a027911"
+        },
+      ]
+    },
+     {
+      title: "AI-900",
+      subtitle:
+        "AI-900 Microsoft certification, 11 yo",
+      image: require("./assets/images/ai-900.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/008c2b1f-53e5-4548-9ceb-b1e7aac41d81"
+        },
+      ]
+    },
+     {
+      title: "SC-900",
+      subtitle:
+        "SC-900 Microsoft certification, 11 yo",
+      image: require("./assets/images/sc-900.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/42bb3fbe-91c7-4af9-af34-15e2d8d3662f"
+        },
+      ]
+    },
+     {
+      title: "PL-900",
+      subtitle:
+        "PL-900 Microsoft certification, 11 yo",
+      image: require("./assets/images/pl-900.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/c1b54442-8027-4bf2-97d5-38b793281b9e"
+        },
+      ]
+    },
+     {
+      title: "PL-100",
+      subtitle:
+        "PL-100 Microsoft certification, 11 yo",
+      image: require("./assets/images/pl-100.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/b5c3ad33-0cb4-4496-9719-472ed6433d8c"
+        },
+      ]
+    },
+    {
+      title: "Pega Certified System Architect",
+      subtitle:
+        "Pega's CSA exam passed at 11.",
+      image: require("./assets/images/pega.png"),
+      imageAlt: "Pega",
+      footerLink: [
+        {
+          name: "Shoutout",
+          url: "https://www.linkedin.com/feed/update/urn:li:activity:6998310978840862720/"
         }
       ]
     },
 
     {
-      title: "PWA Web App Developer",
-      subtitle: "Completed Certifcation from SMIT for PWA Web App Development",
-      image: require("./assets/images/pwaLogo.webp"),
-      imageAlt: "PWA Logo",
+      title: "Oracle Gen AI",
+      subtitle: "Oracle Gen AI certification",
+      image: require("./assets/images/e.png"),
+      imageAlt: "Certification",
       footerLink: [
-        {name: "Certification", url: ""},
         {
-          name: "Final Project",
-          url: "https://pakistan-olx-1.firebaseapp.com/"
+          name: "Badge",
+          url: "https://t.co/OumPKteDbd"
         }
       ]
     }
   ],
   display: true // Set false to hide this section, defaults to true
 };
+
 // Blogs Section
 
 const blogSection = {
@@ -333,7 +404,7 @@ const talkSection = {
       event_url: "https://www.facebook.com/events/2339906106275053/"
     }
   ],
-  display: true // Set false to hide this section, defaults to true
+  display: false // Set false to hide this section, defaults to true
 };
 
 // Podcast Section
@@ -362,13 +433,14 @@ const contactInfo = {
   title: emoji("Contact Me ☎️"),
   subtitle:
     "Discuss a project or just want to say hi? My Inbox is open for all.",
+  number: "+92-0000000000",
   email_address: "hridayahoney@gmail.com"
 };
 
 // Twitter Section
 
 const twitterDetails = {
-  userName: "AgrawalHridya", //Replace "twitter" with your twitter username without @
+  userName: "AgrawalHridaya", //Replace "twitter" with your twitter username without @
   display: true // Set true to display this section, defaults to false
 };
 
@@ -394,3 +466,4 @@ export {
   isHireable,
   resumeSection
 };
+
