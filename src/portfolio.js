@@ -60,8 +60,7 @@ const skillsSection = {
     emoji("⚡ Deploy and manage applications on cloud platforms, ensuring scalability and high availability"),
     emoji("⚡ Follow agile methodologies for efficient project management and continuous delivery"),
     emoji("⚡ Enhance user experience with responsive design and intuitive UI/UX principles")
-  ]
-};
+  ],
 
   /* Make Sure to include correct Font Awesome Classname to view your icon
 https://fontawesome.com/icons?d=gallery */
@@ -118,6 +117,10 @@ https://fontawesome.com/icons?d=gallery */
     {
       skillName: "docker",
       fontAwesomeClassname: "fab fa-docker"
+    },
+    {
+      skillName: "AI",
+      fontAwesomeClassname: "fab fa-microchip"
     }
   ],
   display: true // Set false to hide this section, defaults to true
