@@ -256,18 +256,12 @@ const achievementSection = {
     "Achievements, Certifications, Award Letters and Some Cool Stuff that I have done !",
 
   achievementsCards: [
-     {
-      title: "AZ-900",
-      subtitle:
-        "AZ-900 Microsoft certification, 11 yo",
-      image: require(""),
-      imageAlt: "Cert Logo",
-      footerLink: [
-        {
-          name: "Certification",
-          url: "https://www.credly.com/badges/c2d19134-47d4-4ded-a7cf-12e6455c29ff"
-        },
-      ]
+    {
+      title: "Oracle Gen AI",
+      subtitle: "Oracle Gen AI certification",
+      image: require("./assets/images/e.png"),
+      imageAlt: "Certification",
+      footerLink: []
     },
     {
       title: "Google Assistant Action",
