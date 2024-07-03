@@ -91,14 +91,6 @@ https://fontawesome.com/icons?d=gallery */
       skillName: "nodejs",
       fontAwesomeClassname: "fab fa-node"
     },
-        {
-      skillName: "nextjs",
-      fontAwesomeClassname: "fab fa-n"
-    },
-     {
-      skillName: "Flutter",
-      fontAwesomeClassname: "fab fa-dove"
-    },
     {
       skillName: "swift",
       fontAwesomeClassname: "fab fa-swift"
@@ -130,14 +122,14 @@ https://fontawesome.com/icons?d=gallery */
     {
       skillName: "AI",
       fontAwesomeClassname: "fab fa-microchip"
-    },
+    }
   ],
   display: true // Set false to hide this section, defaults to true
 };
 // Education Section
 
 const educationInfo = {
-  display: true, // Set false to hide this section, defaults to true
+  display: false, // Set false to hide this section, defaults to true
   schools: [
     {
       schoolName: "Harvard University",
@@ -172,11 +164,11 @@ const techStack = {
     },
     {
       Stack: "Backend",
-      progressPercentage: "70%"
+      progressPercentage: "80%"
     },
     {
       Stack: "Programming",
-      progressPercentage: "60%"
+      progressPercentage: "85%"
     }
   ],
   displayCodersrank: false // Set true to display codersrank badges section need to changes your username in src/containers/skillProgress/skillProgress.js:17:62, defaults to false
@@ -185,7 +177,7 @@ const techStack = {
 // Work experience section
 
 const workExperiences = {
-  display: true, //Set it to true to show workExperiences Section
+  display: false, //Set it to true to show workExperiences Section
   experience: [
     {
       role: "Software Engineer",
@@ -253,7 +245,7 @@ const bigProjects = {
       ]
     }
   ],
-  display: true // Set false to hide this section, defaults to true
+  display: false // Set false to hide this section, defaults to true
 };
 
 // Achievement Section
