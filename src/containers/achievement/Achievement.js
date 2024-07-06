@@ -5,7 +5,7 @@ import { achievementSection } from "../../portfolio";
 import { Fade } from "react-reveal";
 import StyleContext from "../../contexts/StyleContext";
 import DisplayLottie from "../../components/displayLottie/DisplayLottie";
-import animationData from "../../assets/lottie/trophie";
+import animationData from "../../assets/lottie/trophy";
 
 export default function Achievement() {
   const { isDark } = useContext(StyleContext);
