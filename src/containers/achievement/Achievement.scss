@@ -6,6 +6,15 @@
   font-weight: 400;
   line-height: normal;
   margin: 0px;
+  display: flex;
+  align-items: center;
+}
+
+.trophy-lottie {
+  margin-left: 10px;
+  display: inline-block;
+  width: 50px; // Control the size of the Lottie animation here
+  height: 50px;
 }
 
 .achievement-subtitle {
@@ -16,11 +25,6 @@
 
 .subTitle {
   color: $subTitle;
-}
-
-.trophy-lottie {
-  display: inline-block;
-  margin-left: 10px;
 }
 
 /* Media Query */
@@ -41,7 +45,6 @@
     text-align: center;
   }
   .trophy-lottie {
-    display: block;
-    margin: 20px auto 0;
+    margin-left: 5px;
   }
 }

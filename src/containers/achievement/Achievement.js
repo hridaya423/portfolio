@@ -5,7 +5,7 @@ import { achievementSection } from "../../portfolio";
 import { Fade } from "react-reveal";
 import StyleContext from "../../contexts/StyleContext";
 import DisplayLottie from "../../components/displayLottie/DisplayLottie";
-import animationData from "../../assets/lottie/trophy";
+import animationData from "../../assets/lottie/trophie";
 
 export default function Achievement() {
   const { isDark } = useContext(StyleContext);
@@ -25,6 +25,9 @@ export default function Achievement() {
               }
             >
               {achievementSection.title}
+              <span className="trophy-lottie">
+                <DisplayLottie animationData={animationData} />
+              </span>
             </h1>
             <p
               className={
@@ -35,9 +38,6 @@ export default function Achievement() {
             >
               {achievementSection.subtitle}
             </p>
-            <div className="trophy-lottie">
-              <DisplayLottie animationData={animationData} />
-            </div>
           </div>
           <div className="achievement-cards-div">
             {achievementSection.achievementsCards.map((card, i) => {
