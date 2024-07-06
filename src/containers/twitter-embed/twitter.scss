@@ -1,23 +1,54 @@
+// src/components/twitter/twitter.scss
 .centerContent {
   text-align: center;
   margin: auto;
   display: block;
-  margin: 0 auto;
   padding: 1.5rem;
+  background: #f5f8fa;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s, box-shadow 0.3s;
 }
+
+.centerContent.error {
+  background: #ffcccc;
+  color: #a94442;
+  border: 1px solid #ebccd1;
+}
+
 .tw-main-div {
-  margin-left: 15px;
-  margin-right: 15px;
-  margin-bottom: 15px;
-  width: auto;
+  margin: 15px;
   padding: 1.5rem;
+  background: #1da1f2;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: background 0.3s, box-shadow 0.3s;
 }
+
 .twitter-component {
-  width: auto;
   padding: 1.5rem;
 }
 
 .timeline-Header-title {
   font-size: 56px;
   font-weight: 100 !important;
+}
+
+@media (max-width: 768px) {
+  .centerContent {
+    padding: 1rem;
+  }
+  .tw-main-div {
+    padding: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .centerContent {
+    background: #1b2836;
+    color: #ffffff;
+  }
+  .tw-main-div {
+    background: #15202b;
+  }
 }
