@@ -1,3 +1,4 @@
+// src/components/achievement/Achievement.scss
 @import "../../_globalColor";
 
 .achievement-heading {
@@ -6,13 +7,20 @@
   line-height: normal;
   margin: 0px;
 }
+
 .achievement-subtitle {
   text-transform: uppercase;
   margin: 0px;
   margin-bottom: 50px;
 }
+
 .subTitle {
   color: $subTitle;
+}
+
+.trophy-lottie {
+  display: inline-block;
+  margin-left: 10px;
 }
 
 /* Media Query */
@@ -21,6 +29,7 @@
     font-size: 40px;
   }
 }
+
 @media (max-width: 768px) {
   .achievement-heading {
     font-size: 30px;
@@ -30,5 +39,9 @@
     font-size: 16px;
     line-height: normal;
     text-align: center;
+  }
+  .trophy-lottie {
+    display: block;
+    margin: 20px auto 0;
   }
 }
