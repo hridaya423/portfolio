@@ -255,7 +255,7 @@ const achievementSection = {
     {
       title: "AZ-900",
       subtitle:
-        "AZ-900 Microsoft certification, 11 yo",
+        "Achieved AZ-900 Microsoft certification at age 11",
       image: require("./assets/images/az-900.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -268,7 +268,7 @@ const achievementSection = {
      {
       title: "DP-900",
       subtitle:
-        "DP-900 Microsoft certification, 11 yo",
+        "Achieved DP-900 Microsoft certification at age 11",
       image: require("./assets/images/dp-900.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -281,7 +281,7 @@ const achievementSection = {
      {
       title: "AI-900",
       subtitle:
-        "AI-900 Microsoft certification, 11 yo",
+        "Achieved AI-900 Microsoft certification at age 11",
       image: require("./assets/images/ai-900.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -294,7 +294,7 @@ const achievementSection = {
      {
       title: "SC-900",
       subtitle:
-        "SC-900 Microsoft certification, 11 yo",
+        "Achieved SC-900 Microsoft certification at age 11",
       image: require("./assets/images/sc-900.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -307,7 +307,7 @@ const achievementSection = {
      {
       title: "PL-900",
       subtitle:
-        "PL-900 Microsoft certification, 11 yo",
+        "Achieved PL-900 Microsoft certification at age 11",
       image: require("./assets/images/pl-900.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -320,7 +320,7 @@ const achievementSection = {
      {
       title: "PL-100",
       subtitle:
-        "PL-100 Microsoft certification, 11 yo",
+        "Achieved PL-100 Microsoft certification at age 11",
       image: require("./assets/images/pl-100.png"),
       imageAlt: "Cert Logo",
       footerLink: [
@@ -333,7 +333,7 @@ const achievementSection = {
     {
       title: "Pega Certified System Architect",
       subtitle:
-        "Pega's CSA exam passed at 11.",
+        "Achieved Pega CSA certification at age 11",
       image: require("./assets/images/pega.png"),
       imageAlt: "Pega",
       footerLink: [
@@ -346,7 +346,7 @@ const achievementSection = {
 
     {
       title: "Oracle Gen AI",
-      subtitle: "Oracle Gen AI certification",
+      subtitle: "Achieved Oracle Gen AI certification at age 13",
       image: require("./assets/images/e.png"),
       imageAlt: "Certification",
       footerLink: [
