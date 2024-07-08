@@ -21,20 +21,27 @@
   color: black; // Start with black color
   position: relative;
   z-index: 1;
-  transition: color 1s ease-in-out; // Smooth transition
+  background: transparent;
+  background-image: url('https://web.archive.org/web/20160312084140im_/http://splatoon.nintendo.com/assets/img/nav-bg-fill-blue.png?1443460871');
+  background-repeat: repeat-x;
+  background-position: 0 -100%;
+  transition: background-position 1.5s ease;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.software-skill-inline:hover > i {
+  background-position: center;
+  color: var(--icon-color); // Change to the color specified in the inline style
 }
 
 .software-skill-inline > p {
   color: black; // Start with black color for the text
   font-size: 10px;
   margin-top: 5px;
-  transition: color 1s ease-in-out; // Smooth transition for text color
-}
-
-.software-skill-inline:hover > i {
-  color: inherit; // Inherit color from the inline style set in React component
+  transition: color 1.5s ease; // Smooth transition for text color
 }
 
 .software-skill-inline:hover > p {
-  color: inherit; // Inherit color from the inline style set in React component
+  color: var(--icon-color); // Change to the color specified in the inline style
 }
