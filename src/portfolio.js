@@ -68,75 +68,93 @@ https://fontawesome.com/icons?d=gallery */
   softwareSkills: [
     {
       skillName: "HTML-5",
-      fontAwesomeClassname: "fab fa-html5"
+      fontAwesomeClassname: "fab fa-html5",
+      color: "#E34F26"
     },
     {
       skillName: "CSS3",
-      fontAwesomeClassname: "fab fa-css3-alt"
+      fontAwesomeClassname: "fab fa-css3-alt",
+      color: "#1572B6"
     },
     {
       skillName: "SASS",
-      fontAwesomeClassname: "fab fa-sass"
+      fontAwesomeClassname: "fab fa-sass",
+      color: "#CC6699"
     },
     {
       skillName: "JavaScript",
-      fontAwesomeClassname: "fab fa-js"
+      fontAwesomeClassname: "fab fa-js",
+      color: "#F7DF1E"
     },
     {
       skillName: "Reactjs",
-      fontAwesomeClassname: "fab fa-react"
+      fontAwesomeClassname: "fab fa-react",
+      color: "#61DAFB"
     },
     {
       skillName: "Nodejs",
-      fontAwesomeClassname: "fab fa-node"
+      fontAwesomeClassname: "fab fa-node",
+      color: "#339933"
     },
     {
       skillName: "npm",
-      fontAwesomeClassname: "fab fa-npm"
+      fontAwesomeClassname: "fab fa-npm",
+      color: "#CB3837"
     },
     {
       skillName: "Sql-database",
-      fontAwesomeClassname: "fas fa-database"
+      fontAwesomeClassname: "fas fa-database",
+      color: "#336791"
     },
     {
       skillName: "AWS",
-      fontAwesomeClassname: "fab fa-aws"
+      fontAwesomeClassname: "fab fa-aws",
+      color: "#FF9900"
     },
     {
       skillName: "Firebase",
-      fontAwesomeClassname: "fas fa-fire"
+      fontAwesomeClassname: "fas fa-fire",
+      color: "#FFCA28"
     },
     {
       skillName: "Python",
-      fontAwesomeClassname: "fab fa-python"
+      fontAwesomeClassname: "fab fa-python",
+      color: "#3776AB"
     },
     {
       skillName: "Docker",
-      fontAwesomeClassname: "fab fa-docker"
+      fontAwesomeClassname: "fab fa-docker",
+      color: "#2496ED"
     },
     {
       skillName: "AI",
-      fontAwesomeClassname: "fab fa-microchip"
+      fontAwesomeClassname: "fab fa-microchip",
+      color: "#FF4081"
     },
     {
       skillName: "Azure",
-      fontAwesomeClassname: "fab fa-cloud"
+      fontAwesomeClassname: "fab fa-cloud",
+      color: "#0078D7"
     },
     {
       skillName: "Unity",
-      fontAwesomeClassname: "fab fa-gamepad"
+      fontAwesomeClassname: "fab fa-gamepad",
+      color: "#000000"
     },
     {
       skillName: "Linux",
-      fontAwesomeClassname: "fab fa-linux"
+      fontAwesomeClassname: "fab fa-linux",
+      color: "#FCC624"
     },
     {
       skillName: "Git",
-      fontAwesomeClassname: "fab fa-git-alt"
+      fontAwesomeClassname: "fab fa-git-alt",
+      color: "#F05032"
     },
   ],
   display: true // Set false to hide this section, defaults to true
 };
+
 // Education Section
 
 const educationInfo = {
