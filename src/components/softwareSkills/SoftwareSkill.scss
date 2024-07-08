@@ -14,6 +14,7 @@
   margin-right: 20px;
   margin-bottom: 20px;
   position: relative;
+  cursor: pointer;
 }
 
 .software-skill-inline > i {
@@ -23,27 +24,26 @@
   transition: color 0.3s ease-in-out;
 }
 
-.software-skill-inline > i:hover {
-  color: transparent;
-  animation: revealColor 1s forwards;
-}
-
 .software-skill-inline > p {
   color: $subTitle;
   font-size: 10px;
+  margin-top: 5px;
+  transition: color 0.3s ease-in-out;
 }
 
-.software-skill-inline > i:hover ~ p {
+.software-skill-inline:hover > i {
+  animation: revealColor 1s forwards;
+}
+
+.software-skill-inline:hover > p {
   color: $skillsColor;
 }
 
 @keyframes revealColor {
   0% {
-    background: transparent;
-    -webkit-background-clip: text;
+    color: transparent;
   }
   100% {
-    background: inherit;
-    -webkit-background-clip: text;
+    color: inherit;
   }
 }
