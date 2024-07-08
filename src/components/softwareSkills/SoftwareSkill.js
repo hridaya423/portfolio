@@ -13,12 +13,12 @@ export default function SoftwareSkill() {
                 key={i}
                 className="software-skill-inline"
                 name={skills.skillName}
+                style={{ "--icon-color": skills.color }}
               >
                 <i 
-                  className={skills.fontAwesomeClassname} 
-                  style={{ "--icon-color": skills.color }}
+                  className={skills.fontAwesomeClassname}
                 ></i>
-                <p style={{ "--icon-color": skills.color }}>{skills.skillName}</p>
+                <p>{skills.skillName}</p>
               </li>
             );
           })}

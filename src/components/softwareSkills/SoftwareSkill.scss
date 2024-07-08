@@ -25,14 +25,12 @@
   background-image: url('https://web.archive.org/web/20160312084140im_/http://splatoon.nintendo.com/assets/img/nav-bg-fill-blue.png?1443460871');
   background-repeat: repeat-x;
   background-position: 0 -100%;
-  transition: background-position 1.5s ease;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  transition: background-position 1.5s ease, color 1.5s ease;
 }
 
 .software-skill-inline:hover > i {
-  background-position: center;
   color: var(--icon-color); // Change to the color specified in the inline style
+  background-position: 0 0;
 }
 
 .software-skill-inline > p {
