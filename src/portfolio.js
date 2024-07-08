@@ -128,17 +128,17 @@ https://fontawesome.com/icons?d=gallery */
     },
     {
       skillName: "AI",
-      fontAwesomeClassname: "fab fa-microchip",
+      fontAwesomeClassname: "fab fa-solid fa-microchip",
       color: "#FF4081"
     },
     {
       skillName: "Azure",
-      fontAwesomeClassname: "fab fa-cloud",
+      fontAwesomeClassname: "fab fa-solid fa-cloud",
       color: "#0078D7"
     },
     {
       skillName: "Unity",
-      fontAwesomeClassname: "fab fa-gamepad",
+      fontAwesomeClassname: "fab fa-solid fa-gamepad",
       color: "#000000"
     },
     {
