@@ -18,32 +18,23 @@
 }
 
 .software-skill-inline > i {
-  color: $subTitle;
+  color: black; // Start with black color
   position: relative;
   z-index: 1;
-  transition: color 0.3s ease-in-out;
+  transition: color 1s ease-in-out; // Smooth transition
 }
 
 .software-skill-inline > p {
-  color: $subTitle;
+  color: black; // Start with black color for the text
   font-size: 10px;
   margin-top: 5px;
-  transition: color 0.3s ease-in-out;
+  transition: color 1s ease-in-out; // Smooth transition for text color
 }
 
 .software-skill-inline:hover > i {
-  animation: revealColor 1s forwards;
+  color: inherit; // Inherit color from the inline style set in React component
 }
 
 .software-skill-inline:hover > p {
-  color: $skillsColor;
-}
-
-@keyframes revealColor {
-  0% {
-    color: transparent;
-  }
-  100% {
-    color: inherit;
-  }
+  color: inherit; // Inherit color from the inline style set in React component
 }
