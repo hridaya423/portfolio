@@ -127,24 +127,9 @@ https://fontawesome.com/icons?d=gallery */
       color: "#2496ED"
     },
     {
-      skillName: "AI",
-      fontAwesomeClassname: "fab fa-solid fa-microchip",
-      color: "#FF4081"
-    },
-    {
-      skillName: "Azure",
-      fontAwesomeClassname: "fab fa-solid fa-cloud",
-      color: "#0078D7"
-    },
-    {
-      skillName: "Unity",
-      fontAwesomeClassname: "fab fa-solid fa-gamepad",
-      color: "#000000"
-    },
-    {
       skillName: "Linux",
       fontAwesomeClassname: "fab fa-linux",
-      color: "#FCC624"
+      color: "#000000"
     },
     {
       skillName: "Git",
