@@ -13,10 +13,9 @@ export default function SoftwareSkill() {
                 key={i}
                 className="software-skill-inline"
                 name={skills.skillName}
+                style={{ '--hover-color': skills.color }}
               >
-                <div className="skill-logo">
-                  <i className={skills.fontAwesomeClassname} style={{ color: skills.color }}></i>
-                </div>
+                <i className={skills.fontAwesomeClassname}></i>
                 <p>{skills.skillName}</p>
               </li>
             );
