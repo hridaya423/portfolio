@@ -21,15 +21,30 @@
   color: black; // Start with black color
   position: relative;
   z-index: 1;
-  background: transparent;
-  background-image: url('https://web.archive.org/web/20160312084140im_/http://splatoon.nintendo.com/assets/img/nav-bg-fill-blue.png?1443460871');
-  background-repeat: repeat-x;
-  background-position: 0 -100%;
-  transition: background-position 1.5s ease, color 1.5s ease;
+  transition: color 1.5s ease;
 }
 
 .software-skill-inline:hover > i {
   color: var(--icon-color); // Change to the color specified in the inline style
+}
+
+.software-skill-inline::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  background-image: url('https://web.archive.org/web/20160312084140im_/http://splatoon.nintendo.com/assets/img/nav-bg-fill-blue.png?1443460871');
+  background-repeat: repeat-x;
+  background-position: 0 -100%;
+  transition: background-position 1.5s ease;
+  -webkit-background-clip: text;
+  z-index: 0;
+  transform: translate(-50%, -50%);
+}
+
+.software-skill-inline:hover::before {
   background-position: 0 0;
 }
 
