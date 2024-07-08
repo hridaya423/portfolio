@@ -13,9 +13,11 @@ export default function SoftwareSkill() {
                 key={i}
                 className="software-skill-inline"
                 name={skills.skillName}
-                style={{ '--hover-color': skills.color }}
               >
-                <i className={skills.fontAwesomeClassname}></i>
+                <i 
+                  className={skills.fontAwesomeClassname} 
+                  style={{ color: skills.color }}
+                ></i>
                 <p>{skills.skillName}</p>
               </li>
             );
