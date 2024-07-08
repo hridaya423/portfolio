@@ -77,7 +77,7 @@ https://fontawesome.com/icons?d=gallery */
       color: "#1572B6"
     },
     {
-      skillName: "SASS",
+      skillName: "Sass",
       fontAwesomeClassname: "fab fa-sass",
       color: "#CC6699"
     },
