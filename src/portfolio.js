@@ -374,7 +374,20 @@ const achievementSection = {
           url: "https://t.co/OumPKteDbd"
         }
       ]
-    }
+    },
+    {
+      title: "Github Foundations",
+      subtitle:
+        "Achieved Github Foundations certification at age 13",
+      image: require("./assets/images/g-found.png"),
+      imageAlt: "Cert Logo",
+      footerLink: [
+        {
+          name: "Certification",
+          url: "https://www.credly.com/badges/19280ad5-3220-4505-b5c9-12044ccfed0e/public_url"
+        },
+      ]
+    },
   ],
   display: true // Set false to hide this section, defaults to true
 };
