@@ -1,32 +1,50 @@
+// src/components/achievement/Achievement.scss
+@import "../../_globalColor";
+
 .achievement-heading {
   font-size: 56px;
   font-weight: 400;
   line-height: normal;
   margin: 0px;
   display: flex;
-  flex-direction: column; // Stack items vertically on mobile
   align-items: center;
 }
 
 .trophy-lottie {
-  margin-left: 0; // Remove fixed left margin
+  margin-left: 350px;
   display: inline-block;
-  width: 100%; // Full width
-  max-width: 300px; // Optional max-width
-  height: auto; // Maintain aspect ratio
+  width: 300px; // Adjusted size for the Lottie animation
+  height: 300px;
+}
+
+.achievement-subtitle {
+  text-transform: uppercase;
+  margin: 0px;
+  margin-bottom: 50px;
+}
+
+.subTitle {
+  color: $subTitle;
+}
+
+/* Media Query */
+@media (max-width: 1380px) {
+  .achievement-heading {
+    font-size: 40px;
+  }
 }
 
 @media (max-width: 768px) {
   .achievement-heading {
     font-size: 30px;
-    flex-direction: column; // Ensure vertical stacking
-    align-items: center;
     text-align: center;
   }
-  
-  .achievement-cards-div {
-    display: flex;
-    flex-direction: column; // Stack cards vertically
-    align-items: center;
+  .achievement-subtitle {
+    font-size: 16px;
+    line-height: normal;
+    text-align: center;
+  }
+  .trophy-lottie {
+    margin-left: 5px;
   }
 }
