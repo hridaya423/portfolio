@@ -1,18 +1,69 @@
+@import "../../_globalColor";
+
 .project-title {
   font-size: 52px;
   font-weight: 400;
   line-height: normal;
+  text-align: center;
+  margin-bottom: 30px;
 }
 
-.startup-project-text img {
-  max-width: 100%;
-  height: auto;
-}
-
-.repo-cards-div-main {
+.project-cards-div-main {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 1rem 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.project-button {
+  display: block;
+  margin: 35px auto 0;
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: $buttonColor;
+  color: $textColorDark;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: darken($buttonColor, 10%);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.github-button {
+  margin-top: 15px;
+  background-color: transparent;
+  color: $textColor;
+  border: 1px solid $buttonColor;
+  
+  &:hover {
+    background-color: rgba($buttonColor, 0.1);
+    color: $textColor;
+  }
+}
+
+/* Dark mode */
+.dark-mode {
+  .project-title {
+    color: $textColorDark;
+  }
+  
+  .github-button {
+    color: $textColorDark;
+    border: 1px solid lighten($buttonColor, 10%);
+    
+    &:hover {
+      background-color: rgba(lighten($buttonColor, 10%), 0.1);
+      color: $textColorDark;
+    }
+  }
 }
 
 /* Media Query */
@@ -20,13 +71,31 @@
   .project-title {
     font-size: 40px;
   }
+  
+  .project-cards-div-main {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
 }
+
 @media (max-width: 768px) {
   .project-title {
     font-size: 30px;
-    text-align: center;
   }
-  .repo-cards-div-main {
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  
+  .project-cards-div-main {
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 15px;
+  }
+  
+  .project-button {
+    padding: 8px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .project-cards-div-main {
+    grid-template-columns: 1fr;
+    max-width: 300px;
   }
 }

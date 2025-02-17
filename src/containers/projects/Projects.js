@@ -100,9 +100,14 @@ const projectsData = [
 
 export default function Projects() {
   const { isDark } = useContext(StyleContext);
-  const [showMore, setShowMore] = useState(false);
+  const [visibleProjects, setVisibleProjects] = useState(6);
+  
+  const handleShowMore = () => {
+    setVisibleProjects(projectsData.length);
+  };
 
-  const displayedProjects = showMore ? projectsData : projectsData.filter(project => project.featured);
+  // Take only the first N projects to display
+  const displayedProjects = projectsData.slice(0, visibleProjects);
 
   return (
     <div className="main" id="projects">
@@ -116,11 +121,11 @@ export default function Projects() {
           />
         ))}
       </div>
-      {!showMore && (
+      {visibleProjects < projectsData.length && (
         <Button
           text={"Show More"}
           className="project-button"
-          onClick={() => setShowMore(true)}
+          onClick={handleShowMore}
         />
       )}
       <Button
