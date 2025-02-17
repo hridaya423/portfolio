@@ -74,7 +74,7 @@ const projectsData = [
     demoUrl: "https://demo.example.com",
     repoUrl: "https://github.com/test/Test",
     techStack: ["React", "Node.js", "MongoDB", "Express", "Redux"],
-    featured: true
+    featured: false
   },
   {
     id: "project8",
