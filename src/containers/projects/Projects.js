@@ -179,6 +179,167 @@ const projectsData = [
   {
     id: "18",
     name: "Moody",
+    description: "Moody is a full-stack web application that helps users track and analyze their emotional well-being.",
+    image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/moody.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/moody",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "19",
+    name: "Athleto",
+    description: "Athleto is a comprehensive fitness tracking and workout management application designed to empower users in their fitness journey.",
+    image: "https://cloud-8c6dpwvfi-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/athleto.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/athleto",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "20",
+    name: "Timeline Crisis",
+    description: "A Marvel-inspired web-based game built with Next.js where players must convice jarvis who ultron has corrupted to give them the override code while roleplaying as their chosen Marvel hero to save the timeline.",
+    image: "https://cloud-2lr2c22nf-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/timelinecrisis.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/timelinecrisis",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "21",
+    name: "Zenith",
+    description: "Transform your new tab into a serene dashboard. Blend productivity with tranquility through elegant task management, inspirational quotes, and quick web access - all in a distraction-free space.",
+    image: "https://cloud-72dqzkhg6-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https://chromewebstore.google.com/detail/zenith/glocalmkapjjbmccnmbmamaljhdljgmg?authuser=8&hl=en-GB",
+    repoUrl: "https://github.com/hridaya423/zenith",
+    techStack: ["Javascript"],
+    featured: false
+  },
+  {
+    id: "22",
+    name: "Cosmic Playground",
+    description: "An interactive 3D physics playground built with React Three Fiber and React Three Cannon, featuring dynamic objects, realistic physics, and a stunning cosmic environment.",
+    image: "https://cloud-ez1zdmamx-hack-club-bot.vercel.appa/0image.png",
+    demoUrl: "https:/cosmicplayground.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/cosmicplayground",
+    techStack: ["Three.js", "React"],
+    featured: false
+  },
+  {
+    id: "23",
+    name: "Jokester",
+    description: "A modern, performant meme platform built with Next.js 14, featuring edge caching, infinite scroll, and real-time meme generation.",
+    image: "https://cloud-dqocb3shc-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/jokester.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/jokester",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "24",
+    name: "Focusly",
+    description: "A Chrome extension for tracking and managing browsing habits with productivity insights",
+    image: "https://cloud-qdg21xgb7-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/focusly.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/focusly",
+    techStack: ["Javascript", "Next.js"],
+    featured: false
+  },
+  {
+    id: "25",
+    name: "Doodlify",
+    description: "Doodlify is a lightweight, intuitive web-based doodling application that enables users to create, save, and share digital artwork directly in their browser.",
+    image: "https://cloud-ffvu4wsuy-hack-club-bot.vercel.app/012345.png",
+    demoUrl: "https:/doodlify.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/doodlify",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "26",
+    name: "Serenade",
+    description: "Serenade is an AI-powered music discovery platform that helps users find their next favorite artist through personalized recommendations, trending analysis, and mood-based curation.",
+    image: "https://cloud-4v4j0f7m8-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/serenade.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/serenade",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "27",
+    name: "Chronicles Of Time",
+    description: "A beautifully crafted React component that displays historical events in a vintage newspaper aesthetic. ",
+    image: "https://cloud-nanxac3k4-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/chroniclesoftime.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/chroniclesoftime",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "28",
+    name: "Thought Lens",
+    description: "ThoughtLens is a modern web application that helps entrepreneurs and businesses validate their ideas through AI-powered analysis. The platform provides market trend analysis, competitive landscape evaluation, and sentiment analysis to help users make data-driven decisions.",
+    image: "https://cloud-gqwknysp2-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/thoughtlens.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/thoughtlens",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "29",
+    name: "Ambient Sound Generator",
+    description: "A beautiful and intuitive web application for creating customized ambient soundscapes. Mix and match different environmental sounds to create the perfect atmosphere for work, relaxation, or focus.",
+    image: "https://cloud-m7p1hb0oa-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/ambientsound.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/ambientsound",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "30",
+    name: "FlowFin",
+    description: "Welcome to the Cyberpunk Arcade - a neon-drenched digital playground featuring classic games with a futuristic twist!",
+    image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/moody.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/f",
+    techStack: ["Next.js"],
+    featured: false
+  },
+
+  {
+    id: "18",
+    name: "Moody",
+    description: "Welcome to the Cyberpunk Arcade - a neon-drenched digital playground featuring classic games with a futuristic twist!",
+    image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/moody.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/moody",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "18",
+    name: "Moody",
+    description: "Welcome to the Cyberpunk Arcade - a neon-drenched digital playground featuring classic games with a futuristic twist!",
+    image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/moody.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/moody",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "18",
+    name: "Moody",
+    description: "Welcome to the Cyberpunk Arcade - a neon-drenched digital playground featuring classic games with a futuristic twist!",
+    image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
+    demoUrl: "https:/moody.hridya.tech/",
+    repoUrl: "https://github.com/hridaya423/moody",
+    techStack: ["Next.js"],
+    featured: false
+  },
+  {
+    id: "18",
+    name: "Moody",
     description: "Welcome to the Cyberpunk Arcade - a neon-drenched digital playground featuring classic games with a futuristic twist!",
     image: "https://cloud-qezh34qvk-hack-club-bot.vercel.app/0image.png",
     demoUrl: "https:/moody.hridya.tech/",
