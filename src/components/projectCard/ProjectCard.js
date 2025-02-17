@@ -48,14 +48,16 @@ export default function ProjectCard({ project, isDark }) {
           <button
             className="project-button demo-button"
             onClick={() => openUrlInNewTab(demoUrl)}
+            aria-label={`View demo of ${name}`}
           >
-            Demo
+            <span>Demo</span>
           </button>
           <button
             className="project-button repo-button"
             onClick={() => openUrlInNewTab(repoUrl)}
+            aria-label={`View GitHub repository for ${name}`}
           >
-            GitHub
+            <span>GitHub</span>
           </button>
         </div>
       </div>
