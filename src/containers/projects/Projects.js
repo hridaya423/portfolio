@@ -220,7 +220,7 @@ const projectsData = [
     id: "22",
     name: "Cosmic Playground",
     description: "An interactive 3D physics playground built with React Three Fiber and React Three Cannon, featuring dynamic objects, realistic physics, and a stunning cosmic environment.",
-    image: "https://cloud-ez1zdmamx-hack-club-bot.vercel.appa/0image.png",
+    image: "https://cloud-ez1zdmamx-hack-club-bot.vercel.app/0image.png",
     demoUrl: "https:/cosmicplayground.hridya.tech/",
     repoUrl: "https://github.com/hridaya423/cosmicplayground",
     techStack: ["Three.js", "React"],
