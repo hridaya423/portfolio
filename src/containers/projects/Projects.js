@@ -100,19 +100,22 @@ const projectsData = [
 
 export default function Projects() {
   const { isDark } = useContext(StyleContext);
-  const [visibleProjects, setVisibleProjects] = useState(6);
+  const [showAll, setShowAll] = useState(false);
   
-  const handleShowMore = () => {
-    setVisibleProjects(projectsData.length);
-  };
+  // Filter out only featured projects for initial display
+  const featuredProjects = projectsData.filter(project => project.featured);
+  
+  // Show either featured projects or all projects based on showAll state
+  const displayedProjects = showAll ? projectsData : featuredProjects;
 
-  // Take only the first N projects to display
-  const displayedProjects = projectsData.slice(0, visibleProjects);
+  const handleShowMore = () => {
+    setShowAll(true);
+  };
 
   return (
     <div className="main" id="projects">
       <h1 className="project-title">My Projects</h1>
-      <div className="project-cards-div-main">
+      <div className="project-cards-grid">
         {displayedProjects.map((project) => (
           <ProjectCard
             key={project.id}
@@ -121,19 +124,22 @@ export default function Projects() {
           />
         ))}
       </div>
-      {visibleProjects < projectsData.length && (
-        <Button
-          text={"Show More"}
-          className="project-button"
+      {!showAll && featuredProjects.length < projectsData.length && (
+        <button
+          className="show-more-button"
           onClick={handleShowMore}
-        />
+        >
+          SHOW MORE
+        </button>
       )}
-      <Button
-        text={"View All Projects on GitHub"}
-        className="project-button github-button"
+      <a
         href={socialMediaLinks.github}
-        newTab={true}
-      />
+        target="_blank"
+        rel="noopener noreferrer"
+        className="view-all-button"
+      >
+        VIEW ALL PROJECTS ON GITHUB
+      </a>
     </div>
   );
 }
