@@ -1,7 +1,5 @@
 import React, { useState, useContext } from "react";
 import "./Project.scss";
-import Button from "../../components/button/Button";
-import { socialMediaLinks } from "../../portfolio";
 import StyleContext from "../../contexts/StyleContext";
 import ProjectCard from "../../components/projectCard/ProjectCard";
 
@@ -351,18 +349,39 @@ const projectsData = [
 
 export default function Projects() {
   const { isDark } = useContext(StyleContext);
-  const [showAll, setShowAll] = useState(false);
+  const [displayCount, setDisplayCount] = useState(6);
   
   const featuredProjects = projectsData.filter(project => project.featured);
-  const displayedProjects = showAll ? projectsData : featuredProjects;
+  const initialCount = featuredProjects.length;
+  const displayedProjects = projectsData.slice(0, displayCount);
+  const remainingProjects = projectsData.length - displayCount;
+
+  const getButtonText = () => {
+    if (displayCount <= initialCount) {
+      return "SHOW MORE";
+    } else if (displayCount < 12) {
+      return "REVEAL MORE PROJECTS";
+    } else if (displayCount < 18) {
+      return "STILL CURIOUS?";
+    } else if (displayCount < 24) {
+      return "NOT IMPRESSED YET?";
+    } else if (displayCount < 30) {
+      return "THERE'S MORE!";
+    } else if (remainingProjects > 0) {
+      return `${remainingProjects} MORE TO GO!`;
+    } else {
+      return "THAT'S ALL FOLKS!";
+    }
+  };
 
   const handleShowMore = () => {
-    setShowAll(true);
+    // Show 6 more projects each time
+    setDisplayCount(prevCount => Math.min(prevCount + 6, projectsData.length));
   };
 
   return (
-    <div className="main" id="projects">
-      <h1 className="project-title">My Projects</h1>
+    <div className={`main ${isDark ? 'dark-mode' : ''}`} id="projects">
+      <h1 className="project-title">Projects</h1>
       <div className="project-cards-grid">
         {displayedProjects.map((project) => (
           <ProjectCard
@@ -372,13 +391,16 @@ export default function Projects() {
           />
         ))}
       </div>
-      {!showAll && featuredProjects.length < projectsData.length && (
+      {displayCount < projectsData.length && (
         <button
           className="show-more-button"
           onClick={handleShowMore}
         >
-          SHOW MORE
+          {getButtonText()}
         </button>
+      )}
+      {displayCount === projectsData.length && remainingProjects === 0 && (
+        <p className="all-shown-message">You've seen all {projectsData.length} projects!</p>
       )}
     </div>
   );

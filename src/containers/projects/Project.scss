@@ -1,5 +1,9 @@
 @import "../../_globalColor";
 
+.main {
+  padding: 50px 0;
+}
+
 .project-title {
   font-size: 52px;
   font-weight: 400;
@@ -7,12 +11,13 @@
   text-align: center;
   margin-bottom: 50px;
   color: $textColor;
+  transition: color 0.3s ease;
 }
 
 .project-cards-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
+  gap: 30px;
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 20px;
@@ -21,17 +26,18 @@
 .show-more-button, .view-all-button {
   display: block;
   width: 280px;
-  margin: 40px auto 0;
-  padding: 14px 0;
+  margin: 50px auto 0;
+  padding: 16px 0;
   font-size: 16px;
   font-weight: 600;
   text-align: center;
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 12px;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   transition: all 0.3s ease;
   text-decoration: none;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .show-more-button {
@@ -41,12 +47,18 @@
   
   &:hover {
     background-color: darken($buttonColor, 10%);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
   }
-
+  
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  }
+  
   &:focus {
     outline: none;
+    box-shadow: 0 0 0 3px rgba($buttonColor, 0.3), 0 4px 6px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -58,9 +70,24 @@
   
   &:hover {
     background-color: rgba($buttonColor, 0.1);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
   }
+}
+
+.all-shown-message {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 18px;
+  color: $textColor;
+  font-style: italic;
+  opacity: 0.8;
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 0.8; transform: translateY(0); }
 }
 
 /* Dark mode */
@@ -74,8 +101,12 @@
     border: 2px solid lighten($buttonColor, 10%);
     
     &:hover {
-      background-color: rgba(lighten($buttonColor, 10%), 0.1);
+      background-color: rgba(lighten($buttonColor, 10%), 0.15);
     }
+  }
+  
+  .all-shown-message {
+    color: $textColorDark;
   }
 }
 
@@ -84,12 +115,14 @@
   .project-cards-grid {
     grid-template-columns: repeat(3, 1fr);
     padding: 0 30px;
+    gap: 25px;
   }
 }
 
 @media (max-width: 992px) {
   .project-cards-grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
   
   .project-title {
@@ -105,24 +138,43 @@
   
   .show-more-button, .view-all-button {
     width: 240px;
-    padding: 12px 0;
-    font-size: 14px;
-    margin-top: 30px;
+    padding: 14px 0;
+    font-size: 15px;
+    margin-top: 35px;
+    border-radius: 10px;
   }
   
   .view-all-button {
-    margin-top: 15px;
+    margin-top: 18px;
+  }
+  
+  .all-shown-message {
+    font-size: 16px;
+    margin-top: 25px;
   }
 }
 
 @media (max-width: 576px) {
   .project-cards-grid {
     grid-template-columns: 1fr;
-    max-width: 300px;
+    max-width: 320px;
+    gap: 18px;
   }
   
   .project-title {
     font-size: 28px;
     margin-bottom: 25px;
+  }
+  
+  .show-more-button, .view-all-button {
+    width: 220px;
+    padding: 12px 0;
+    font-size: 14px;
+    border-radius: 8px;
+  }
+  
+  .all-shown-message {
+    font-size: 15px;
+    margin-top: 20px;
   }
 }
