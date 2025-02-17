@@ -77,13 +77,13 @@ const projectsData = [
     featured: false
   },
   {
-    id: "project8",
-    name: "Test",
-    description: "Test",
-    image: "/images/projects/Test.png",
+    id: "8",
+    name: "QR Code Generator",
+    description: "A modern, user-friendly QR Code Generator",
+    image: "https://cloud-850cgly3n-hack-club-bot.vercel.app/0image.png",
     demoUrl: "https://demo.example.com",
-    repoUrl: "https://github.com/test/Test",
-    techStack: ["React", "Node.js", "MongoDB", "Express", "Redux"],
+    repoUrl: "https://github.com/hridaya423/qrcodegenerator",
+    techStack: ["Next.js"],
     featured: false
   },
   {
