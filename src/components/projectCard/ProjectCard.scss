@@ -1,0 +1,169 @@
+@import "../../_globalColor";
+
+.project-card-div {
+  color: $textColor;
+  background-color: $lightBackground2;
+  box-shadow: $lightBoxShadowDark 0px 10px 30px -15px;
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  height: 100%;
+  
+  &:hover {
+    box-shadow: $lightBoxShadowDark 0px 20px 30px -10px;
+    transform: translateY(-5px);
+  }
+}
+
+.project-image-div {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.project-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+.project-detail-div {
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.project-name {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: $textColor;
+}
+
+.project-description {
+  flex: 1;
+  font-size: 16px;
+  color: $textColor;
+  margin-bottom: 15px;
+  line-height: 1.5;
+  
+  /* For truncating text after 3 lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.project-tech-stack {
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.tech-tag {
+  background-color: $buttonColor;
+  color: $textColorDark;
+  font-size: 12px;
+  padding: 5px 10px;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  border-radius: 15px;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background-color: darken($buttonColor, 10%);
+    transform: translateY(-2px);
+  }
+}
+
+.project-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: auto;
+}
+
+.project-button {
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+  margin: 0 5px;
+  border: none;
+  
+  &:first-child {
+    margin-left: 0;
+  }
+  
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.demo-button {
+  background-color: $buttonColor;
+  color: $textColorDark;
+  
+  &:hover {
+    background-color: darken($buttonColor, 10%);
+  }
+}
+
+.repo-button {
+  background-color: transparent;
+  color: $textColor;
+  border: 1px solid $buttonColor;
+  
+  &:hover {
+    background-color: rgba($buttonColor, 0.1);
+  }
+}
+
+/* For dark mode */
+.dark-card-mode {
+  background-color: $darkBackground;
+  
+  .project-name, .project-description {
+    color: $textColorDark;
+  }
+  
+  .repo-button {
+    color: $textColorDark;
+    border: 1px solid lighten($buttonColor, 10%);
+    
+    &:hover {
+      background-color: rgba(lighten($buttonColor, 10%), 0.1);
+    }
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .project-name {
+    font-size: 20px;
+  }
+  
+  .project-description {
+    font-size: 14px;
+  }
+  
+  .tech-tag {
+    font-size: 11px;
+    padding: 4px 8px;
+  }
+  
+  .project-button {
+    font-size: 13px;
+    padding: 6px 12px;
+  }
+}
