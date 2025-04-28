@@ -219,12 +219,12 @@ export const DATA = {
       image: "https://github.com/hackclub/juice/raw/main/site/public/juicebigimage.png",
       links: [
         {
-          icon: Icons.github(),
+          icon: Icons.github({}),
           type: "repo",
           href: "https://github.com/hridaya423/undeadcourier",
         },
         {
-          icon: Icons.globe(),
+          icon: Icons.globe({}),
           type: "website",
           href: "https://undeadcourier.hridya.tech/",
         },
