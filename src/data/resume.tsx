@@ -230,6 +230,25 @@ export const DATA = {
         },
       ],
     },
+    {
+      title: "Shiba",
+      description: "Built a game in 120 hours, and went to Tokyo to build a arcade machine and presented to locals!",
+      location: "Hybrid",
+      dates: "Nov 2025",
+      image: "https://shiba.hackclub.com/SpeedyShibaShipper.png",
+      links: [
+        {
+          icon: Icons.github({}),
+          type: "repo",
+          href: "https://github.com/hridaya423/whisper",
+        },
+        {
+          icon: Icons.globe({}),
+          type: "website",
+          href: "https://tc8ckgo4kskk48s0o8cwc0g8.a.selfhosted.hackclub.com/play/019a41d9-ce39-79e2-868f-2ff8eecafea3/",
+        },
+      ],
+    },
   ],
   achievements: [
     {
