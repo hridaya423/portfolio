@@ -42,8 +42,8 @@ importers:
         specifier: ^0.395.0
         version: 0.395.0(react@18.3.1)
       motion:
-        specifier: ^12.7.4
-        version: 12.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^12.23.25
+        version: 12.23.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       next:
         specifier: 14.2.32
         version: 14.2.32(@babel/core@7.28.5)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -2027,8 +2027,8 @@ packages:
   motion-utils@12.23.6:
     resolution: {integrity: sha512-eAWoPgr4eFEOFfg2WjIsMoqJTW6Z8MTUCgn/GZ3VRpClWBdnbjryiA3ZSNLyxCTmCQx4RmYX6jX1iWHbenUPNQ==}
 
-  motion@12.7.4:
-    resolution: {integrity: sha512-MBGrMbYageHw4iZJn+pGTr7abq5n53jCxYkhFC1It3vYukQPRWg5zij46MnwYGpLR8KG465MLHSASXot9edYOw==}
+  motion@12.23.25:
+    resolution: {integrity: sha512-Fk5Y1kcgxYiTYOUjmwfXQAP7tP+iGqw/on1UID9WEL/6KpzxPr9jY2169OsjgZvXJdpraKXy0orkjaCVIl5fgQ==}
     peerDependencies:
       '@emotion/is-prop-valid': '*'
       react: ^18.0.0 || ^19.0.0
@@ -5069,7 +5069,7 @@ snapshots:
 
   motion-utils@12.23.6: {}
 
-  motion@12.7.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  motion@12.23.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       framer-motion: 12.23.25(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       tslib: 2.8.1
