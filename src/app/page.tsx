@@ -9,13 +9,13 @@ import { Badge } from "@/components/ui/badge";
 import { DATA } from "@/data/resume";
 import Link from "next/link";
 import Markdown from "react-markdown";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { AchievementCard } from "@/components/achievement-card";
 const BLUR_FADE_DELAY = 0.04;
 
 export default function Page() {
-  const theme = useTheme();
+  const { setTheme } = useTheme();
   const [displayCount, setDisplayCount] = useState(4);
   const totalProjects = DATA.projects.length;
   const displayedProjects = DATA.projects.slice(0, displayCount);
@@ -23,7 +23,10 @@ export default function Page() {
 
   const hasWork = DATA.work && DATA.work.length > 0;
   const hasEducation = DATA.education && DATA.education.length > 0;
-  theme.setTheme("dark")
+  
+  useEffect(() => {
+    setTheme("dark");
+  }, [setTheme]);
   const handleShowMore = () => {
     setDisplayCount((prev) => Math.min(prev + 4, totalProjects));
   };
