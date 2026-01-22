@@ -29,7 +29,7 @@ export const ResumeCard = ({
   period,
   description,
 }: ResumeCardProps) => {
-  const [isExpanded, setIsExpanded] = React.useState(false);
+  const [isExpanded, setIsExpanded] = React.useState(true);
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
     if (description) {
@@ -61,7 +61,7 @@ export const ResumeCard = ({
               <h3 className="inline-flex items-center justify-center font-semibold leading-none text-xs sm:text-sm">
                 {title}
                 {badges && (
-                  <span className="inline-flex gap-x-1">
+                  <span className="inline-flex gap-x-1 ml-2">
                     {badges.map((badge, index) => (
                       <Badge
                         variant="secondary"
