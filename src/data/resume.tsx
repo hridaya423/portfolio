@@ -69,7 +69,17 @@ export const DATA = {
     },
   },
   work: [
-    
+    {
+      company: "Hack Club",
+      href: "https://hackclub.com",
+      badges: ["Volunteer"],
+      location: "Remote",
+      title: "Volunteer",
+      logoUrl: "https://assets.hackclub.com/icon-rounded.png",
+      start: "Aug 2025",
+      end: null,
+      description: "Performing fraud checks and order reviews. Checking for inflated and fraudulent time, low quality projects. Managing bans, appeals, and ensuring community integrity.",
+    },
   ],
   education: [
   ],
