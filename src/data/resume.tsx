@@ -32,6 +32,7 @@ export const DATA = {
     "Kubernetes",
     "Java",
     "C++",
+    "n8n"
   ],
   navbar: [
     { href: "/", icon: HomeIcon, label: "Home" },
@@ -68,22 +69,22 @@ export const DATA = {
     },
   },
   work: [
-    // No work experiences enabled in portfolio.js, so leaving this empty or add if you want to show
+    
   ],
   education: [
   ],
   projects: [
     {
       title: "Vexture",
-      description: "A SaaS platform currently in development.",
-      image: "https://vexture.app/og-image.png",
+      description: "Turn sketches into masterpieces. Draw rough ideas, describe your vision, and watch AI build production-ready artwork in seconds.",
+      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/Screenshot%202026-01-22%20at%2021.55.29.png",
       href: "https://vexture.app",
-      technologies: ["SaaS"],
+      technologies: ["SaaS", "Next.js"],
     },
     {
       title: "Neurobits",
       description: "A Flutter-based brain training app with AI-generated learning challenges, personalized learning paths, and daily challenges. Duolingo for everything - learn any topic, any time.",
-      image: "https://raw.githubusercontent.com/hridaya423/neurobits/main/assets/neurobitslogo.png",
+      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/Screenshot%202026-01-22%20at%2021.55.48.png",
       href: "https://neurobits.hridya.tech",
       repo: "https://github.com/hridaya423/neurobits",
       technologies: ["Flutter", "AI", "Supabase"],
@@ -91,7 +92,7 @@ export const DATA = {
     {
       title: "Maroon",
       description: "A pirate-themed esoteric programming language that makes coding as adventurous as sailing the high seas! Features unique syntax inspired by pirate parlance.",
-      image: "https://cloud-r5gvnkecb-hack-club-bot.vercel.app/0maroon_logo-removebg-preview.png",
+      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/Screenshot%202026-01-22%20at%2021.56.03.png",
       href: "https://maroon.hridya.tech",
       repo: "https://github.com/hridaya423/maroon",
       technologies: ["Python", "Next.js"],
@@ -99,7 +100,7 @@ export const DATA = {
     {
       title: "Undead Courier",
       description: "A zombie apocalypse game where you navigate through a post-apocalyptic world as a courier.",
-      image: "https://github.com/hackclub/juice/raw/main/site/public/juicebigimage.png",
+      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/Screenshot%202026-01-22%20at%2021.56.18.png",
       href: "https://undeadcourier.hridya.tech",
       repo: "https://github.com/hridaya423/undeadcourier",
       technologies: ["Unity", "C#"],
