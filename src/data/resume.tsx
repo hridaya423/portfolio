@@ -195,9 +195,9 @@ export const DATA = {
     },
     {
       title: "Pega Certified System Architect",
-      subtitle: "Achieved Pega CSA certification at age 11",
+      subtitle: "Achieved Pega CSA certification at age 11 (verify with email: hridayahoney@gmail.com)",
       image: "/pega.png",
-      link: "https://www.linkedin.com/feed/update/urn:li:activity:6998310978840862720/",
+      link: "https://academy.pega.com/verify-certification",
     },
     {
       title: "Oracle Gen AI",
