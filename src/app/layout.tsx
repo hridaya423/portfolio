@@ -22,9 +22,9 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
-      { url: "/me.png", type: "image/png" }
+      { url: "https://github.com/user-attachments/assets/66a8838b-026b-4f6b-8e29-cc4769638eb5", type: "image/png" }
     ],
-    apple: { url: "/me.png", type: "image/png" },
+    apple: { url: "https://github.com/user-attachments/assets/66a8838b-026b-4f6b-8e29-cc4769638eb5", type: "image/png" },
   },
   openGraph: {
     title: `${DATA.name}`,
@@ -63,7 +63,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/me.png" />
+        <link rel="icon" href="https://github.com/user-attachments/assets/66a8838b-026b-4f6b-8e29-cc4769638eb5" />
       </head>
       <body
         className={cn(

@@ -85,11 +85,11 @@ export const DATA = {
   ],
   projects: [
     {
-      title: "Vexture",
-      description: "Turn sketches into masterpieces. Draw rough ideas, describe your vision, and watch AI build production-ready artwork in seconds.",
-      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/Screenshot%202026-01-22%20at%2021.55.29.png",
-      href: "https://vexture.app",
-      technologies: ["SaaS", "Next.js"],
+      title: "Lexis",
+      description: "Talk To Your Terminal. Describe what you need in plain language. Lexis translates the request into platform-aware shell commands with risk checks before execution.",
+      image: "https://github.com/user-attachments/assets/66a8838b-026b-4f6b-8e29-cc4769638eb5",
+      href: "https://lexis.hridya.tech",
+      technologies: ["CLI", "Shell"],
     },
     {
       title: "Neurobits",
