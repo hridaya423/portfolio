@@ -8,7 +8,7 @@ export const DATA = {
   location: "London, UK",
   locationLink: "https://www.google.com/maps/place/London,+UK",
   description:
-    "A skilled Full Stack Developer proficient in JavaScript, React.js, Python, and Flutter. Passionate about creating innovative web and mobile applications that deliver exceptional user experiences through cutting-edge technologies.",
+    "I spend most of my free time building stuff because they were a problem. ",
   summary:
     "",
   avatarUrl: "/me.png",
@@ -87,7 +87,7 @@ export const DATA = {
     {
       title: "Lexis",
       description: "Talk To Your Terminal. Describe what you need in plain language. Lexis translates the request into platform-aware shell commands with risk checks before execution.",
-      image: "https://github.com/user-attachments/assets/66a8838b-026b-4f6b-8e29-cc4769638eb5",
+      image: "https://raw.githubusercontent.com/hridaya423/portfolio/refs/heads/main/public/580477673-66a8838b-026b-4f6b-8e29-cc4769638eb5.png",
       href: "https://lexis.hridya.tech",
       technologies: ["CLI", "Shell"],
     },
