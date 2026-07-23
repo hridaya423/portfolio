@@ -8,7 +8,7 @@ export const DATA = {
   location: "London, UK",
   locationLink: "https://www.google.com/maps/place/London,+UK",
   description:
-    "I spend most of my free time building stuff because they were a problem. ",
+    "I spend most of my free time building things that solve problems I've run into.",
   summary:
     "",
   avatarUrl: "/me.png",
