@@ -87,6 +87,9 @@ export function Experience({
 }
 
 export function About() {
+  const GitHubIcon = DATA.contact.social.GitHub.icon;
+  const EmailIcon = DATA.contact.social.email.icon;
+
   return (
     <section
       id="about"
@@ -115,8 +118,12 @@ export function About() {
         </div>
         <nav aria-label="About links" className="about-links">
           <a href="#projects">Back to the work</a>
-          <a href={DATA.contact.social.GitHub.url}>GitHub</a>
-          <a href={DATA.contact.social.email.url}>Email</a>
+          <a className="social-icon-link" href={DATA.contact.social.GitHub.url} aria-label="GitHub" title="GitHub">
+            <GitHubIcon aria-hidden="true" width={19} height={19} />
+          </a>
+          <a className="social-icon-link" href={DATA.contact.social.email.url} aria-label="Email" title="Email">
+            <EmailIcon aria-hidden="true" width={20} height={20} />
+          </a>
         </nav>
       </div>
     </section>
@@ -124,12 +131,19 @@ export function About() {
 }
 
 export function Footer() {
+  const LinkedInIcon = DATA.contact.social.LinkedIn.icon;
+  const XIcon = DATA.contact.social.X.icon;
+
   return (
     <footer className="portfolio-footer section-width">
       <a href="#hero">Hridya Agrawal</a>
       <nav aria-label="Social links">
-        <a href={DATA.contact.social.LinkedIn.url}>LinkedIn</a>
-        <a href={DATA.contact.social.X.url}>X</a>
+        <a className="social-icon-link" href={DATA.contact.social.LinkedIn.url} aria-label="LinkedIn" title="LinkedIn">
+          <LinkedInIcon aria-hidden="true" width={18} height={18} />
+        </a>
+        <a className="social-icon-link" href={DATA.contact.social.X.url} aria-label="X" title="X">
+          <XIcon aria-hidden="true" width={18} height={18} />
+        </a>
         <Link href="/blog">Blog</Link>
       </nav>
     </footer>

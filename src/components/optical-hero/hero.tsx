@@ -5,6 +5,8 @@ import { Tray } from "./tray";
 import "./hero.css";
 
 export function OpticalHero() {
+  const EmailIcon = DATA.contact.social.email.icon;
+
   return (
     <section
       id="hero"
@@ -42,7 +44,14 @@ export function OpticalHero() {
           <a className="desktop-link" href="#about">
             About
           </a>
-          <a href={DATA.contact.social.email.url}>Email</a>
+          <a
+            className="social-icon-link"
+            href={DATA.contact.social.email.url}
+            aria-label="Email"
+            title="Email"
+          >
+            <EmailIcon aria-hidden="true" width={20} height={20} />
+          </a>
         </nav>
       </header>
       <div className="hero-copy">

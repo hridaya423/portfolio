@@ -280,6 +280,19 @@
   display: flex;
   align-items: center;
 }
+.social-icon-link {
+  justify-content: center;
+  width: 44px;
+  text-decoration: none !important;
+}
+.social-icon-link svg {
+  display: block;
+  transition: transform 180ms ease, opacity 180ms ease;
+}
+.social-icon-link:hover svg {
+  transform: translateY(-2px);
+  opacity: 0.68;
+}
 .review-page {
   min-height: 1024px;
 }
