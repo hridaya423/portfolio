@@ -19,7 +19,7 @@ def paper_material():
     shader.inputs['Roughness'].default_value = 0.86
     coord = nodes.new('ShaderNodeTexCoord')
     grain = nodes.new('ShaderNodeTexNoise')
-    grain.inputs['Scale'].default_value = 750 if mode == 'tabs' else 280
+    grain.inputs['Scale'].default_value = 1100 if mode == 'tabs' else 280
     grain.inputs['Detail'].default_value = 3
     links.new(coord.outputs['Object'], grain.inputs['Vector'])
     bump = nodes.new('ShaderNodeBump')
@@ -29,9 +29,9 @@ def paper_material():
     links.new(bump.outputs['Normal'], shader.inputs['Normal'])
     tone = nodes.new('ShaderNodeValToRGB')
     tone.color_ramp.elements[0].position = 0.2
-    tone.color_ramp.elements[0].color = (0.79, 0.78, 0.75, 1) if mode == 'tabs' else (0.64, 0.63, 0.59, 1)
+    tone.color_ramp.elements[0].color = (0.57, 0.54, 0.47, 1) if mode == 'tabs' else (0.64, 0.63, 0.59, 1)
     tone.color_ramp.elements[1].position = 0.8
-    tone.color_ramp.elements[1].color = (0.93, 0.92, 0.89, 1) if mode == 'tabs' else (0.98, 0.97, 0.94, 1)
+    tone.color_ramp.elements[1].color = (0.95, 0.93, 0.86, 1) if mode == 'tabs' else (0.98, 0.97, 0.94, 1)
     links.new(grain.outputs['Fac'], tone.inputs[0])
     links.new(tone.outputs['Color'], shader.inputs['Base Color'])
     return mat
