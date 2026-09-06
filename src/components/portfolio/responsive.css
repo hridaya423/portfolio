@@ -1,0 +1,221 @@
+@media (width < 1200px) {
+  .project-grid {
+    margin-inline: 0;
+    column-gap: 40px;
+  }
+  .projects-heading { margin-left: 0; margin-bottom: 56px; }
+  .project-question {
+    position: relative;
+    top: auto;
+    width: auto !important;
+    left: auto !important;
+    right: auto !important;
+    display: block;
+    margin-bottom: 18px;
+    min-height: 62px;
+  }
+  .project-question p {
+    max-width: none;
+    font-size: 23px;
+  }
+  .project-question svg {
+    display: none;
+  }
+  .certifications-section h2 {
+    font-size: 48px;
+  }
+  .credential-name {
+    display: none;
+  }
+  .credential-index {
+    gap: 0 20px;
+  }
+}
+@media (width < 768px) {
+  .section-width {
+    margin-inline: 0;
+  }
+  .projects-section {
+    padding: 55px 20px;
+  }
+  .project-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+  .project-question {
+    min-height: 0;
+    margin-bottom: 16px;
+  }
+  .project-question p {
+    font-size: 22px;
+    margin: 0;
+    max-width: 290px;
+  }
+  .project-entry h3 {
+    font-size: 38px;
+    margin-top: 18px;
+  }
+  .project-preview {
+    aspect-ratio: 1.03;
+  }
+  .certifications-section {
+    padding: 55px 20px;
+  }
+  .certifications-section > header {
+    display: block;
+    margin-bottom: 16px;
+  }
+  .certifications-section h2 {
+    font-size: 39px;
+    letter-spacing: -1.5px;
+  }
+  .issuer-filters {
+    gap: 14px;
+    margin-top: 20px;
+    font-size: 13px;
+  }
+  .credential-issuer {
+    font-size: 18px;
+    margin-bottom: 22px;
+  }
+  .credential-index {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    grid-auto-flow: row;
+    padding: 8px 16px;
+  }
+  .credential-index-entry:nth-child(3n) {
+    border-bottom: 1px solid #d2d2d2;
+  }
+  .credential-index-entry:last-child {
+    border-bottom: 0;
+  }
+  .credential-name {
+    display: block;
+  }
+  .credential-index-entry {
+    gap: 10px;
+  }
+  .credential-index-entry button {
+    min-width: 75px;
+  }
+  .desktop-break {
+    display: none;
+  }
+  .portfolio-footer {
+    padding: 20px;
+    font-size: 12px;
+    gap: 12px;
+  }
+  .portfolio-footer nav {
+    gap: 14px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-home * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+.credential-index-entry {
+  min-width: 0;
+}
+.credential-index-entry > a {
+  min-width: 44px;
+}
+@media (width >= 1200px) {
+  .certifications-section h2 {
+    font-size: 72px;
+  }
+  .issuer-filters {
+    transform: translateY(40px);
+  }
+}
+@media (width < 768px) {
+  .credential-index {
+    grid-template-rows: none;
+    grid-auto-flow: row;
+  }
+}
+@media (width >= 1200px) {
+  .certifications-section h2 {
+    transform: translateX(18px);
+  }
+}
+@media (width < 1200px) {
+  .project-question { transform: none; }
+  .credential-deck { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px; }
+  .about-section { grid-template-columns: 200px minmax(0,1fr); gap: 24px; }
+  .about-copy { padding: 0; }
+  .about-statement { font-size: 36px; }
+  .about-description { font-size: 19px; }
+  .about-links { margin-top: 32px; flex-wrap: wrap; gap: 0 24px; }
+}
+@media (width < 768px) {
+  .project-question { top: auto; }
+  .project-grid { row-gap: 72px; }
+  .credential-deck { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; margin-top: 24px; }
+  .credential-card { padding: 24px 16px 18px; min-height: 235px; }
+  .credential-card h3 { font-size: 21px; }
+  .credential-issuer { margin-bottom: 22px; font-size: 15px; }
+  .issuer-mark { max-width: 90px; height: 20px; }
+  .credential-card-bottom { flex-wrap: wrap; gap: 0 8px; font-size: 11px; }
+  .about-section { display: block; padding: 60px 20px 40px; }
+  .about-identity { margin-bottom: 32px; }
+  .about-identity h2 { font-size: 34px; margin-bottom: 12px; }
+  .about-identity p { font-size: 17px; }
+  .about-note { min-height: 0; }
+  .about-copy { padding: 0; }
+  .about-statement { font-size: 32px; letter-spacing: -1px; }
+  .about-description { font-size: 18px; }
+  .about-links { margin-top: 32px; flex-wrap: wrap; gap: 0 24px; }
+  .about-links a:first-child { width: 100%; margin: 0; }
+}
+@media (width < 360px) {
+  .credential-deck { grid-template-columns: 1fr; }
+  .credential-card { min-height: 225px; padding: 30px; }
+}
+
+@media (width < 768px) {
+  .projects-heading { margin-bottom: 48px; }
+  .credential-title { min-width: 0; }
+  .credential-index-entry { flex-wrap: wrap; gap: 8px; }
+  .credential-index-entry .credential-name { flex-basis: 40%; }
+}
+
+@media (width < 1000px) {
+  .experience-section, .events-section { padding: 64px 32px; }
+  .experience-section { padding: 0; }
+  .experience-paper { padding: 40px 30px 46px 52px; }
+  .experience-company { font-size: 30px; }
+
+  .trip summary { grid-template-columns: minmax(0,1.4fr) minmax(0,1fr) 20px; gap: 24px; }
+}
+@media (width < 768px) {
+  .experience-section, .events-section { padding: 56px 20px; }
+  .experience-section > h2, .events-section > h2 { font-size: 32px; margin-bottom: 28px; }
+  .experience-section { display: block; padding: 40px 24px; }
+  .experience-heading { padding: 0; margin-bottom: 32px; border-right: 0; }
+  .experience-stack { padding: 0; gap: 28px; }
+  .experience-heading h2 { font-size: 32px; }
+  .experience-paper { min-height: 340px; padding: 36px 24px 44px 42px; }
+  .experience-paper:nth-child(even) { transform: none; min-height: 290px; padding: 36px 24px 44px 42px; }
+  .review-page > .experience-section { padding-top: 40px; }
+  .experience-stock { inset: -6% -2.8% -6%; }
+  .experience-card-heading { gap: 14px; }
+  .experience-summary { font-size: 16px; margin-top: 24px; max-width: none; }
+  .experience-role { font-size: 15px; margin-top: 18px; }
+  .experience-company { font-size: 30px; }
+
+  .events-section { padding: 72px 20px 80px; }
+  .events-section > h2 { font-size: 34px; margin-bottom: 24px; }
+  .trip summary { grid-template-columns: minmax(0,1fr) 20px; gap: 18px 12px; padding: 24px 20px; }
+  .trip-city { grid-column: 1 / -1; }
+  .trip-board { gap: 7px; }
+  .trip-word { gap: 2px; }
+  .trip-letter { --tile-height: 44px; width: 27px; font-size: 30px; }
+  .trip-event { gap: 4px; }
+  .trip-event strong { font-size: 22px; }
+  .trip-detail { display: block; padding: 0 20px 24px; }
+}
