@@ -3,6 +3,8 @@ import Link from "next/link";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { DATA } from "@/data/resume";
 import { experience, projects } from "@/data/portfolio";
+import { questionFont } from "./font";
+import { ExperienceLightField } from "./experience-light-field";
 
 export function Projects() {
   return (
@@ -19,10 +21,10 @@ export function Projects() {
           >
             <div className="project-visual">
             <div className="project-question">
-              <p>{project.question}</p>
+              <p className={questionFont.className}>{project.question}</p>
               <svg viewBox="0 0 80 100" aria-hidden="true">
-                <path d="M0 50H14Q26 50 26 38V24Q26 12 38 12H78" />
-                <path d="M72 7L78 12L72 17" />
+                <path d="M5 67C25 75 49 64 43 47C39 35 25 39 31 50C39 63 61 39 73 25" />
+                <path d="M61 28Q67 26 73 25Q72 32 73 37" />
               </svg>
             </div>
             <a
@@ -62,23 +64,18 @@ export function Experience({
       className="experience-section section-width"
       aria-labelledby="experience-heading"
     >
+      <ExperienceLightField count={roles.length} />
       <header className="experience-heading">
         <h2 id="experience-heading">Experience</h2>
-        <Image src="/along-the-way.svg" alt="Along the way" width={150} height={23} />
       </header>
       <div className="experience-stack">
-        {roles.map((role) => (
-          <article className="experience-paper" key={`${role.company}-${role.start}`}>
-            <picture className="experience-stock">
-              <source media="(width < 768px)" srcSet="/materials/experience-mobile.webp" />
-              <img src="/materials/experience-desktop.webp" alt="" width="1600" height="680" loading="lazy" />
-            </picture>
-            <header className="experience-card-heading">
-              <h3 className="experience-company"><a href={role.href}>{role.company}</a></h3>
-              <span className="experience-date">{role.start}–{role.end ?? "Present"}</span>
-            </header>
+        {roles.map((role, index) => (
+          <article className="experience-entry" key={`${role.company}-${role.start}`}>
+            <span className="experience-index" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+            <h3 className="experience-company"><a href={role.href}>{role.company}</a></h3>
             <p className="experience-role">{role.title}</p>
-            <p className="experience-summary">{role.summary.split(/(mortgage calculator)/).map((part, index) => part === "mortgage calculator" ? <mark key={index}>{part}</mark> : part)}</p>
+            <span className="experience-date">{role.start}–{role.end ?? "Present"}</span>
+            <p className="experience-summary">{role.summary}</p>
           </article>
         ))}
       </div>

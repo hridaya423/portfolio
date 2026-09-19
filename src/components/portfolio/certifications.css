@@ -1,0 +1,76 @@
+.certifications-section { max-width: 1280px; margin-inline: auto; padding: 80px 40px; overflow: clip; color: #30312d; }
+.certifications-heading { margin-bottom: 40px; }
+.certifications-heading h2 { margin: 0; font-size: clamp(34px, 3.5vw, 48px); line-height: 1.15; font-weight: 400; letter-spacing: -.045em; }
+.certifications-note { margin: 8px 0 0 4px; font-size: 27px; color: #726e66; width: fit-content; position: relative; transform: rotate(-3deg); }
+.credential-book { display: grid; position: relative; isolation: isolate; }
+.notebook-page { position: relative; isolation: isolate; min-width: 0; padding: 44px; }
+.other-credentials { display: grid; gap: 26px; }
+.credential-issuer { display: flex; align-items: center; gap: 8px; height: 28px; font-size: 22px; font-weight: 600; mix-blend-mode: multiply; }
+.credential-issuer img { width: auto; max-width: 145px; height: 27px; object-fit: contain; object-position: left; }
+.credential-issuer svg { width: 26px; height: 26px; }
+.microsoft-page > .credential-issuer { margin-bottom: 34px; }
+.microsoft-credentials { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 32px; }
+.credential-card { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: start; }
+.credential-card h3 { margin: 0; font-size: 23px; line-height: 1.25; font-weight: 400; letter-spacing: -.035em; }
+.credential-name { margin: 7px 0 10px; font-size: 14px; line-height: 1.5; color: #62635b; }
+.credential-footer { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; }
+.stamp-earned { font-size: 19px; line-height: 1.2; color: #757365; transform: rotate(-3deg); }
+.stamp-verify { display: inline-flex; align-items: center; gap: 5px; min-width: 44px; min-height: 44px; font-size: 11px; color: #666154; text-decoration: underline; text-decoration-color: #be7860; text-underline-offset: 5px; text-decoration-thickness: 1px; }
+.stamp-verify svg { width: 12px; height: 12px; }
+.stamp-verify:focus-visible, .verification-help summary:focus-visible { outline: 2px solid #a84b35; outline-offset: 4px; }
+.other-credentials .credential-card + .credential-card { border-top: 1px solid #77705b24; padding-top: 26px; }
+.other-credentials .credential-issuer { margin-bottom: 16px; }
+.other-credentials .credential-footer { margin-top: 12px; }
+.verification-help { margin-top: 26px; font-size: 13px; color: #5c5d57; }
+.verification-help summary { min-height: 44px; align-content: center; cursor: pointer; width: fit-content; }
+.verification-help p { margin: 0; overflow-wrap: anywhere; }
+@media (hover: hover) { .stamp-verify:hover { color: #a44733; text-decoration-color: currentColor; } }
+@media (width < 1000px) {
+  .certifications-section { padding: 64px 28px; }
+  .notebook-page { padding: 30px; }
+  .microsoft-credentials { column-gap: 22px; }
+  .credential-footer { align-items: start; flex-direction: column; gap: 0; }
+}
+@media (width < 760px) {
+  .certifications-section { padding: 56px 20px; }
+  .certifications-heading { margin-bottom: 28px; }
+  .credential-book { grid-template-columns: 1fr; gap: 18px; box-shadow: none; }
+  .credential-footer { flex-direction: row; align-items: center; }
+}
+@media (width < 480px) {
+  .notebook-page { padding: 28px 24px; }
+  .microsoft-credentials { grid-template-columns: 1fr; gap: 20px; }
+  .microsoft-credentials .credential-card + .credential-card { padding-top: 20px; border-top: 1px solid #77705b24; }
+  .credential-card h3 { font-size: 22px; }
+  .microsoft-credentials .credential-card + .credential-card .credential-badge { top: 16px; }
+}
+
+.certifications-note::after { content: ""; position: absolute; right: 1px; bottom: -4px; width: 62%; height: 2px; border-radius: 50%; background: #bb7960; transform: rotate(-2deg); opacity: .65; }
+.credential-badge { position: absolute; top: -8px; right: -3px; width: 47px; height: 51px; object-fit: cover; mix-blend-mode: multiply; opacity: .83; }
+.microsoft-credentials .credential-card h3 { padding-right: 52px; }
+.microsoft-credentials .credential-name { padding-top: 7px; }
+.stamp-verify svg { transition: transform 180ms cubic-bezier(.23,1,.32,1); }
+.stamp-verify:active { color: #8c4934; }
+@media (hover: hover) and (pointer: fine) {
+  .stamp-verify:hover svg { transform: translateX(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stamp-verify svg { transition: none; }
+  .stamp-verify:hover svg { transform: none; }
+}
+
+.notebook-page h3, .notebook-page .credential-name, .notebook-page .stamp-earned, .credential-issuer, .credential-badge { mask-image: url('/materials/certifications/ink-grain.svg'); mask-mode: luminance; mask-size: 160px 160px; }
+.credential-card:nth-child(2n) .stamp-earned { transform: rotate(-1.2deg) translateY(1px); color: #716e60; }
+.credential-card:nth-child(3n) .stamp-earned { transform: rotate(-2.1deg); color: #7b7567; }
+
+
+.book-render, .page-render { display: none; }
+@media (width >= 1200px) {
+  .credential-book { grid-template-columns: 1fr 1fr; box-shadow: none; min-height: 600px; }
+  .book-render { display: block; position: absolute; z-index: -1; left: -6.667%; top: -15.167%; width: 113.334%; height: 130.334%; max-width: none; pointer-events: none; }
+}
+
+@media (width < 1200px) {
+  .credential-book { grid-template-columns: 1fr; gap: 32px; box-shadow: none; }
+  .page-render { display: block; position: absolute; z-index: -1; left: -6.667%; top: -3.5%; width: 113.334%; height: 107%; max-width: none; pointer-events: none; }
+}
