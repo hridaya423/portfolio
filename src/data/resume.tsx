@@ -70,6 +70,18 @@ export const DATA = {
   },
   work: [
     {
+      company: "Silver Suits AI",
+      summary: "Building autonomous voice agents for banking and finance, on production infra handling 10k+ calls for banks like SIDBI and SBI.",
+      href: "https://www.silversuits.ai",
+      badges: [],
+      location: "",
+      title: "AI Engineer",
+      logoUrl: "",
+      start: "Apr 2026",
+      end: null,
+      description: "Building autonomous AI voice agents for the banking and finance sector. Running production calling infra that handles 10k+ calls for banks like SIDBI and SBI.",
+    },
+    {
       company: "Shawbrook Bank",
       summary: "Built and containerized a mortgage calculator app with a scalable architecture.",
       href: "https://www.shawbrook.co.uk",
