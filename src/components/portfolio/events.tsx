@@ -1,5 +1,7 @@
-import { DepartureBoard } from "./departure-board";
 import type { PortfolioEvent } from "@/data/portfolio";
+import { ArrowRight } from "lucide-react";
+import { EventArtwork } from "./event-artwork";
+import { CloudDivider } from "./cloud-divider";
 
 export function Events({ entries }: { entries: PortfolioEvent[] }) {
   return (
@@ -13,30 +15,53 @@ export function Events({ entries }: { entries: PortfolioEvent[] }) {
         <p>More events to come.</p>
       ) : (
         <div className="departure-ledger">
-          {entries.map((event) => (
-            <details className="trip" key={event.id}>
+          {entries.map((event, index) => (
+            <details
+              className="trip"
+              data-city={event.city}
+              name="portfolio-events"
+              suppressHydrationWarning
+              key={event.id}
+              open={
+                event.id === "shiba" || (entries.length === 1 && index === 0)
+              }
+            >
               <summary>
-                <DepartureBoard city={event.city} />
-                <span className="trip-event">
-                  <strong>{event.title}</strong>
-                  <span className="trip-location">{event.country}</span>
-                  <span>{event.date}</span>
+                <span className="trip-city-label">{event.city}</span>
+                <span>
+                  {event.title} / {event.date}
                 </span>
                 <span className="trip-toggle" aria-hidden="true" />
+                <CloudDivider />
               </summary>
               <div className="trip-detail">
-                <div>
-                  <p>{event.description}</p>
-                  <nav aria-label={`${event.title} links`}>
-                    <a href={event.href}>Event website</a>
-                    {event.game && (
-                      <>
-                        <a href={event.game.href}>Play {event.game.title}</a>
-                        <a href={event.game.repo}>Game source</a>
-                      </>
-                    )}
-                  </nav>
+                <EventArtwork
+                  city={event.city}
+                  title={event.game?.title ?? event.title}
+                />
+                <div className="trip-meta">
+                  <span>{event.title}</span>
+                  <span>{event.date}</span>
                 </div>
+                <p>{event.description}</p>
+                <nav aria-label={`${event.title} links`}>
+                  {event.game && (
+                    <a href={event.game.href}>
+                      Play {event.game.title}
+                      <ArrowRight size={16} />
+                    </a>
+                  )}
+                  <a href={event.href}>
+                    Event website
+                    <ArrowRight size={16} />
+                  </a>
+                  {event.game && (
+                    <a className="trip-source" href={event.game.repo}>
+                      Game source
+                      <ArrowRight size={16} />
+                    </a>
+                  )}
+                </nav>
               </div>
             </details>
           ))}
