@@ -1,16 +1,17 @@
-import Image from "next/image";
 import Link from "next/link";
+import Image from "next/image";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { DATA } from "@/data/resume";
 import { experience, projects } from "@/data/portfolio";
 import { questionFont } from "./font";
 import { ExperienceLightField } from "./experience-light-field";
+import { ProjectVideo } from "./project-video";
 
 export function Projects() {
   return (
     <section id="projects" className="projects-section" aria-label="Projects">
       <h2 className="projects-heading">
-        <span className="sr-only">What if?</span>
+        <span className="sr-only">Projects</span>
         <Image src="/what-if.svg" alt="" width={407} height={105} aria-hidden="true" />
       </h2>
       <div className="project-grid">
@@ -20,27 +21,42 @@ export function Projects() {
             key={project.id}
           >
             <div className="project-visual">
-            <div className="project-question">
-              <p className={questionFont.className}>{project.question}</p>
-              <svg viewBox="0 0 80 100" aria-hidden="true">
-                <path d="M5 67C25 75 49 64 43 47C39 35 25 39 31 50C39 63 61 39 73 25" />
-                <path d="M61 28Q67 26 73 25Q72 32 73 37" />
-              </svg>
-            </div>
-            <a
-              href={project.href}
-              className="project-preview"
-              aria-label={`Open ${project.title}`}
-            >
-              <Image
-                src={project.image}
-                alt={project.alt}
-                width={project.previewWidth}
-                height={project.previewHeight}
-                sizes="(min-width: 1200px) 36vw, (min-width: 768px) 48vw, 100vw"
-              />
-            </a>
-              {project.repo && <a href={project.repo} className="source-link" aria-label={`${project.title} on GitHub`}><GitHubLogoIcon width={20} height={20} /></a>}
+              <div className="project-question">
+                <p className={questionFont.className}>{project.question}</p>
+                <svg viewBox="0 0 80 100" aria-hidden="true">
+                  <path d="M5 67C25 75 49 64 43 47C39 35 25 39 31 50C39 63 61 39 73 25" />
+                  <path d="M61 28Q67 26 73 25Q72 32 73 37" />
+                </svg>
+              </div>
+              {"video" in project && project.video ? (
+                <ProjectVideo
+                  href={project.href}
+                  src={project.video}
+                  poster={project.image}
+                  label={`Open ${project.title}`}
+                  width={project.previewWidth}
+                  height={project.previewHeight}
+                />
+              ) : (
+                <a
+                  href={project.href}
+                  className="project-preview"
+                  aria-label={`Open ${project.title}`}
+                >
+                  <Image
+                    src={project.image}
+                    alt={project.alt}
+                    width={project.previewWidth}
+                    height={project.previewHeight}
+                    sizes="(min-width: 1200px) 36vw, (min-width: 768px) 48vw, 100vw"
+                  />
+                </a>
+              )}
+              {project.repo && (
+                <a href={project.repo} className="source-link" aria-label={`${project.title} on GitHub`}>
+                  <GitHubLogoIcon width={20} height={20} />
+                </a>
+              )}
             </div>
             <h3>{project.title}</h3>
             <div className="project-links">
