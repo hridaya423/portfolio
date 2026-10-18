@@ -156,6 +156,13 @@
 .trip[data-city="San Francisco"] {
   --trip-light: #39987b;
 }
+.trip[data-city="London"] {
+  --trip-light: #c99a2e;
+}
+.trip-meta > .trip-award {
+  grid-column: 2;
+  margin-top: 6px;
+}
 .trip-city-label {
   font-size: 18px;
   letter-spacing: 0.2px;
