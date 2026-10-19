@@ -27,7 +27,7 @@ export const events: PortfolioEvent[] = [
     title: "Reinvent the Wheel",
     date: "16–18 October 2026",
     description:
-      "Built Locus at Reinvent the Wheel, a Tools for Science hackathon in King's Cross: ask for public datasets in plain English and it searches 891k of them across 18 repositories, counts case and control samples, and writes nf-core samplesheets. It took 1st place and the £1,000 grand prize.",
+      "Built Locus at Reinvent the Wheel, a Tools for Science hackathon in King's Cross. Ask for public datasets in plain English: it searches 891k of them across 18 repositories, counts case and control samples, and writes the nf-core samplesheets. It won 1st place and the £1,000 grand prize.",
     href: "https://luma.com/vdq0qw9u",
     project: { title: "Locus", repo: "https://github.com/hridaya423/locus" },
     award: "1st place",
@@ -41,7 +41,7 @@ export const events: PortfolioEvent[] = [
     title: "Juice",
     date: "April 2025",
     description:
-      "Made Undead Courier for Juice: 100 hours building a game for a gaming pop-up café in Shanghai.",
+      "Made Undead Courier for Juice: 100 hours building a game, then showing it at a gaming pop-up café in Shanghai.",
     href: "https://juice.hackclub.com",
     game: {
       title: "Undead Courier",
@@ -56,7 +56,7 @@ export const events: PortfolioEvent[] = [
     title: "Shiba",
     date: "November 2025",
     description:
-      "Made Whisper for Shiba: 120 hours building a game for an arcade in Tokyo.",
+      "Made Whisper for Shiba: 120 hours building a game, then building an arcade machine for it in Tokyo.",
     href: "https://shiba.hackclub.com",
     game: {
       title: "Whisper",
@@ -70,7 +70,7 @@ export const events: PortfolioEvent[] = [
     country: "United States",
     title: "Open Sauce",
     date: "17–19 July 2026",
-    description: "Open Sauce 2026 at the San Mateo County Event Center, in the San Francisco Bay Area.",
+    description: "Open Sauce 2026, at the San Mateo County Event Center in the San Francisco Bay Area.",
     href: "https://www.opensauce.com/",
   },
 ];

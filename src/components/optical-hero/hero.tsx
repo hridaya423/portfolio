@@ -1,14 +1,11 @@
 import { portfolioFont } from "@/components/portfolio/font";
 import { DATA } from "@/data/resume";
-import { events } from "@/data/portfolio";
 import { IdeaEffect } from "./idea-effect";
 import { Tray } from "./tray";
 import "./hero.css";
 
 export function OpticalHero() {
   const EmailIcon = DATA.contact.social.email.icon;
-  const role = DATA.work.find((work) => work.end === null) ?? DATA.work[0];
-  const win = events.find((event) => event.award);
 
   return (
     <section
@@ -80,22 +77,6 @@ export function OpticalHero() {
             Explore my work
           </a>
         </div>
-        <dl className="hero-now hero-intro">
-          <div>
-            <dt>Now</dt>
-            <dd>
-              {role.title} at {role.company}
-            </dd>
-          </div>
-          {win && (
-            <div>
-              <dt>Latest</dt>
-              <dd>
-                {win.award} at {win.title}, with {win.project?.title ?? win.game?.title}
-              </dd>
-            </div>
-          )}
-        </dl>
       </div>
       <Tray />
     </section>

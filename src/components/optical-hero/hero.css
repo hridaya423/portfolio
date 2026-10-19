@@ -34,7 +34,7 @@
   margin-top: clamp(56px, 10svh, 112px);
 }
 .hero-main {
-  grid-column: 1 / 9;
+  grid-column: 1 / 10;
 }
 .hero-copy h1 {
   margin: 0;
@@ -70,37 +70,13 @@
   text-decoration: none;
   background: linear-gradient(currentColor, currentColor) 0 calc(100% - 9px) / 100% 1px no-repeat;
 }
-.hero-now {
-  grid-column: 9 / 13;
-  display: grid;
-  gap: 18px;
-  margin: 0 0 6px;
-  padding-left: 20px;
-  border-left: 1px solid var(--rule);
-}
-.hero-now dt {
-  margin-bottom: 4px;
-  font-family: var(--font-label);
-  font-size: 11.5px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--signal-ink);
-}
-.hero-now dd {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
-  color: var(--ink-soft);
-  text-wrap: pretty;
-}
-
 /* Intro pre-hide: only when motion is allowed, released by the choreography,
    and released by CSS after a beat if scripts never arrive. */
 .motion-ok:not(.motion-live) .hero-line-inner {
   transform: translateY(112%);
   animation: intro-release 0s 2.5s forwards;
 }
-.motion-ok:not(.motion-live) :is(.hero-intro, .tray-base, .tray-lip, .tray-tab) {
+.motion-ok:not(.motion-live) :is(.hero-intro, .tray-base, .tray-lip, .tray-navigation) {
   opacity: 0;
   animation: intro-release 0s 2.5s forwards;
 }
@@ -218,16 +194,8 @@
   }
 }
 @media (width < 1000px) {
-  .hero-main,
-  .hero-now {
+  .hero-main {
     grid-column: 1 / -1;
-  }
-  .hero-now {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin-top: 40px;
-    padding: 16px 0 0;
-    border-left: 0;
-    border-top: 1px solid var(--rule);
   }
 }
 @media (width < 768px) {
@@ -249,11 +217,6 @@
   }
   .hero-sub {
     margin-top: 20px;
-  }
-  .hero-now {
-    grid-template-columns: 1fr;
-    gap: 12px;
-    margin-top: 28px;
   }
   .optical-tray {
     width: 100%;
@@ -341,6 +304,10 @@
   height: calc(100% + 24px);
   pointer-events: none;
   opacity: 0;
+  transition: opacity 180ms linear;
+}
+.idea-fallback {
+  transition: opacity 180ms linear;
 }
 .idea-word[data-lens-ready] canvas {
   opacity: 1;

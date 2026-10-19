@@ -44,36 +44,8 @@
   }
 }
 
-/* A small brushed-aluminium plate, cut from the same stock as the tray. */
-.led-plaque {
-  display: grid;
-  place-items: center;
-  padding: 7px 12px;
-  border-radius: 7px;
-  background:
-    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.22) 0 1px, transparent 1px 3px),
-    linear-gradient(180deg, #f6f6f5, #dcdddc);
-  box-shadow:
-    inset 0 1px 0 #fff,
-    inset 0 -1px 0 rgb(0 0 0 / 0.08),
-    0 0 0 1px rgb(23 24 24 / 0.08),
-    0 2px 6px -2px rgb(23 24 24 / 0.18);
-}
-.led-panel {
-  display: block;
-  height: 15px;
-  width: auto;
-  overflow: visible;
-}
-.led-panel circle {
-  fill: rgb(40 40 40 / 0.045);
-  transition: fill 160ms linear calc(var(--column) * 6ms);
-}
-.led-panel circle[data-lit] {
-  fill: var(--signal);
-}
-.led-panel {
-  filter: drop-shadow(0 0 1.2px rgb(232 104 60 / 0.55));
+.site-header-lcd {
+  justify-self: center;
 }
 
 @media (width < 860px) {
@@ -87,9 +59,6 @@
   .site-header-name {
     font-size: 15px;
   }
-  .led-panel {
-    height: 12px;
-  }
 }
 @media (width < 400px) {
   .site-header-name {
@@ -98,7 +67,7 @@
   .site-header-inner {
     grid-template-columns: auto 1fr;
   }
-  .led-plaque {
+  .site-header-lcd {
     justify-self: start;
   }
 }

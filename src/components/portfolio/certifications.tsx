@@ -32,7 +32,7 @@ export function Certifications({ entries }: { entries: Credential[] }) {
 
   return <section id="achievements" className="section certifications-section" aria-labelledby="certifications-heading" data-section-label="CERTS">
     <div className="shell">
-    <SectionHead id="certifications-heading" index="04" label="Certifications">
+    <SectionHead id="certifications-heading">
       Certified at eleven.
     </SectionHead>
     <p className="certifications-lede" data-reveal="rise">{spell(atEleven, true)} exams before I turned twelve{later ? `, ${spell(later)} more at thirteen` : ""}. Pick one to verify it.</p>

@@ -38,8 +38,8 @@ void main() {
   surface += grain;
   float first = texelFetch(rows, ivec2(0,0), 0).x * scale;
   vec4 lastRow = texelFetch(rows, ivec2(count-1,0), 0) * scale;
-  float beginning = max(20.0, first - 30.0);
-  float ending = lastRow.x + lastRow.y * .65;
+  float beginning = max(20.0, first - 110.0);
+  float ending = lastRow.x + lastRow.y + 60.0;
   float reach = openTo * scale;
   float along = smoothstep(beginning, beginning + 90.0, p.y) * (1.0 - smoothstep(ending - 35.0, ending + 100.0, p.y));
   along *= 1.0 - smoothstep(reach - 60.0, reach + 60.0, p.y);
@@ -56,11 +56,13 @@ void main() {
     vec4 row = raw * scale;
     float lit = raw.z;
     if (lit < .001) continue;
-    float start = row.x + row.y * .11;
-    float end = row.x + row.y * (i == 0 ? .43 : .36);
+    // Rows are the roles' text blocks: each beam opens on its text and stays centred on it.
+    float middle = row.x + row.y * .5;
+    float start = middle - row.y * .34;
+    float end = middle + row.y * .34;
     float x = max(0.0, dx);
-    float upper = start - x * .145;
-    float lower = end + x * .64;
+    float upper = start - x * .17;
+    float lower = end + x * .3;
     float penumbra = 2.0 + x * .052;
     float visibility = smoothstep(upper - penumbra, upper + penumbra, p.y) * (1.0 - smoothstep(lower - penumbra * 1.7, lower + penumbra * 1.7, p.y));
     float falloff = exp(-x / 940.0);
@@ -166,7 +168,8 @@ export function ExperienceLightField({ count }: { count: number }) {
         if (!active || stopped || gl.isContextLost()) return;
         const bounds = section.getBoundingClientRect();
         const entries = Array.from(section.querySelectorAll<HTMLElement>(".experience-entry"));
-        const body = section.querySelector<HTMLElement>(".experience-body");
+        const bodies = entries.map((entry) => entry.querySelector<HTMLElement>(".experience-body") ?? entry);
+        const body = bodies[0];
         if (!bounds.width || !bounds.height || !entries.length) return;
         const delta = previous ? Math.min((now - previous) / 1000, .05) : 1 / 60;
         previous = now;
@@ -178,9 +181,9 @@ export function ExperienceLightField({ count }: { count: number }) {
             moving = true;
           } else lit[index] = targets[index];
         }
-        // Soft light hides a lower resolution while beams are travelling.
+        // One fixed resolution: switching it as beams settle reads as a pop.
         const maximum = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
-        const ratio = Math.min(moving ? 1 : devicePixelRatio, 2, maximum / bounds.height, maximum / bounds.width, Math.sqrt(8000000 / (bounds.width * bounds.height)));
+        const ratio = Math.min(devicePixelRatio, 1.5, maximum / bounds.height, maximum / bounds.width, Math.sqrt(8000000 / (bounds.width * bounds.height)));
         const width = Math.round(bounds.width * ratio), height = Math.round(bounds.height * ratio);
         if (canvas.width !== width || canvas.height !== height) {
           canvas.width = width;
@@ -189,8 +192,10 @@ export function ExperienceLightField({ count }: { count: number }) {
         gl.viewport(0, 0, canvas.width, canvas.height);
         const data = new Float32Array(entries.length * 4);
         let openTo = 0;
-        entries.forEach((entry, index) => {
-          const box = entry.getBoundingClientRect();
+        bodies.forEach((text, index) => {
+          // Layout box, so the reveal's translate doesn't drag the light with it.
+          const parent = text.offsetParent?.getBoundingClientRect().top ?? bounds.top;
+          const box = { top: parent + text.offsetTop, height: text.offsetHeight };
           data[index * 4] = box.top - bounds.top;
           data[index * 4 + 1] = box.height;
           data[index * 4 + 2] = lit[index] ?? 1;

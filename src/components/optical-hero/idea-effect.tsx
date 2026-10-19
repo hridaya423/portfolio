@@ -192,8 +192,9 @@ export function IdeaEffect() {
         restoreText();
         return;
       }
-      if (strength === 0) restoreText();
-      else element!.setAttribute("data-lens-ready", "true");
+      // Hand over to the lens once and stay there: swapping back to the DOM text
+      // after every hover shows as a one-pixel jump between the two renderings.
+      if (strength > 0) element!.setAttribute("data-lens-ready", "true");
       if (!opening) arrived.current = true;
       const moving =
         Math.abs(lensX - targetX) + Math.abs(lensY - targetY) > 0.1;

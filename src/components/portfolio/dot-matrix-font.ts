@@ -39,6 +39,20 @@ const glyphs: Record<string, string[]> = {
   "-": ["00000", "00000", "00000", "11111", "00000", "00000", "00000"],
   ".": ["00000", "00000", "00000", "00000", "00000", "01100", "01100"],
   "!": ["00100", "00100", "00100", "00100", "00100", "00000", "00100"],
+  "?": ["01110", "10001", "00001", "00010", "00100", "00000", "00100"],
+  ":": ["00000", "01100", "01100", "00000", "01100", "01100", "00000"],
+  "/": ["00000", "00001", "00010", "00100", "01000", "10000", "00000"],
+  ">": ["01000", "00100", "00010", "00001", "00010", "00100", "01000"],
+  "<": ["00010", "00100", "01000", "10000", "01000", "00100", "00010"],
+  _: ["00000", "00000", "00000", "00000", "00000", "00000", "11111"],
+  "#": ["01010", "01010", "11111", "01010", "11111", "01010", "01010"],
+  "+": ["00000", "00100", "00100", "11111", "00100", "00100", "00000"],
+  "*": ["00000", "00100", "10101", "01110", "10101", "00100", "00000"],
+  "'": ["01100", "00100", "01000", "00000", "00000", "00000", "00000"],
+  "@": ["01110", "10001", "00001", "01101", "10101", "10101", "01110"],
+  "%": ["11000", "11001", "00010", "00100", "01000", "10011", "00011"],
+  "£": ["00110", "01001", "01000", "11100", "01000", "01000", "11111"],
+  "\u2588": ["11111", "11111", "11111", "11111", "11111", "11111", "11111"],
   " ": ["00000", "00000", "00000", "00000", "00000", "00000", "00000"],
 };
 
@@ -58,4 +72,25 @@ export function dotMatrix(text: string) {
     );
   });
   return { dots, columns: Math.max(0, characters.length * (GLYPH_WIDTH + 1) - 1) };
+}
+
+/** Every glyph as one 5-bit row per byte, for GPU lookup. Index 0 is a space. */
+export const GLYPH_CHARACTERS = [" ", ...Object.keys(glyphs).filter((character) => character !== " ")];
+export function glyphAtlas() {
+  const atlas = new Uint8Array(GLYPH_CHARACTERS.length * GLYPH_HEIGHT);
+  GLYPH_CHARACTERS.forEach((character, index) =>
+    glyphs[character].forEach((row, y) => {
+      atlas[y * GLYPH_CHARACTERS.length + index] = parseInt(row, 2);
+    }),
+  );
+  return atlas;
+}
+export function glyphCode(character: string) {
+  const index = GLYPH_CHARACTERS.indexOf(character.toUpperCase());
+  return index < 0 ? 0 : index;
+}
+
+/** The 5×7 rows for one character, as bit strings. Unknown characters are blank. */
+export function glyphRows(character: string) {
+  return glyphs[character.toUpperCase()] ?? glyphs[" "];
 }

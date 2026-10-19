@@ -13,7 +13,7 @@ export function Events({ entries }: { entries: PortfolioEvent[] }) {
       data-section-label="EVENTS"
     >
       <div className="shell">
-        <SectionHead id="events-heading" index="03" label="Events">
+        <SectionHead id="events-heading">
           Out in the world.
         </SectionHead>
         {entries.length === 0 ? (

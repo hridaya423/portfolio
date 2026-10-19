@@ -10,12 +10,17 @@ import "lenis/dist/lenis.css";
 // One motion vocabulary for the whole page.
 const EASE = "power4.out";
 const SOFT = "power2.inOut";
-const ENTER = "top 86%";
+const ENTER = "top 88%";
+// After this point the CSS fallback may already have shown the hero, so
+// replaying the intro would hide visible content: skip it instead.
+const INTRO_DEADLINE = 1800;
 
 /**
- * Page-wide choreography over server-rendered markup. Everything it touches is
- * already visible without JavaScript; under reduced motion it does nothing and
- * the page renders in its final state with native scrolling.
+ * Page-wide choreography over server-rendered markup.
+ *
+ * Rule that keeps it flicker-free: an element is only ever hidden while it is
+ * still below the fold, and only revealed with `to` tweens. Anything already
+ * on screen (or scrolled past) when this runs is left exactly as it is.
  */
 export function Choreography() {
   useEffect(() => {
@@ -32,32 +37,23 @@ export function Choreography() {
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
 
-    // Release the CSS pre-hide and build every from-state in the same task,
-    // so the hero never paints in between.
-    root.classList.add("motion-live");
+    const pending = (element: Element) =>
+      element.getBoundingClientRect().top > innerHeight;
+    const playIntro = performance.now() < INTRO_DEADLINE;
+    let disposed = false;
 
     const context = gsap.context(() => {
-      const intro = gsap.timeline({
-        defaults: { ease: EASE },
-        onComplete: () => document.querySelectorAll(".hero-line").forEach((line) => line.classList.add("is-open")),
-      });
-      intro
-        .from(".hero-line-inner", { yPercent: 112, duration: 1.15, stagger: 0.1 }, 0.05)
-        .from(".hero-intro", { y: 14, autoAlpha: 0, duration: 0.9, stagger: 0.08, clearProps: "all" }, 0.5)
-        .from(".tray-base, .tray-lip", { y: 36, autoAlpha: 0, duration: 1.3, clearProps: "all" }, 0.25)
-        .from(
-          ".tray-tab",
-          {
-            y: -70,
-            rotation: (index: number) => [-7, 5, -4][index] ?? 0,
-            autoAlpha: 0,
-            duration: 0.9,
-            ease: "back.out(1.35)",
-            stagger: 0.09,
-            clearProps: "transform,opacity,visibility",
-          },
-          0.75,
-        );
+      // Hero: claim the pre-hidden state in the same task, so nothing paints in between.
+      root.classList.add("motion-live");
+      const openLines = () =>
+        document.querySelectorAll(".hero-line").forEach((line) => line.classList.add("is-open"));
+      if (playIntro) {
+        gsap
+          .timeline({ defaults: { ease: EASE }, onComplete: openLines })
+          .fromTo(".hero-line-inner", { yPercent: 112 }, { yPercent: 0, duration: 1.15, stagger: 0.1 }, 0.05)
+          .fromTo(".hero-intro", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.08, clearProps: "all" }, 0.5)
+          .fromTo(".tray-base, .tray-lip, .tray-navigation", { y: 28, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.3, clearProps: "all" }, 0.3);
+      } else openLines();
 
       gsap.to(".optical-tray", {
         yPercent: 8,
@@ -65,112 +61,124 @@ export function Choreography() {
         scrollTrigger: { trigger: ".optical-hero", start: "top top", end: "bottom top", scrub: true },
       });
 
-      gsap.utils.toArray<HTMLElement>('[data-reveal="words"]').forEach((heading) => {
-        SplitText.create(heading, {
-          type: "lines,words",
-          mask: "lines",
-          autoSplit: true,
-          onSplit(split) {
-            // Line masks clip by default; give descenders room to hang.
-            gsap.set(split.masks, { paddingBottom: "0.14em", marginBottom: "-0.14em" });
-            return gsap.from(split.words, {
-              yPercent: 115,
-              duration: 1.05,
-              ease: EASE,
-              stagger: 0.045,
-              scrollTrigger: { trigger: heading, start: ENTER, once: true },
-            });
-          },
+      const reveal = (selector: string) => gsap.utils.toArray<HTMLElement>(selector).filter(pending);
+
+      const rises = reveal('[data-reveal="rise"], .trip');
+      const show = (batch: Element[]) =>
+        gsap.to(batch, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1,
+          ease: EASE,
+          stagger: 0.07,
+          overwrite: true,
+          clearProps: "transform,opacity,visibility",
         });
-      });
-
-      ScrollTrigger.batch('[data-reveal="fade"]', {
-        start: ENTER,
-        once: true,
-        onEnter: (batch) =>
-          gsap.from(batch, { autoAlpha: 0, y: 8, duration: 0.8, ease: EASE, stagger: 0.06, clearProps: "all" }),
-      });
-
-      ScrollTrigger.batch('[data-reveal="rise"], .trip', {
-        start: ENTER,
-        once: true,
-        onEnter: (batch) =>
-          gsap.from(batch, { autoAlpha: 0, y: 26, duration: 1, ease: EASE, stagger: 0.07, clearProps: "all" }),
-      });
+      if (rises.length) {
+        gsap.set(rises, { autoAlpha: 0, y: 26 });
+        ScrollTrigger.batch(rises, {
+          start: ENTER,
+          once: true,
+          onEnter: show,
+          // A fast anchor jump can skip straight past the start.
+          onLeave: show,
+        });
+      }
 
       // Media surfaces out of a feathered edge, then the mask is dropped.
-      gsap.utils.toArray<HTMLElement>('[data-reveal="media"]').forEach((media) => {
+      reveal('[data-reveal="media"]').forEach((media) => {
         const image = media.querySelector("img, video");
         media.classList.add("is-masking");
-        const timeline = gsap.timeline({
-          scrollTrigger: { trigger: media, start: "top 90%", once: true },
-          onComplete: () => media.classList.remove("is-masking"),
-        });
-        timeline
-          .fromTo(media, { "--mask-y": "100%" }, { "--mask-y": "0%", duration: 1.5, ease: SOFT })
-          .from(image, { scale: 1.07, duration: 1.8, ease: EASE, clearProps: "transform" }, 0);
+        gsap.set(media, { "--mask-y": "100%" });
+        gsap
+          .timeline({
+            scrollTrigger: { trigger: media, start: "top 92%", once: true },
+            onComplete: () => media.classList.remove("is-masking"),
+          })
+          .to(media, { "--mask-y": "0%", duration: 1.5, ease: SOFT })
+          .fromTo(image, { scale: 1.07 }, { scale: 1, duration: 1.8, ease: EASE, clearProps: "transform" }, 0);
       });
 
       // Handwritten notes write themselves, then the arrow is drawn.
-      gsap.utils.toArray<HTMLElement>('[data-reveal="note"]').forEach((note) => {
+      reveal('[data-reveal="note"]').forEach((note) => {
         const text = note.querySelector("p");
-        const paths = note.querySelectorAll("path");
-        const timeline = gsap.timeline({ scrollTrigger: { trigger: note, start: ENTER, once: true } });
-        timeline.fromTo(
-          text,
-          { clipPath: "inset(-20% 100% -20% 0)" },
-          { clipPath: "inset(-20% 0% -20% 0)", duration: 1.1, ease: "power1.inOut", clearProps: "clipPath" },
+        const paths = Array.from(note.querySelectorAll("path"));
+        gsap.set(text, { clipPath: "inset(-20% 100% -20% 0)" });
+        const lengths = paths.map((path) => path.getTotalLength());
+        paths.forEach((path, index) =>
+          gsap.set(path, { strokeDasharray: lengths[index], strokeDashoffset: lengths[index] }),
         );
-        paths.forEach((path, index) => {
-          const length = path.getTotalLength();
-          timeline.fromTo(
+        const timeline = gsap.timeline({ scrollTrigger: { trigger: note, start: ENTER, once: true } });
+        timeline.to(text, { clipPath: "inset(-20% 0% -20% 0)", duration: 1.1, ease: "power1.inOut", clearProps: "clipPath" });
+        paths.forEach((path, index) =>
+          timeline.to(
             path,
-            { strokeDasharray: length, strokeDashoffset: length },
             { strokeDashoffset: 0, duration: index ? 0.25 : 0.7, ease: "power1.inOut", clearProps: "strokeDasharray,strokeDashoffset" },
             index ? ">-0.05" : "-=0.35",
-          );
+          ),
+        );
+      });
+
+      reveal('[data-reveal="ink"]').forEach((ink) => {
+        gsap.set(ink, { clipPath: "inset(-10% 100% -10% 0)" });
+        gsap.to(ink, {
+          clipPath: "inset(-10% 0% -10% 0)",
+          duration: 1.5,
+          ease: "power1.inOut",
+          clearProps: "clipPath",
+          scrollTrigger: { trigger: ink, start: ENTER, once: true },
         });
       });
 
-      gsap.utils.toArray<HTMLElement>('[data-reveal="ink"]').forEach((ink) => {
-        gsap.fromTo(
-          ink,
-          { clipPath: "inset(-10% 100% -10% 0)" },
-          {
-            clipPath: "inset(-10% 0% -10% 0)",
-            duration: 1.5,
-            ease: "power1.inOut",
-            clearProps: "clipPath",
-            scrollTrigger: { trigger: ink, start: ENTER, once: true },
-          },
-        );
-      });
-
-      gsap.from(".credential-artwork", {
-        autoAlpha: 0,
-        scale: 0.97,
-        duration: 1.4,
-        ease: EASE,
-        clearProps: "all",
-        scrollTrigger: { trigger: ".credential-experience", start: "top 80%", once: true },
+      reveal(".credential-artwork").forEach((artwork) => {
+        gsap.set(artwork, { autoAlpha: 0, scale: 0.97 });
+        gsap.to(artwork, {
+          autoAlpha: 1,
+          scale: 1,
+          duration: 1.4,
+          ease: EASE,
+          clearProps: "all",
+          scrollTrigger: { trigger: artwork, start: "top 85%", once: true },
+        });
       });
     });
 
-    // Layout shifts (fonts, media, opened rows) move every trigger.
-    let pending = 0;
+    // Headings split by word once fonts are final, so a font swap can never
+    // re-split (and replay) a heading. Word masks don't depend on line breaks,
+    // so resizing never needs a re-split either.
+    void document.fonts.ready.then(() => {
+      if (disposed) return;
+      context.add(() => {
+        gsap.utils.toArray<HTMLElement>('[data-reveal="words"]').filter(pending).forEach((heading) => {
+          const split = SplitText.create(heading, { type: "words", mask: "words" });
+          gsap.set(split.masks, { paddingBottom: "0.14em", marginBottom: "-0.14em" });
+          gsap.set(split.words, { yPercent: 115 });
+          gsap.to(split.words, {
+            yPercent: 0,
+            duration: 1.05,
+            ease: EASE,
+            stagger: 0.05,
+            scrollTrigger: { trigger: heading, start: ENTER, once: true },
+          });
+        });
+      });
+      ScrollTrigger.refresh();
+    });
+
+    // Only discrete layout changes move triggers: fonts, page load, opened rows.
+    let timer = 0;
     const refresh = () => {
-      cancelAnimationFrame(pending);
-      pending = requestAnimationFrame(() => ScrollTrigger.refresh());
+      clearTimeout(timer);
+      timer = window.setTimeout(() => ScrollTrigger.refresh(), 160);
     };
-    const layout = new ResizeObserver(refresh);
-    layout.observe(document.body);
-    void document.fonts.ready.then(refresh);
     window.addEventListener("load", refresh);
+    document.addEventListener("toggle", refresh, true);
 
     return () => {
-      cancelAnimationFrame(pending);
-      layout.disconnect();
+      disposed = true;
+      clearTimeout(timer);
       window.removeEventListener("load", refresh);
+      document.removeEventListener("toggle", refresh, true);
       context.revert();
       document.querySelectorAll(".is-masking").forEach((media) => media.classList.remove("is-masking"));
       gsap.ticker.remove(raf);

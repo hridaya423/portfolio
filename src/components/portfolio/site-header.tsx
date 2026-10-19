@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { DATA } from "@/data/resume";
-import { LedText } from "./led-text";
+import { LcdChip } from "./lcd-chip";
 
 const links = [
   { label: "Work", href: "#projects" },
@@ -12,7 +12,7 @@ const links = [
 
 /**
  * The compact header that takes over once the hero's own header scrolls away.
- * Its LED plaque reads out the section in view, like the panel on the tray.
+ * Its LCD reads out the section in view, in the same voice as the finale's wall.
  */
 export function SiteHeader() {
   const [label, setLabel] = useState("HELLO");
@@ -51,9 +51,7 @@ export function SiteHeader() {
         <a className="site-header-name" href="#hero">
           {DATA.name}
         </a>
-        <div className="led-plaque">
-          <LedText text={label} capacity={10} className="led-panel" />
-        </div>
+        <LcdChip text={label} columns={10} dot={1.9} className="site-header-lcd" />
         <nav aria-label="Sections" className="site-header-nav">
           {links.map(({ label, href }) => (
             <a key={href} href={href}>
