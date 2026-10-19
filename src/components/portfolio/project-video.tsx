@@ -24,48 +24,20 @@ export function ProjectVideo({
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-
     video.volume = 0.6;
-
     const sync = () => setMuted(video.muted);
     video.addEventListener("volumechange", sync);
-
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    // Loads and plays only while on screen; reduced motion keeps the poster.
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry.isIntersecting) void video.play().catch(() => {});
+        if (entry.isIntersecting && !reduced.matches)
+          void video.play().catch(() => {});
         else video.pause();
       },
       { threshold: 0.35 },
     );
     observer.observe(video);
-
-    const unmute = () => {
-      video.muted = false;
-    };
-
-    if (navigator.userActivation?.hasBeenActive) {
-      unmute();
-    } else {
-      // First real gesture anywhere on the page turns sound on.
-      const onGesture = (event: Event) => {
-        if ((event.target as Element | null)?.closest?.(".sound-toggle")) return;
-        unmute();
-        window.removeEventListener("pointerdown", onGesture, true);
-        window.removeEventListener("keydown", onGesture, true);
-        window.removeEventListener("touchstart", onGesture, true);
-      };
-      window.addEventListener("pointerdown", onGesture, true);
-      window.addEventListener("keydown", onGesture, true);
-      window.addEventListener("touchstart", onGesture, true);
-      return () => {
-        observer.disconnect();
-        video.removeEventListener("volumechange", sync);
-        window.removeEventListener("pointerdown", onGesture, true);
-        window.removeEventListener("keydown", onGesture, true);
-        window.removeEventListener("touchstart", onGesture, true);
-      };
-    }
-
     return () => {
       observer.disconnect();
       video.removeEventListener("volumechange", sync);
@@ -76,11 +48,12 @@ export function ProjectVideo({
     const video = videoRef.current;
     if (!video) return;
     video.muted = !video.muted;
+    if (!video.muted && video.paused) void video.play().catch(() => {});
   }
 
   return (
     <>
-      <a href={href} className="project-preview" aria-label={label}>
+      <a href={href} className="project-frame" aria-label={label}>
         <video
           ref={videoRef}
           src={src}
@@ -88,13 +61,14 @@ export function ProjectVideo({
           loop
           muted
           playsInline
+          preload="none"
           width={width}
           height={height}
         />
       </a>
       <button
         type="button"
-        className="sound-toggle"
+        className="media-button sound-toggle"
         onClick={toggleSound}
         aria-label={muted ? "Play sound" : "Mute sound"}
         aria-pressed={!muted}

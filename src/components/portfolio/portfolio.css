@@ -1,5 +1,11 @@
-@import "./sections.css";
-@import "./responsive.css";
+@import "./tokens.css";
+@import "./header.css";
+@import "./projects.css";
+@import "./experience.css";
+@import "./events.css";
 @import "./certifications.css";
+@import "./finale.css";
 
-@import "./optical-sections.css";
+.review-page > .section:first-child {
+  padding-top: 80px;
+}

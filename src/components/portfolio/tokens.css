@@ -1,0 +1,162 @@
+/* One system for every section: tokens, shell, grid, section heads, links. */
+.portfolio-home {
+  --paper: #efeff0;
+  --ink: #171818;
+  --ink-soft: #2b2d2c;
+  --muted: #5f6366;
+  --faint: #8d9194;
+  --rule: rgb(23 24 24 / 0.12);
+  /* The LED orange from the tray's display, plus a darker cut for text and focus. */
+  --signal: #d8603a;
+  --signal-ink: #ad4727;
+
+  --font-sans: var(--font-portfolio), "Helvetica Neue", Arial, sans-serif;
+  --font-label: var(--font-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --t-display: clamp(40px, 5.2vw, 76px);
+  --t-h2: clamp(36px, 4.3vw, 62px);
+  --t-h3: clamp(30px, 3vw, 44px);
+  --t-lede: clamp(17px, 1.4vw, 20px);
+  --t-label: 12px;
+
+  --gutter: clamp(20px, 3.4vw, 48px);
+  --gap: clamp(16px, 1.7vw, 24px);
+  --section-y: clamp(112px, 12.5vw, 184px);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.portfolio-home a {
+  color: inherit;
+  text-underline-offset: 0.22em;
+  text-decoration-thickness: 1px;
+}
+.portfolio-home button {
+  font: inherit;
+  cursor: pointer;
+}
+.portfolio-home :focus-visible {
+  outline: 2px solid var(--signal-ink);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.shell {
+  width: 100%;
+  max-width: 1280px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+/* Sections own only their top space, so the gap between any two is identical. */
+.section {
+  position: relative;
+  padding-top: var(--section-y);
+  scroll-margin-top: 24px;
+}
+
+.section-head {
+  margin-bottom: clamp(48px, 6.4vw, 96px);
+}
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 0 0 22px;
+  font-family: var(--font-label);
+  font-size: var(--t-label);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.section-index {
+  color: var(--signal-ink);
+}
+.section-index::after {
+  content: "";
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  margin-left: 14px;
+  vertical-align: middle;
+  background: var(--rule);
+}
+.section-title {
+  margin: 0;
+  max-width: 18ch;
+  font-size: var(--t-h2);
+  font-weight: 400;
+  line-height: 1.04;
+  letter-spacing: -0.045em;
+  text-wrap: balance;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 15px;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 9px) / 100% 1px no-repeat;
+}
+.text-link svg {
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .text-link:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+
+.social-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  min-height: 44px;
+  text-decoration: none;
+}
+.social-icon-link svg {
+  transition: transform 180ms var(--ease-out), opacity 180ms;
+}
+@media (hover: hover) and (pointer: fine) {
+  .social-icon-link:hover svg {
+    transform: translateY(-2px);
+    opacity: 0.7;
+  }
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 100;
+  top: 12px;
+  left: 12px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: #171818;
+  color: #fff;
+  font: 14px var(--font-portfolio), sans-serif;
+  transform: translateY(-160%);
+  transition: transform 200ms;
+}
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid #ad4727;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .portfolio-home *,
+  .portfolio-home *::before,
+  .portfolio-home *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}

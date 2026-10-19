@@ -27,7 +27,7 @@ void main() {
     float angle = band * 2.39996 + .3;
     vec2 direction = vec2(cos(angle), sin(angle));
     float frequency = 46. + band * 23.;
-    float amplitude = .00105 / (1. + band * .60);
+    float amplitude = .00085 / (1. + band * .60);
     float phase = dot(source, direction) * frequency + band * 3.7 + dot(lightPosition, direction) * .9 - time * (.22 + band * .075);
     height += amplitude * sin(phase);
     slope += amplitude * frequency * cos(phase) * direction;
@@ -85,7 +85,10 @@ void main() {
   vec3 rays = light(p, blur);
   vec3 spill = light(p, 4.5 + blur) * .055 + light(p, 6.5) * .06;
   float wash = exp(-dot(p / vec2(.58, .23), p / vec2(.58, .23)) * 1.7);
-  vec3 surface = paper * (1. - wash * .20);
+  // The slab's shadow feathers out before the canvas edge so no box shows.
+  vec2 edge = smoothstep(vec2(0.), vec2(.16, .22), uv) * smoothstep(vec2(0.), vec2(.16, .22), 1. - uv);
+  wash *= edge.x * edge.y;
+  vec3 surface = paper * (1. - wash * .15);
   vec3 radiance = surface + (rays * .20 + spill) * mix(.25, 1., focus);
   color = vec4(pow(max(radiance, vec3(0.)), vec3(1. / 2.2)), 1.);
 }`;
@@ -133,7 +136,7 @@ export class CredentialRefractionScene {
     if (!context) return;
     context.fillStyle = "black";
     context.fillRect(0, 0, canvas.width, canvas.height);
-    context.font = `400 380px ${font}`;
+    context.font = `500 380px ${font}`;
     const scale = Math.min(1, 1820 / context.measureText(label).width);
     context.translate(canvas.width / 2, canvas.height / 2);
     context.scale(scale, scale * 1.5625);

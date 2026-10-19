@@ -12,6 +12,7 @@ precision highp float;
 uniform vec2 resolution;
 uniform vec2 size;
 uniform float slit;
+uniform float openTo;
 uniform int count;
 uniform sampler2D rows;
 out vec4 color;
@@ -37,9 +38,11 @@ void main() {
   surface += grain;
   float first = texelFetch(rows, ivec2(0,0), 0).x * scale;
   vec4 lastRow = texelFetch(rows, ivec2(count-1,0), 0) * scale;
-  float beginning = max(20.0, first - 110.0);
+  float beginning = max(20.0, first - 30.0);
   float ending = lastRow.x + lastRow.y * .65;
+  float reach = openTo * scale;
   float along = smoothstep(beginning, beginning + 90.0, p.y) * (1.0 - smoothstep(ending - 35.0, ending + 100.0, p.y));
+  along *= 1.0 - smoothstep(reach - 60.0, reach + 60.0, p.y);
   float bow = 3.0 * sin(clamp((p.y-beginning)/(ending-beginning),0.0,1.0)*3.14159);
   float dx = p.x - seam + bow;
   float recess = exp(-pow((dx + 4.0) / 3.4, 2.0)) * along;
@@ -49,7 +52,10 @@ void main() {
   surface += vec3(.025,.022,.014) * lip;
   float emitted = 0.0;
   for (int i = 0; i < count; i++) {
-    vec4 row = texelFetch(rows, ivec2(i,0), 0) * scale;
+    vec4 raw = texelFetch(rows, ivec2(i,0), 0);
+    vec4 row = raw * scale;
+    float lit = raw.z;
+    if (lit < .001) continue;
     float start = row.x + row.y * .11;
     float end = row.x + row.y * (i == 0 ? .43 : .36);
     float x = max(0.0, dx);
@@ -68,12 +74,15 @@ void main() {
     float outsideLowerEdge = smoothstep(lower - penumbra * .2, lower + penumbra * .65, p.y);
     float edgeShadow = outsideLowerEdge * exp(-max(0.0, p.y-lower) / shadowWidth) * exp(-x / 1050.0) * smoothstep(1.0, 14.0, x);
     float lightTexture = (noise(p * .018) - .5) * .004 * visibility;
-    surface += vec3(.082, .066, .019) * light;
-    surface += vec3(.020, .015, .002) * centerGlow;
-    surface += vec3(.017, .013, .003) * bounce * smoothstep(-2.0, 5.0, dx);
-    surface += lightTexture;
-    surface -= vec3(.021, .022, .024) * edgeShadow;
-    float opening = smoothstep(start-5.0, start+5.0, p.y) * (1.0-smoothstep(end-5.0,end+5.0,p.y));
+    // Each beam travels outward from the slit as its role is lit.
+    float travel = smoothstep(lit * 1800.0 - 300.0, lit * 1800.0, x) ;
+    float beam = lit * (1.0 - travel);
+    surface += vec3(.082, .066, .019) * light * beam;
+    surface += vec3(.020, .015, .002) * centerGlow * beam;
+    surface += vec3(.017, .013, .003) * bounce * smoothstep(-2.0, 5.0, dx) * lit;
+    surface += lightTexture * beam;
+    surface -= vec3(.021, .022, .024) * edgeShadow * beam;
+    float opening = smoothstep(start-5.0, start+5.0, p.y) * (1.0-smoothstep(end-5.0,end+5.0,p.y)) * lit;
     emitted += opening;
   }
   float coreWidth = max(2.6, .95 * scale);
@@ -146,35 +155,80 @@ export function ExperienceLightField({ count }: { count: number }) {
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      const uniforms = Object.fromEntries(["resolution", "size", "slit", "count", "rows"].map(name => [name, gl.getUniformLocation(program, name)]));
-      let frame = 0;
-      const draw = () => {
+      const uniforms = Object.fromEntries(["resolution", "size", "slit", "openTo", "count", "rows"].map(name => [name, gl.getUniformLocation(program, name)]));
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+      // Per-role light: 0 until the role scrolls into view, then eases to 1 and stays.
+      const lit = new Float32Array(count).fill(reduced.matches ? 1 : 0);
+      const targets = new Float32Array(count).fill(reduced.matches ? 1 : 0);
+      let frame = 0, previous = 0, visible = false;
+      const draw = (now: number) => {
+        frame = 0;
         if (!active || stopped || gl.isContextLost()) return;
         const bounds = section.getBoundingClientRect();
         const entries = Array.from(section.querySelectorAll<HTMLElement>(".experience-entry"));
+        const body = section.querySelector<HTMLElement>(".experience-body");
         if (!bounds.width || !bounds.height || !entries.length) return;
+        const delta = previous ? Math.min((now - previous) / 1000, .05) : 1 / 60;
+        previous = now;
+        let moving = false;
+        for (let index = 0; index < count; index++) {
+          const gap = targets[index] - lit[index];
+          if (Math.abs(gap) > .002) {
+            lit[index] += gap * (1 - Math.exp(-delta * 2.4));
+            moving = true;
+          } else lit[index] = targets[index];
+        }
+        // Soft light hides a lower resolution while beams are travelling.
         const maximum = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
-        const ratio = Math.min(devicePixelRatio, 2, maximum / bounds.height, maximum / bounds.width, Math.sqrt(8000000 / (bounds.width * bounds.height)));
-        canvas.width = Math.round(bounds.width * ratio);
-        canvas.height = Math.round(bounds.height * ratio);
+        const ratio = Math.min(moving ? 1 : devicePixelRatio, 2, maximum / bounds.height, maximum / bounds.width, Math.sqrt(8000000 / (bounds.width * bounds.height)));
+        const width = Math.round(bounds.width * ratio), height = Math.round(bounds.height * ratio);
+        if (canvas.width !== width || canvas.height !== height) {
+          canvas.width = width;
+          canvas.height = height;
+        }
         gl.viewport(0, 0, canvas.width, canvas.height);
         const data = new Float32Array(entries.length * 4);
+        let openTo = 0;
         entries.forEach((entry, index) => {
           const box = entry.getBoundingClientRect();
           data[index * 4] = box.top - bounds.top;
           data[index * 4 + 1] = box.height;
+          data[index * 4 + 2] = lit[index] ?? 1;
+          if (lit[index] > .001) openTo = Math.max(openTo, box.top - bounds.top + box.height * Math.min(1, lit[index] * 1.4));
         });
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, entries.length, 1, 0, gl.RGBA, gl.FLOAT, data);
         gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
         gl.uniform2f(uniforms.size, bounds.width, bounds.height);
-        gl.uniform1f(uniforms.slit, bounds.width * (bounds.width < 480 ? .15 : .2018));
+        const slit = body ? body.getBoundingClientRect().left - bounds.left - Math.min(72, bounds.width * .06) : bounds.width * .2;
+        gl.uniform1f(uniforms.slit, slit);
+        gl.uniform1f(uniforms.openTo, openTo);
         gl.uniform1i(uniforms.count, entries.length);
         gl.uniform1i(uniforms.rows, 0);
         gl.drawArrays(gl.TRIANGLES, 0, 3);
         canvas.dataset.ready = "true";
+        if (moving && visible) frame = requestAnimationFrame(draw);
+        else previous = 0;
       };
       const schedule = () => { if (!active) return; cancelAnimationFrame(frame); frame = requestAnimationFrame(draw); };
+      const aim = () => {
+        if (reduced.matches) return;
+        let changed = false;
+        section.querySelectorAll<HTMLElement>(".experience-entry").forEach((entry, index) => {
+          if (!targets[index] && entry.getBoundingClientRect().top < innerHeight * .7) {
+            targets[index] = 1;
+            changed = true;
+          }
+        });
+        if (changed) schedule();
+      };
+      const visibility = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible) { aim(); schedule(); }
+      });
+      visibility.observe(section);
+      const scroll = () => { if (visible) aim(); };
+      window.addEventListener("scroll", scroll, { passive: true });
       const observer = new ResizeObserver(schedule);
       observer.observe(section);
       window.addEventListener("resize", schedule);
@@ -183,6 +237,8 @@ export function ExperienceLightField({ count }: { count: number }) {
       schedule();
       dispose = () => {
         active = false;
+        visibility.disconnect();
+        window.removeEventListener("scroll", scroll);
         window.removeEventListener("resize", schedule);
         cancelAnimationFrame(frame);
         observer.disconnect();

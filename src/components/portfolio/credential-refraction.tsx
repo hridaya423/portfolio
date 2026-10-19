@@ -60,7 +60,7 @@ export function CredentialRefraction({ inscription }: { inscription: string }) {
       loading = true;
       try {
         const [{ CredentialRefractionScene }] = await Promise.all([
-          import("./credential-refraction-scene"), document.fonts.load(`400 380px ${font}`),
+          import("./credential-refraction-scene"), document.fonts.load(`500 380px ${font}`),
         ]);
         if (disposed) return;
         scene = new CredentialRefractionScene(canvas);

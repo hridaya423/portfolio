@@ -5,12 +5,19 @@ import { useId, useState } from "react";
 import { ArrowRightIcon, GitHubLogoIcon } from "@radix-ui/react-icons";
 import type { Credential } from "@/data/portfolio";
 import { CredentialRefraction } from "./credential-refraction";
+import { SectionHead } from "./sections";
 
 const issuerMarks: Record<string, string> = {
   Microsoft: "/issuers/microsoft.svg",
   Pega: "/issuers/pega.svg",
   Oracle: "/issuers/oracle.svg",
 };
+
+const numbers = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
+function spell(count: number, capital = false) {
+  const word = numbers[count] ?? String(count);
+  return capital ? word[0].toUpperCase() + word.slice(1) : word;
+}
 
 function labelFor(entry: Credential) {
   return entry.issuer === "Microsoft" ? entry.title : entry.issuer;
@@ -20,9 +27,15 @@ export function Certifications({ entries }: { entries: Credential[] }) {
   const group = useId();
   const [selected, setSelected] = useState(entries[0]?.id);
   const active = entries.find(entry => entry.id === selected) ?? entries[0];
+  const atEleven = entries.filter(entry => entry.ageEarned === 11).length;
+  const later = entries.length - atEleven;
 
-  return <section id="achievements" className="certifications-section" aria-labelledby="certifications-heading">
-    <h2 id="certifications-heading">Certifications</h2>
+  return <section id="achievements" className="section certifications-section" aria-labelledby="certifications-heading" data-section-label="CERTS">
+    <div className="shell">
+    <SectionHead id="certifications-heading" index="04" label="Certifications">
+      Certified at eleven.
+    </SectionHead>
+    <p className="certifications-lede" data-reveal="rise">{spell(atEleven, true)} exams before I turned twelve{later ? `, ${spell(later)} more at thirteen` : ""}. Pick one to verify it.</p>
     <noscript><style>{`
       .credential-artwork, .credential-choice, .credential-radio, .credential-mobile-selection { display: none; }
       .credential-selection { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 40px; }
@@ -54,5 +67,6 @@ export function Certifications({ entries }: { entries: Credential[] }) {
         </select>
       </label>
     </div> : <p>No credentials in this collection yet.</p>}
+    </div>
   </section>;
 }

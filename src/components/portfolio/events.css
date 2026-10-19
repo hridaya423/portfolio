@@ -1,0 +1,254 @@
+.departure-ledger {
+  border-top: 1px solid var(--rule);
+}
+.trip {
+  border-bottom: 1px solid var(--rule);
+}
+.trip summary {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  align-items: center;
+  min-height: 72px;
+  list-style: none;
+  cursor: pointer;
+}
+.trip summary::-webkit-details-marker {
+  display: none;
+}
+.trip-city-label {
+  grid-column: 1 / 5;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+}
+.trip summary > span:nth-child(2) {
+  grid-column: 5 / 12;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.trip-toggle {
+  grid-column: 12;
+  justify-self: end;
+  position: relative;
+  width: 14px;
+  height: 14px;
+}
+.trip-toggle::before,
+.trip-toggle::after {
+  content: "";
+  position: absolute;
+  background: currentColor;
+  transition: transform 300ms var(--ease-out);
+}
+.trip-toggle::before {
+  inset: 6.5px 0 auto;
+  height: 1px;
+}
+.trip-toggle::after {
+  inset: 0 auto 0 6.5px;
+  width: 1px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .trip:not([open]) > summary:hover .trip-toggle {
+    color: var(--signal-ink);
+    transform: rotate(90deg);
+  }
+  .trip-toggle {
+    transition: transform 400ms var(--ease-out), color 200ms;
+  }
+}
+
+/* An open row shows its full card; the summary steps aside. */
+.trip[open] > summary {
+  min-height: 0;
+  height: 0;
+  padding-block: 0;
+  overflow: hidden;
+}
+.trip[open] > summary:focus-visible {
+  height: 72px;
+}
+.trip[open] > summary .cloud-divider {
+  visibility: hidden;
+}
+.trip::details-content {
+  interpolate-size: allow-keywords;
+  height: 0;
+  opacity: 0;
+  overflow: clip;
+  transition:
+    height 420ms var(--ease-out),
+    opacity 300ms var(--ease-out),
+    content-visibility 420ms allow-discrete;
+}
+.trip[open]::details-content {
+  height: auto;
+  opacity: 1;
+}
+
+.trip-detail {
+  padding-bottom: 44px;
+}
+.trip-meta {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  margin-top: 28px;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.trip-meta > span:first-child {
+  grid-column: 1 / 5;
+}
+.trip-meta > span:nth-child(2) {
+  grid-column: 5 / 9;
+  color: var(--muted);
+}
+.trip-meta > .trip-award {
+  grid-column: 9 / 13;
+  justify-self: end;
+  color: var(--signal-ink);
+}
+.trip-detail p {
+  max-width: 62ch;
+  margin: 18px 0 26px;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.trip-detail nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 36px;
+}
+.trip-detail nav a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  font-size: 15px;
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 9px) / 100% 1px no-repeat;
+}
+.trip-detail nav a svg {
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .trip-detail nav a:hover svg {
+    transform: translateX(3px);
+  }
+}
+.trip-source {
+  color: var(--muted);
+}
+
+.cloud-divider {
+  position: absolute;
+  left: 0;
+  bottom: -8px;
+  width: 100%;
+  height: 64px;
+  pointer-events: none;
+}
+.event-visual {
+  position: relative;
+  padding-top: 24px;
+}
+.cloud-artwork {
+  position: relative;
+  aspect-ratio: 2.85;
+  width: 112%;
+  margin-left: -6%;
+  isolation: isolate;
+}
+.cloud-artwork-stacked {
+  aspect-ratio: 1.6;
+}
+.cloud-artwork::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 48%, #93aabf1c, #a8b8c50a 48%, transparent 72%);
+  pointer-events: none;
+}
+.cloud-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 900ms;
+}
+.cloud-canvas[data-ready="true"] {
+  opacity: 1;
+}
+.cloud-title {
+  margin-top: -20px;
+  text-align: center;
+  font-family: var(--font-label);
+  font-size: 12px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (width < 760px) {
+  .trip summary {
+    grid-template-columns: minmax(0, 1fr) 20px;
+    row-gap: 4px;
+    padding-block: 18px;
+  }
+  .trip-city-label {
+    grid-column: 1;
+    font-size: 18px;
+  }
+  .trip summary > span:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+    font-size: 11px;
+  }
+  .trip-toggle {
+    grid-column: 2;
+    grid-row: 1 / 3;
+  }
+  .trip-meta {
+    grid-template-columns: 1fr auto;
+    row-gap: 6px;
+    font-size: 11px;
+  }
+  .trip-meta > span:first-child {
+    grid-column: 1;
+  }
+  .trip-meta > span:nth-child(2) {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .trip-meta > .trip-award {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .trip-detail p {
+    font-size: 15px;
+  }
+  .trip-detail nav {
+    gap: 0 24px;
+  }
+  .cloud-title {
+    margin-top: 0;
+    font-size: 10px;
+    letter-spacing: 0.24em;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .trip::details-content {
+    transition: none;
+  }
+}

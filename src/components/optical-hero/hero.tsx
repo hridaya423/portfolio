@@ -1,17 +1,21 @@
 import { portfolioFont } from "@/components/portfolio/font";
 import { DATA } from "@/data/resume";
+import { events } from "@/data/portfolio";
 import { IdeaEffect } from "./idea-effect";
 import { Tray } from "./tray";
 import "./hero.css";
 
 export function OpticalHero() {
   const EmailIcon = DATA.contact.social.email.icon;
+  const role = DATA.work.find((work) => work.end === null) ?? DATA.work[0];
+  const win = events.find((event) => event.award);
 
   return (
     <section
       id="hero"
-      className={`optical-hero ${portfolioFont.variable}`}
+      className={`optical-hero shell ${portfolioFont.variable}`}
       aria-labelledby="hero-heading"
+      data-section-label="HELLO"
     >
       {["base", "lip"].map((layer) => (
         <link
@@ -41,6 +45,9 @@ export function OpticalHero() {
           <a className="desktop-link" href="#projects">
             Work
           </a>
+          <a className="desktop-link" href="#hackathons">
+            Events
+          </a>
           <a className="desktop-link" href="#about">
             About
           </a>
@@ -55,15 +62,40 @@ export function OpticalHero() {
         </nav>
       </header>
       <div className="hero-copy">
-        <h1 id="hero-heading">
-          I follow an <IdeaEffect />
-          <br />
-          until it works.
-        </h1>
-        <p>Software, games, and a few things in between.</p>
-        <a className="explore-work" href="#projects">
-          Explore my work
-        </a>
+        <div className="hero-main">
+          <h1 id="hero-heading">
+            <span className="hero-line">
+              <span className="hero-line-inner">
+                I follow an <IdeaEffect />
+              </span>
+            </span>{" "}
+            <span className="hero-line">
+              <span className="hero-line-inner">until it works.</span>
+            </span>
+          </h1>
+          <p className="hero-sub hero-intro">
+            Software, games, and a few things in between.
+          </p>
+          <a className="explore-work hero-intro" href="#projects">
+            Explore my work
+          </a>
+        </div>
+        <dl className="hero-now hero-intro">
+          <div>
+            <dt>Now</dt>
+            <dd>
+              {role.title} at {role.company}
+            </dd>
+          </div>
+          {win && (
+            <div>
+              <dt>Latest</dt>
+              <dd>
+                {win.award} at {win.title}, with {win.project?.title ?? win.game?.title}
+              </dd>
+            </div>
+          )}
+        </dl>
       </div>
       <Tray />
     </section>

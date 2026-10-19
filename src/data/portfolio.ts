@@ -32,7 +32,7 @@ export const events: PortfolioEvent[] = [
     project: { title: "Locus", repo: "https://github.com/hridaya423/locus" },
     award: "1st place",
     label: "Reinvent the Wheel",
-    cloud: "£1000",
+    cloud: "1ST",
   },
   {
     id: "juice",

@@ -1,14 +1,6 @@
-import Navbar from "@/components/navbar";
+import { notFound } from "next/navigation";
 
-export default function BlogLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="max-w-2xl mx-auto py-12 sm:py-24 px-6">
-      {children}
-      <Navbar />
-    </div>
-  );
+// The blog is hidden until it is rebuilt in the portfolio's visual system.
+export default function BlogLayout() {
+  notFound();
 }
