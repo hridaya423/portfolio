@@ -2,6 +2,7 @@ import Image from "next/image";
 import type { ReactNode } from "react";
 import { GitHubLogoIcon } from "@radix-ui/react-icons";
 import { ArrowUpRight } from "lucide-react";
+import { Icons } from "@/components/icons";
 import { DATA } from "@/data/resume";
 import { experience, projects } from "@/data/portfolio";
 import { questionFont } from "./font";
@@ -10,7 +11,6 @@ import { ExperienceLightField } from "./experience-light-field";
 import { LcdChip } from "./lcd-chip";
 import { LcdWall } from "./lcd-wall";
 import { LondonClock } from "./london-clock";
-import { ProjectVideo } from "./project-video";
 
 export function SectionHead({
   id,
@@ -54,29 +54,36 @@ export function Projects() {
           {projects.map((project, index) => (
             <li className="project-card" key={project.id} data-lcd-host>
               <div className="project-media" data-reveal="media">
-                {"video" in project && project.video ? (
-                  <ProjectVideo
-                    href={project.href}
-                    src={project.video}
-                    poster={project.image}
-                    label={`Open ${project.title}`}
+                <a
+                  href={project.href}
+                  className="project-frame"
+                  aria-label={`Open ${project.title}`}
+                >
+                  <Image
+                    src={project.image}
+                    alt={project.alt}
                     width={project.previewWidth}
                     height={project.previewHeight}
+                    sizes="(min-width: 1280px) 580px, (min-width: 860px) 46vw, 100vw"
                   />
-                ) : (
-                  <a
-                    href={project.href}
-                    className="project-frame"
-                    aria-label={`Open ${project.title}`}
-                  >
-                    <Image
-                      src={project.image}
-                      alt={project.alt}
-                      width={project.previewWidth}
-                      height={project.previewHeight}
-                      sizes="(min-width: 1280px) 580px, (min-width: 860px) 46vw, 100vw"
-                    />
-                  </a>
+                </a>
+                {project.launch && (
+                  <div className="launch-links">
+                    <a
+                      href={project.launch.x}
+                      className="media-button"
+                      aria-label={`${project.title} launch post on X`}
+                    >
+                      <Icons.x width={16} height={16} aria-hidden="true" />
+                    </a>
+                    <a
+                      href={project.launch.linkedin}
+                      className="media-button"
+                      aria-label={`${project.title} launch post on LinkedIn`}
+                    >
+                      <Icons.linkedin width={17} height={17} aria-hidden="true" />
+                    </a>
+                  </div>
                 )}
                 {project.repo && (
                   <a

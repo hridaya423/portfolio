@@ -13,8 +13,8 @@ const WALL = 9;
 const WORDS: [string, string][] = [
   ["LEXIS", "ASK->RUN"],
   ["FOUNDRY", "-69% RAM"],
+  ["CUE", "PASTE AI"],
   ["REVISE", "PAST QS"],
-  ["NEURIX", "BLOCK+AI"],
   ["LOCUS", "1ST £1K"],
   ["891K", "DATASETS"],
   ["SILVER", "SUITS AI"],

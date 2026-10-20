@@ -3,6 +3,8 @@ import { DATA } from "./resume";
 export const projects = DATA.projects.map((project) => ({
   ...project,
   alt: `${project.title} interface`,
+  // Link to the launch post rather than autoplaying the launch film.
+  launch: (project as { launch?: { x: string; linkedin: string } }).launch,
 }));
 export type PortfolioEvent = {
   id: string;

@@ -102,8 +102,17 @@
 .source-link {
   right: 14px;
 }
-.sound-toggle {
+/* Launch posts sit beside the work rather than playing over it. */
+.launch-links {
+  position: absolute;
+  z-index: 2;
+  bottom: 14px;
   left: 14px;
+  display: flex;
+  gap: 8px;
+}
+.launch-links .media-button {
+  position: static;
 }
 
 /* Title on the left, its number on the display to the right; hovering the card turns it into an arrow. */
@@ -169,7 +178,8 @@
   .source-link {
     right: 10px;
   }
-  .sound-toggle {
+  .launch-links {
+    bottom: 10px;
     left: 10px;
   }
 }
