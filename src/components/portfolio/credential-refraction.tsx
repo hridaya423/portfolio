@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { CredentialRefractionScene } from "./credential-refraction-scene";
+import type * as THREE from "three";
+import { CredentialRefractionScene } from "./credential-refraction-scene";
+import { getStage, type Frame, type ViewHandle } from "./gl/stage";
 
 export function CredentialRefraction({ inscription }: { inscription: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -12,23 +14,39 @@ export function CredentialRefraction({ inscription }: { inscription: string }) {
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-    const area = canvas.parentElement;
-    if (!area) return;
+    const area = canvas?.parentElement;
+    const stage = getStage();
+    if (!canvas || !area || !stage) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    const coarse = matchMedia("(pointer: coarse)");
     let scene: CredentialRefractionScene | undefined;
-    let disposed = false, visible = false, loading = false, contextLost = false;
-    let frame = 0, previous = 0, changeTime = 0;
+    let handle: ViewHandle | undefined;
+    let disposed = false, touching = false, surfaceDirty = true;
+    let changeTime = 0, size = "";
     let x = 0, y = 0, targetX = 0, targetY = 0;
     let current = initialLabel.current, pending = initialLabel.current;
     const font = getComputedStyle(area).fontFamily;
-    const draw = (now: number) => {
-      frame = 0;
-      if (!scene || disposed || contextLost || !visible || document.hidden) { previous = 0; return; }
-      if (!reduced.matches && previous && now - previous < 32) { frame = requestAnimationFrame(draw); return; }
-      const delta = previous ? Math.min((now - previous) / 1000, .05) : 1 / 60;
-      previous = now;
-      const follow = reduced.matches ? 1 : 1 - Math.exp(-delta * 9);
+
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      if (!scene) {
+        scene = new CredentialRefractionScene(renderer, frame.settings.caustics);
+        current = pending;
+        scene.setInscription(current, font);
+      }
+      const key = `${frame.cssWidth}x${frame.cssHeight}`;
+      if (key !== size || surfaceDirty) {
+        size = key;
+        surfaceDirty = false;
+        const surface = getComputedStyle(area).getPropertyValue("--paper").trim() || "#efeff0";
+        scene.resize(frame.cssWidth, frame.cssHeight, frame.cssWidth < 700, surface);
+      }
+      const now = frame.now;
+      // Without a pointer the light wanders on its own, so phones see the water move too.
+      if (coarse.matches && !touching && !reduced.matches) {
+        targetX = Math.sin(now * .00023) * .45;
+        targetY = Math.sin(now * .00017 + 1) * .3;
+      }
+      const follow = reduced.matches ? 1 : 1 - Math.exp(-Math.min(frame.delta, .05) * 9);
       x += (targetX - x) * follow;
       y += (targetY - y) * follow;
       const progress = reduced.matches ? 1 : Math.min(1, (now - changeTime) / 550);
@@ -39,82 +57,47 @@ export function CredentialRefraction({ inscription }: { inscription: string }) {
       const focus = progress < .32 ? 1 - progress / .32 : Math.min(1, (progress - .32) / .68);
       const moving = Math.abs(targetX - x) + Math.abs(targetY - y) > .0005 || progress < 1;
       scene.draw(x, y, focus, reduced.matches ? 0 : now / 1000);
-      canvas.dataset.ready = "true";
       canvas.dataset.moving = String(moving);
-      if (moving || !reduced.matches) frame = requestAnimationFrame(draw);
-      else previous = 0;
+      return moving || !reduced.matches;
     };
-    const wake = () => {
-      if (!frame && scene && visible && !document.hidden && !disposed && !contextLost) frame = requestAnimationFrame(draw);
-    };
-    const resize = () => {
-      if (!scene) return;
-      const bounds = canvas.getBoundingClientRect();
-      if (!bounds.width || !bounds.height) return;
-      const surface = getComputedStyle(area).getPropertyValue("--paper").trim() || "#efeff0";
-      scene.resize(bounds.width, bounds.height, bounds.width < 700, surface);
-      wake();
-    };
-    const initialize = async () => {
-      if (loading || scene || disposed) return;
-      loading = true;
-      try {
-        const [{ CredentialRefractionScene }] = await Promise.all([
-          import("./credential-refraction-scene"), document.fonts.load(`500 380px ${font}`),
-        ]);
-        if (disposed) return;
-        scene = new CredentialRefractionScene(canvas);
-        current = pending;
-        scene.setInscription(current, font);
-        resize();
-      } catch {
-        canvas.dataset.ready = "false";
-      }
-    };
-    changeRef.current = label => { pending = label; changeTime = performance.now(); wake(); };
+
+    changeRef.current = label => { pending = label; changeTime = performance.now(); handle?.wake(); };
     const pointer = (event: PointerEvent) => {
-      if (reduced.matches || event.pointerType === "touch") return;
+      if (reduced.matches) return;
+      touching = event.pointerType !== "mouse";
       const bounds = area.getBoundingClientRect();
       targetX = (event.clientX - bounds.left) / bounds.width * 2 - 1;
       targetY = (event.clientY - bounds.top) / bounds.height * 2 - 1;
-      wake();
+      handle?.wake();
     };
-    const reset = () => { targetX = 0; targetY = 0; wake(); };
-    const lost = (event: Event) => {
-      event.preventDefault();
-      contextLost = true;
-      canvas.dataset.ready = "false";
-      cancelAnimationFrame(frame);
-      frame = 0;
-    };
-    const restored = () => { contextLost = false; resize(); };
-    const observer = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) { void initialize(); wake(); }
-      else { cancelAnimationFrame(frame); frame = 0; previous = 0; }
-    }, { rootMargin: "150px" });
-    observer.observe(canvas);
-    const size = new ResizeObserver(resize);
-    size.observe(canvas);
-    const theme = new MutationObserver(resize);
+    const reset = () => { touching = false; targetX = 0; targetY = 0; handle?.wake(); };
+    const theme = new MutationObserver(() => { surfaceDirty = true; handle?.wake(); });
     theme.observe(document.documentElement, { attributes: true, attributeFilter: ["class", "style"] });
     area.addEventListener("pointermove", pointer);
     area.addEventListener("pointerleave", reset);
-    canvas.addEventListener("webglcontextlost", lost);
-    canvas.addEventListener("webglcontextrestored", restored);
-    document.addEventListener("visibilitychange", wake);
+    area.addEventListener("pointercancel", reset);
+    area.addEventListener("pointerup", reset);
     reduced.addEventListener("change", reset);
+    document.fonts.load(`500 380px ${font}`).catch(() => {}).then(() => {
+      if (disposed) return;
+      handle = stage.add({
+        placeholder: canvas,
+        ratio: () => Math.min(devicePixelRatio, 1.5),
+        fps: settings => settings.caustics.fps,
+        priority: () => touching ? 3 : 1,
+        render,
+      });
+    });
     return () => {
       disposed = true;
-      cancelAnimationFrame(frame);
-      observer.disconnect(); size.disconnect(); theme.disconnect();
+      theme.disconnect();
       area.removeEventListener("pointermove", pointer);
       area.removeEventListener("pointerleave", reset);
-      canvas.removeEventListener("webglcontextlost", lost);
-      canvas.removeEventListener("webglcontextrestored", restored);
-      document.removeEventListener("visibilitychange", wake);
+      area.removeEventListener("pointercancel", reset);
+      area.removeEventListener("pointerup", reset);
       reduced.removeEventListener("change", reset);
       changeRef.current = null;
+      handle?.remove();
       scene?.dispose();
     };
   }, []);

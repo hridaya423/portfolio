@@ -167,6 +167,7 @@
   width: 112%;
   margin-left: -6%;
   isolation: isolate;
+  touch-action: pan-y;
 }
 .cloud-artwork-stacked {
   aspect-ratio: 1.6;

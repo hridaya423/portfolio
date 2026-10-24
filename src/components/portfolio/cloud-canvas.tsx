@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type * as THREE from "three";
 import { CloudFlow } from "./cloud-flow";
 import { CloudScene } from "./cloud-scene";
+import type { Settings } from "./gl/quality";
+import { getStage, type Frame, type ViewHandle } from "./gl/stage";
 
 const vertex = `#version 300 es
 in vec3 position;
@@ -26,6 +29,10 @@ uniform sampler3D airflow;
 uniform float flowEnabled;
 uniform float cloudScale;
 uniform vec2 viewSize;
+uniform int lightSamples;
+uniform int lightEvery;
+uniform float lightGrowth;
+uniform float jitter;
 const vec3 sun = vec3(-.55, .68, .48);
 float letter(vec2 p) {
   vec2 st = p / viewSize + .5;
@@ -67,9 +74,10 @@ float sunlight(vec3 p) {
   float distance = .025;
   float stride = .035;
   for (int i = 0; i < 6; i++) {
+    if (i >= lightSamples) break;
     optical += density(p + sun * distance, i < 2) * stride;
     distance += stride;
-    stride *= 1.65;
+    stride *= lightGrowth;
   }
   return optical;
 }
@@ -79,7 +87,8 @@ vec3 toSRGB(vec3 v) {
 void main() {
   vec2 p = (uv - .5) * viewSize;
   float stride = 1.7 / steps;
-  float midpoint = .5;
+  // Fewer steps band; a per-pixel offset turns the bands into fine grain.
+  float midpoint = jitter > 0. ? fract(52.9829189 * fract(dot(gl_FragCoord.xy + jitter * 5.588238, vec2(.06711056, .00583715)))) : .5;
   float transmission = 1.;
   vec3 radiance = vec3(0.);
   float opticalSum = 0.;
@@ -90,7 +99,7 @@ void main() {
     vec3 samplePoint = vec3(p * (5. - z) / 5., z);
     float rho = density(samplePoint, true);
     if (rho < .015) { optical = -1.; continue; }
-    if (i % 2 == 0 || optical < 0.) {
+    if (i % lightEvery == 0 || optical < 0.) {
       optical = sunlight(samplePoint);
     }
     float direct = exp(-optical * 1.35);
@@ -179,150 +188,132 @@ export function CloudCanvas({ fontFamily, city, playing }: { fontFamily: string;
   }, [playing]);
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const artwork = canvas?.parentElement;
+    const stage = getStage();
+    if (!canvas || !artwork || !stage) return;
     const review = window.location.pathname.startsWith("/review/");
     const params = new URLSearchParams(window.location.search);
     const flow = new CloudFlow();
-    let scene: CloudScene;
-    try {
-      scene = new CloudScene(canvas, vertex, fragment, flow, review && params.has("cloudCapture"));
-    } catch {
-      return;
-    }
-    const gl = scene.renderer.getContext();
-    const abort = new AbortController();
-    let disposed = false;
-    let frame = 0;
-    const dispose = () => {
-      disposed = true;
-      abort.abort();
-      cancelAnimationFrame(frame);
-      wakeRef.current = null;
-      scene.dispose();
-    };
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    const details = canvas.closest("details");
     const profiling = review && params.has("cloudProfile");
-    let frameTotal = 0, frameSamples = 0;
     const frozen = review && params.has("cloudTime");
     const requestedTime = Number(params.get("cloudTime"));
     let elapsed = frozen && Number.isFinite(requestedTime) ? requestedTime : 0;
-    scene.uniforms.diagnostic.value = review ? Number(params.get("cloudDebug")) || 0 : 0;
-    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-    const details = canvas.closest("details");
-    let ready = false, visible = false, previous = 0;
-    let width = 0, height = 0;
-    const artwork = canvas.parentElement;
-    if (!artwork) { dispose(); return; }
+    let frameTotal = 0, frameSamples = 0;
+    let scene: CloudScene | null = null;
+    let mask: ReturnType<typeof glyphDistance> | null = null;
+    let handle: ViewHandle | null = null;
+    let disposed = false;
     let pointerX = 20, pointerY = 20, pointerActive = 0;
     let cursorX = 20, cursorY = 20, cursorAmount = 0;
-    let flowTime = 0;
+    const wake = () => handle?.wake();
+    wakeRef.current = wake;
+
+    // Touch stirs too: horizontal drags reach the clouds, vertical ones still scroll the page.
     const pointerMove = (event: PointerEvent) => {
-      if (event.pointerType === "touch" || !playingRef.current || reduced.matches) return;
+      if (!playingRef.current || reduced.matches) return;
       const bounds = artwork.getBoundingClientRect();
       const x = ((event.clientX - bounds.left) / bounds.width - .5) * 6.8;
       const y = (.5 - (event.clientY - bounds.top) / bounds.height) * 2.55;
       if (!pointerActive) { cursorX = x; cursorY = y; }
       pointerX = x; pointerY = y; pointerActive = 1;
+      wake();
     };
     const pointerLeave = () => { pointerActive = 0; };
-    artwork.addEventListener("pointermove", pointerMove);
-    artwork.addEventListener("pointerleave", pointerLeave);
-    const tick = (now: number) => {
-      frame = 0;
-      if (disposed || !ready || !visible || document.hidden || (details && !details.open) || gl.isContextLost()) { previous = 0; return; }
-      const moving = playingRef.current && !reduced.matches && !frozen;
-      if (profiling && previous && moving && frameSamples < 180) {
-        frameTotal += now - previous;
-        frameSamples++;
-        canvas.dataset.frameMs = (frameTotal / frameSamples).toFixed(2);
+    const touchEnd = (event: PointerEvent) => { if (event.pointerType !== "mouse") pointerActive = 0; };
+
+    // Tiers that hold a still frame draw that one frame at full quality; the
+    // cheap settings are only for frames that are about to be replaced.
+    const moving = () => playingRef.current && !reduced.matches && !frozen;
+    const lively = (settings: Settings["cloud"]) => moving() && (settings.idleFps > 0 || flow.active || pointerActive > 0 || cursorAmount > .01);
+    let refined = false, seed = 0;
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      const settings = frame.settings.cloud;
+      if (!scene && mask) {
+        scene = new CloudScene(renderer, vertex, fragment, flow);
+        scene.uniforms.diagnostic.value = review ? Number(params.get("cloudDebug")) || 0 : 0;
+        scene.uniforms.cloudScale.value = mask.cloudScale;
+        scene.uniforms.viewSize.value.set(6.8, 6.8 * mask.height / mask.width);
+        scene.setGlyph(mask);
       }
-      const delta = previous ? Math.min((now - previous) / 1000, .1) : 1 / 60;
-      if (previous && moving) elapsed += delta;
-      if (moving) {
+      if (!scene) return false;
+      flow.relax = settings.idleFps < 60 ? .7 : 0;
+      const wide = frame.cssWidth >= 600;
+      if (refined) {
+        scene.uniforms.steps.value = wide ? 128 : 96;
+        scene.setLighting(6, 2);
+        scene.setJitter(0);
+      } else {
+        scene.uniforms.steps.value = settings.steps === 128 && !wide ? 96 : settings.steps;
+        scene.setLighting(settings.lightSamples, settings.lightEvery);
+        scene.setJitter(settings.steps < 48 ? (seed = seed % 64 + 1) : 0);
+      }
+      const wasLively = !refined;
+      let flowChanged = frame.first;
+      if (moving()) {
+        const delta = frame.first ? 1 / 60 : frame.delta;
+        if (!frame.first) elapsed += delta;
+        if (profiling && !frame.first && frameSamples < 180) {
+          frameTotal += delta * 1000;
+          frameSamples++;
+          canvas.dataset.frameMs = (frameTotal / frameSamples).toFixed(2);
+        }
         const follow = 1 - Math.exp(-delta * 9);
         const previousX = cursorX, previousY = cursorY;
         cursorX += (pointerX - cursorX) * follow;
         cursorY += (pointerY - cursorY) * follow;
         if (pointerActive) flow.stir(previousX, previousY, cursorX, cursorY, .3 * scene.uniforms.cloudScale.value);
         cursorAmount += (pointerActive - cursorAmount) * (1 - Math.exp(-delta * 8));
-        flowTime += delta;
-        let substeps = 0;
-        while (flowTime >= 1 / 60 && substeps < 4) {
-          flow.step(1 / 60);
-          flowTime -= 1 / 60;
-          substeps++;
+        // One step per drawn frame: catching up with several is what made slow phones slower.
+        if (flow.active) {
+          flow.step(Math.min(delta, 1 / 30));
+          flowChanged = true;
         }
-        flowTime = Math.min(flowTime, 1 / 60);
       }
-      previous = moving ? now : 0;
-      scene.draw(elapsed, !reduced.matches);
-      canvas.dataset.ready = "true";
+      scene.draw(renderer, elapsed, !reduced.matches, flowChanged);
       if (review) {
         canvas.dataset.cloudTime = elapsed.toFixed(3);
         canvas.dataset.cursor = cursorAmount.toFixed(3);
       }
-      if (moving) frame = requestAnimationFrame(tick);
+      // Settling down: one more frame, drawn refined.
+      return lively(settings) || (wasLively && settings.idleFps === 0 && !frame.first);
     };
-    const wake = () => {
-      if (!frame && !disposed) frame = requestAnimationFrame(tick);
-    };
-    wakeRef.current = wake;
-    const resize = () => {
-      const bounds = canvas.getBoundingClientRect();
-      if (!bounds.width || !bounds.height) return;
-      const ratio = Math.min(devicePixelRatio, bounds.width > 900 ? 1 : 1.25);
-      const nextWidth = Math.round(bounds.width * ratio);
-      const nextHeight = Math.round(bounds.height * ratio);
-      if (nextWidth === width && nextHeight === height) return;
-      canvas.dataset.ready = "false";
-      width = nextWidth;
-      height = nextHeight;
-      scene.resize(width, height);
-      scene.uniforms.steps.value = bounds.width < 600 ? 96 : 128;
-      wake();
-    };
-    const sizeObserver = new ResizeObserver(resize);
-    sizeObserver.observe(canvas);
-    const visibility = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; previous = 0; wake(); });
-    visibility.observe(canvas);
-    const lost = () => { canvas.dataset.ready = "false"; cancelAnimationFrame(frame); frame = 0; };
-    canvas.addEventListener("webglcontextlost", lost);
-    document.addEventListener("visibilitychange", wake);
+
+    artwork.addEventListener("pointermove", pointerMove);
+    artwork.addEventListener("pointerleave", pointerLeave);
+    artwork.addEventListener("pointerup", touchEnd);
+    artwork.addEventListener("pointercancel", pointerLeave);
     details?.addEventListener("toggle", wake);
     reduced.addEventListener("change", wake);
-    Promise.all([
-      document.fonts.load(`900 300px ${fontFamily}`),
-      fetch("/materials/cloud-noise.bin", { signal: abort.signal }).then(response => {
-        if (!response.ok) throw new Error("Cloud density fields unavailable");
-        return response.arrayBuffer();
-      }),
-    ]).then(([, bytes]) => {
-      if (disposed || gl.isContextLost()) return;
-      if (bytes.byteLength !== 64 ** 3 * 4) throw new Error("Invalid cloud density fields");
-      const mask = glyphDistance(fontFamily, city);
-      scene.uniforms.cloudScale.value = mask.cloudScale;
-      scene.uniforms.viewSize.value.set(6.8, 6.8 * mask.height / mask.width);
-      flow.clear();
-      scene.setCloud(mask, bytes);
-      ready = true;
-      resize();
-      wake();
+    document.fonts.load(`900 300px ${fontFamily}`).then(() => {
+      if (disposed) return;
+      mask = glyphDistance(fontFamily, city);
+      handle = stage.add({
+        placeholder: canvas,
+        ratio: (settings, width) => {
+          refined = !lively(settings.cloud);
+          return Math.min(devicePixelRatio, width > 900 ? 1 : 1.25) * (refined ? 1 : settings.cloud.scale);
+        },
+        fps: settings => flow.active || pointerActive ? settings.cloud.activeFps : settings.cloud.idleFps || settings.cloud.activeFps,
+        priority: () => details && !details.open ? 0 : pointerActive ? 3 : 1,
+        render,
+      });
     }).catch(error => {
-      if (!disposed) {
-        canvas.dataset.ready = "false";
-        console.error("Cloud artwork unavailable:", error);
-      }
+      if (!disposed) console.error("Cloud artwork unavailable:", error);
     });
     return () => {
+      disposed = true;
+      wakeRef.current = null;
       artwork.removeEventListener("pointermove", pointerMove);
       artwork.removeEventListener("pointerleave", pointerLeave);
-      sizeObserver.disconnect();
-      visibility.disconnect();
-      canvas.removeEventListener("webglcontextlost", lost);
-      document.removeEventListener("visibilitychange", wake);
+      artwork.removeEventListener("pointerup", touchEnd);
+      artwork.removeEventListener("pointercancel", pointerLeave);
       details?.removeEventListener("toggle", wake);
       reduced.removeEventListener("change", wake);
+      handle?.remove();
+      scene?.dispose();
       canvas.dataset.ready = "false";
-      dispose();
     };
   }, [fontFamily, city]);
   return <canvas ref={canvasRef} className="cloud-canvas" aria-hidden="true" />;

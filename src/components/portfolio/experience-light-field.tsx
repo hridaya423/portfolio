@@ -1,13 +1,15 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import * as THREE from "three";
+import { getStage, type Frame } from "./gl/stage";
 
-const vertex = `#version 300 es
-in vec2 position;
-void main() { gl_Position = vec4(position, 0.0, 1.0); }
+const vertex = `
+in vec3 position;
+void main() { gl_Position = vec4(position, 1.0); }
 `;
 
-const fragment = `#version 300 es
+const fragment = `
 precision highp float;
 uniform vec2 resolution;
 uniform vec2 size;
@@ -100,167 +102,121 @@ void main() {
 }
 `;
 
+type Row = { top: number; height: number };
+
 export function ExperienceLightField({ count }: { count: number }) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = ref.current;
     const section = canvas?.parentElement;
-    if (!canvas || !section || !count) return;
-    const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, powerPreference: "low-power" });
-    if (!gl) return;
-    let dispose = () => {};
-    let stopped = false;
+    const stage = getStage();
+    if (!canvas || !section || !count || !stage) return;
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+    // Per-role light: 0 until the role scrolls into view, then eases to 1 and stays.
+    const lit = new Float32Array(count).fill(reduced.matches ? 1 : 0);
+    const targets = new Float32Array(count).fill(reduced.matches ? 1 : 0);
+    const data = new Float32Array(count * 4);
+    const rowTexture = new THREE.DataTexture(data, count, 1, THREE.RGBAFormat, THREE.FloatType);
+    rowTexture.minFilter = rowTexture.magFilter = THREE.NearestFilter;
+    const uniforms = {
+      resolution: { value: new THREE.Vector2(1, 1) },
+      size: { value: new THREE.Vector2(1, 1) },
+      slit: { value: 0 },
+      openTo: { value: 0 },
+      count: { value: count },
+      rows: { value: rowTexture },
+    };
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
+    const material = new THREE.RawShaderMaterial({ vertexShader: vertex, fragmentShader: fragment, glslVersion: THREE.GLSL3, uniforms, depthTest: false, depthWrite: false });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    const scene = new THREE.Scene().add(mesh);
+    const camera = new THREE.Camera();
 
-    function initialize() {
-      if (!gl || !canvas || !section) return;
-      let active = true;
-      const shaders: WebGLShader[] = [];
-      const program = gl.createProgram();
-      if (!program) return;
-      for (const [type, source] of [[gl.VERTEX_SHADER, vertex], [gl.FRAGMENT_SHADER, fragment]] as const) {
-        const shader = gl.createShader(type);
-        if (!shader) {
-          shaders.forEach(item => gl.deleteShader(item));
-          gl.deleteProgram(program);
-          return;
-        }
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-          console.error("Experience light shader:", gl.getShaderInfoLog(shader));
-          gl.deleteShader(shader);
-          shaders.forEach(item => gl.deleteShader(item));
-          gl.deleteProgram(program);
-          return;
-        }
-        shaders.push(shader);
-        gl.attachShader(program, shader);
-      }
-      gl.linkProgram(program);
-      shaders.forEach(shader => gl.deleteShader(shader));
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-        console.error("Experience light program:", gl.getProgramInfoLog(program));
-        gl.deleteProgram(program);
-        return;
-      }
-      gl.useProgram(program);
-      const buffer = gl.createBuffer();
-      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 3,-1, -1,3]), gl.STATIC_DRAW);
-      const position = gl.getAttribLocation(program, "position");
-      gl.enableVertexAttribArray(position);
-      gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-      const texture = gl.createTexture();
-      gl.bindTexture(gl.TEXTURE_2D, texture);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-      const uniforms = Object.fromEntries(["resolution", "size", "slit", "openTo", "count", "rows"].map(name => [name, gl.getUniformLocation(program, name)]));
-      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
-      // Per-role light: 0 until the role scrolls into view, then eases to 1 and stays.
-      const lit = new Float32Array(count).fill(reduced.matches ? 1 : 0);
-      const targets = new Float32Array(count).fill(reduced.matches ? 1 : 0);
-      let frame = 0, previous = 0, visible = false;
-      const draw = (now: number) => {
-        frame = 0;
-        if (!active || stopped || gl.isContextLost()) return;
-        const bounds = section.getBoundingClientRect();
-        const entries = Array.from(section.querySelectorAll<HTMLElement>(".experience-entry"));
-        const bodies = entries.map((entry) => entry.querySelector<HTMLElement>(".experience-body") ?? entry);
-        const body = bodies[0];
-        if (!bounds.width || !bounds.height || !entries.length) return;
-        const delta = previous ? Math.min((now - previous) / 1000, .05) : 1 / 60;
-        previous = now;
-        let moving = false;
-        for (let index = 0; index < count; index++) {
-          const gap = targets[index] - lit[index];
-          if (Math.abs(gap) > .002) {
-            lit[index] += gap * (1 - Math.exp(-delta * 2.4));
-            moving = true;
-          } else lit[index] = targets[index];
-        }
-        // One fixed resolution: switching it as beams settle reads as a pop.
-        const maximum = gl.getParameter(gl.MAX_RENDERBUFFER_SIZE) as number;
-        const ratio = Math.min(devicePixelRatio, 1.5, maximum / bounds.height, maximum / bounds.width, Math.sqrt(8000000 / (bounds.width * bounds.height)));
-        const width = Math.round(bounds.width * ratio), height = Math.round(bounds.height * ratio);
-        if (canvas.width !== width || canvas.height !== height) {
-          canvas.width = width;
-          canvas.height = height;
-        }
-        gl.viewport(0, 0, canvas.width, canvas.height);
-        const data = new Float32Array(entries.length * 4);
-        let openTo = 0;
-        bodies.forEach((text, index) => {
-          // Layout box, so the reveal's translate doesn't drag the light with it.
-          const parent = text.offsetParent?.getBoundingClientRect().top ?? bounds.top;
-          const box = { top: parent + text.offsetTop, height: text.offsetHeight };
-          data[index * 4] = box.top - bounds.top;
-          data[index * 4 + 1] = box.height;
-          data[index * 4 + 2] = lit[index] ?? 1;
-          if (lit[index] > .001) openTo = Math.max(openTo, box.top - bounds.top + box.height * Math.min(1, lit[index] * 1.4));
-        });
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA32F, entries.length, 1, 0, gl.RGBA, gl.FLOAT, data);
-        gl.uniform2f(uniforms.resolution, canvas.width, canvas.height);
-        gl.uniform2f(uniforms.size, bounds.width, bounds.height);
-        const slit = body ? body.getBoundingClientRect().left - bounds.left - Math.min(72, bounds.width * .06) : bounds.width * .2;
-        gl.uniform1f(uniforms.slit, slit);
-        gl.uniform1f(uniforms.openTo, openTo);
-        gl.uniform1i(uniforms.count, entries.length);
-        gl.uniform1i(uniforms.rows, 0);
-        gl.drawArrays(gl.TRIANGLES, 0, 3);
-        canvas.dataset.ready = "true";
-        if (moving && visible) frame = requestAnimationFrame(draw);
-        else previous = 0;
-      };
-      const schedule = () => { if (!active) return; cancelAnimationFrame(frame); frame = requestAnimationFrame(draw); };
-      const aim = () => {
-        if (reduced.matches) return;
-        let changed = false;
-        section.querySelectorAll<HTMLElement>(".experience-entry").forEach((entry, index) => {
-          if (!targets[index] && entry.getBoundingClientRect().top < innerHeight * .7) {
-            targets[index] = 1;
-            changed = true;
-          }
-        });
-        if (changed) schedule();
-      };
-      const visibility = new IntersectionObserver(([entry]) => {
-        visible = entry.isIntersecting;
-        if (visible) { aim(); schedule(); }
+    // Layout is read when it can change, never per frame.
+    let rows: Row[] = [];
+    let slit = 0;
+    const measure = () => {
+      const bounds = section.getBoundingClientRect();
+      const bodies = Array.from(section.querySelectorAll<HTMLElement>(".experience-entry"))
+        .map(entry => entry.querySelector<HTMLElement>(".experience-body") ?? entry);
+      // Layout box, so the reveal's translate doesn't drag the light with it.
+      rows = bodies.map(text => {
+        const parent = text.offsetParent?.getBoundingClientRect().top ?? bounds.top;
+        return { top: parent + text.offsetTop - bounds.top, height: text.offsetHeight };
       });
-      visibility.observe(section);
-      const scroll = () => { if (visible) aim(); };
-      window.addEventListener("scroll", scroll, { passive: true });
-      const observer = new ResizeObserver(schedule);
-      observer.observe(section);
-      window.addEventListener("resize", schedule);
-      section.querySelectorAll(".experience-entry").forEach(entry => observer.observe(entry));
-      document.fonts.ready.then(() => { if (!stopped) schedule(); });
-      schedule();
-      dispose = () => {
-        active = false;
-        visibility.disconnect();
-        window.removeEventListener("scroll", scroll);
-        window.removeEventListener("resize", schedule);
-        cancelAnimationFrame(frame);
-        observer.disconnect();
-        gl.deleteTexture(texture);
-        gl.deleteBuffer(buffer);
-        gl.deleteProgram(program);
-      };
-    }
-    const lost = (event: Event) => { event.preventDefault(); delete canvas.dataset.ready; dispose(); };
-    initialize();
-    canvas.addEventListener("webglcontextlost", lost);
-    canvas.addEventListener("webglcontextrestored", initialize);
+      const body = bodies[0];
+      slit = body ? body.getBoundingClientRect().left - bounds.left - Math.min(72, bounds.width * .06) : bounds.width * .2;
+    };
+
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      if (!rows.length) measure();
+      let moving = false;
+      for (let index = 0; index < count; index++) {
+        const gap = targets[index] - lit[index];
+        if (Math.abs(gap) > .002) {
+          lit[index] += gap * (1 - Math.exp(-frame.delta * 2.4));
+          moving = true;
+        } else lit[index] = targets[index];
+      }
+      let openTo = 0;
+      rows.forEach((row, index) => {
+        data[index * 4] = row.top;
+        data[index * 4 + 1] = row.height;
+        data[index * 4 + 2] = lit[index] ?? 1;
+        if (lit[index] > .001) openTo = Math.max(openTo, row.top + row.height * Math.min(1, lit[index] * 1.4));
+      });
+      rowTexture.needsUpdate = true;
+      uniforms.resolution.value.set(frame.width, frame.height);
+      uniforms.size.value.set(frame.cssWidth, frame.cssHeight);
+      uniforms.slit.value = slit;
+      uniforms.openTo.value = openTo;
+      uniforms.count.value = Math.min(count, rows.length);
+      renderer.render(scene, camera);
+      return moving;
+    };
+
+    const handle = stage.add({
+      placeholder: canvas,
+      // Soft light: a fixed pixel budget looks the same and costs a fraction on tall phones.
+      ratio: (settings, width, height) => Math.min(devicePixelRatio, 1.5, Math.sqrt(settings.light.budget / (width * height))),
+      // A background: whatever sits on top of it gets the canvas first.
+      priority: () => 0.3,
+      render,
+    });
+    const aim = () => {
+      if (reduced.matches) return;
+      let changed = false;
+      section.querySelectorAll<HTMLElement>(".experience-entry").forEach((entry, index) => {
+        if (!targets[index] && entry.getBoundingClientRect().top < innerHeight * .7) {
+          targets[index] = 1;
+          changed = true;
+        }
+      });
+      if (changed) handle.wake();
+    };
+    let near = false;
+    const visibility = new IntersectionObserver(([entry]) => {
+      near = entry.isIntersecting;
+      if (near) aim();
+    });
+    visibility.observe(section);
+    const scroll = () => { if (near) aim(); };
+    window.addEventListener("scroll", scroll, { passive: true });
+    const relayout = () => { measure(); handle.wake(); };
+    const sizes = new ResizeObserver(relayout);
+    section.querySelectorAll(".experience-entry").forEach(entry => sizes.observe(entry));
+    document.fonts.ready.then(relayout);
     return () => {
-      stopped = true;
-      dispose();
-      canvas.removeEventListener("webglcontextlost", lost);
-      canvas.removeEventListener("webglcontextrestored", initialize);
+      visibility.disconnect();
+      sizes.disconnect();
+      window.removeEventListener("scroll", scroll);
+      handle.remove();
+      rowTexture.dispose();
+      geometry.dispose();
+      material.dispose();
     };
   }, [count]);
 

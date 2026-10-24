@@ -19,15 +19,29 @@ export class CloudFlow {
   private pressure = new Float32Array(SIZE);
   private nextPressure = new Float32Array(SIZE);
   private divergence = new Float32Array(SIZE);
+  private calm = 0;
+  private wasStill = false;
+  /** False once the air has settled: stepping would change nothing visible, so callers skip it. */
+  active = false;
+  /**
+   * Once the air is still, the vapor heals by diffusion alone, which takes
+   * minutes. A positive rate also pulls it home exponentially, so devices that
+   * can't afford minutes of simulation settle in seconds instead.
+   */
+  relax = 0;
 
   clear() {
     for (const field of [this.pixels, this.material, this.velocity, this.nextVelocity, this.pressure, this.nextPressure, this.divergence]) field.fill(0);
+    this.active = false;
   }
 
   stir(fromX: number, fromY: number, toX: number, toY: number, depth = .3) {
     const dx = toX - fromX, dy = toY - fromY, dz = 0;
     const distance = Math.hypot(dx, dy, dz);
     if (distance < .0001) return;
+    this.active = true;
+    this.calm = 0;
+    this.wasStill = false;
     const samples = Math.max(1, Math.ceil(distance * SCALE));
     const strength = Math.min(distance * .8, 2) / samples;
     const radius = .22;
@@ -65,8 +79,9 @@ export class CloudFlow {
   }
 
   step(dt: number) {
+    if (!this.active) return;
     dt = Math.min(dt, 1 / 30);
-    const drag = Math.exp(-dt * .65);
+    const drag = Math.exp(-dt * (.65 + this.relax));
     for (let z = 1; z < DEPTH - 1; z++) for (let y = 1; y < HEIGHT - 1; y++) for (let x = 1; x < WIDTH - 1; x++) {
       const i = z * LAYER + y * WIDTH + x;
       const px = x - this.velocity[i * 3] * dt;
@@ -87,18 +102,31 @@ export class CloudFlow {
       }
       [this.pressure, this.nextPressure] = [this.nextPressure, this.pressure];
     }
+    let speed = 0, change = 0, displaced = 0;
+    const settle = this.relax > 0 && this.wasStill ? Math.exp(-dt * this.relax) : 1;
     for (let z = 1; z < DEPTH - 1; z++) for (let y = 1; y < HEIGHT - 1; y++) for (let x = 1; x < WIDTH - 1; x++) {
       const i = z * LAYER + y * WIDTH + x;
-      for (let c = 0; c < 3; c++) this.velocity[i * 3 + c] = clamp(this.velocity[i * 3 + c] - .5 * (this.pressure[i + NEIGHBORS[c]] - this.pressure[i - NEIGHBORS[c]]), -16, 16);
+      for (let c = 0; c < 3; c++) {
+        const v = clamp(this.velocity[i * 3 + c] - .5 * (this.pressure[i + NEIGHBORS[c]] - this.pressure[i - NEIGHBORS[c]]), -16, 16);
+        this.velocity[i * 3 + c] = v;
+        speed = Math.max(speed, Math.abs(v));
+      }
       const px = x - this.velocity[i * 3] * dt;
       const py = y - this.velocity[i * 3 + 1] * dt;
       const pz = z - this.velocity[i * 3 + 2] * dt;
       for (let c = 0; c < 3; c++) {
         const transported = this.sample(this.pixels, px, py, pz, 4, c) - this.velocity[i * 3 + c] * dt / (c === 2 ? Z_SCALE : SCALE);
         const mixed = (this.pixels[(i - 1) * 4 + c] + this.pixels[(i + 1) * 4 + c] + this.pixels[(i - WIDTH) * 4 + c] + this.pixels[(i + WIDTH) * 4 + c] + this.pixels[(i - LAYER) * 4 + c] + this.pixels[(i + LAYER) * 4 + c]) / 6;
-        this.material[i * 4 + c] = transported * (1 - dt * .45) + mixed * dt * .45;
+        const next = (transported * (1 - dt * .45) + mixed * dt * .45) * settle;
+        change = Math.max(change, Math.abs(next - this.pixels[i * 4 + c]));
+        displaced = Math.max(displaced, Math.abs(next));
+        this.material[i * 4 + c] = next;
       }
     }
     this.pixels.set(this.material);
+    this.wasStill = speed < .02;
+    // Settled for half a second: what remains is a still, slightly stirred cloud.
+    this.calm = this.wasStill && (change < 1e-4 || displaced < .004) ? this.calm + 1 : 0;
+    if (this.calm > 30) this.active = false;
   }
 }

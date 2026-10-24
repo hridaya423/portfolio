@@ -1,8 +1,4 @@
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { ShaderPass } from "three/examples/jsm/postprocessing/ShaderPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 import { GLYPH_CHARACTERS, GLYPH_HEIGHT, glyphAtlas } from "./dot-matrix-font";
 
 /** Characters per module line, lines per module, and the repeating wall size in modules. */
@@ -144,77 +140,76 @@ void main() {
   float lit = clamp(own * boost, 0., 1.3) * hole;
   vec3 emission = mix(RIM, CORE, 1. - smoothstep(.05, .32, length(inDot)));
   result = mix(result, emission, clamp(lit, 0., 1.));
-  color = vec4(result, 1.);
+  // Stored as sRGB so an 8-bit target keeps the shadows smooth on every GPU.
+  result = max(result, 0.);
+  color = vec4(mix(result * 12.92, 1.055 * pow(result, vec3(1. / 2.4)) - .055, step(vec3(.0031308), result)), 1.);
 }`;
 
-const lens = {
-  uniforms: {
-    tDiffuse: { value: null },
-    resolution: { value: new THREE.Vector2(1, 1) },
-    focus: { value: new THREE.Vector2(.5, .5) },
-    paper: { value: new THREE.Color("#efeff0") },
-    blur: { value: 14 },
-    time: { value: 0 },
-  },
-  vertexShader: `
-    varying vec2 vUv;
-    void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.); }`,
-  fragmentShader: `
-    uniform sampler2D tDiffuse;
-    uniform vec2 resolution;
-    uniform vec2 focus;
-    uniform vec3 paper;
-    uniform float blur;
-    uniform float time;
-    varying vec2 vUv;
-    float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
-    void main() {
-      // Tilt-shift: a band of focus lying along the wall's text direction.
-      vec2 delta = (vUv - focus) * vec2(resolution.x / resolution.y, 1.);
-      float c = cos(${(-ANGLE * SQUASH).toFixed(4)}), s = sin(${(-ANGLE * SQUASH).toFixed(4)});
-      delta = mat2(c, -s, s, c) * delta;
-      float band = length(delta * vec2(.42, 1.55));
-      float amount = smoothstep(.14, .7, band);
-      float radius = amount * blur;
-      vec3 sum = texture2D(tDiffuse, vUv).rgb;
-      float weight = 1.;
-      if (radius > .35) {
-        float spin = hash(gl_FragCoord.xy) * 6.2831;
-        for (int i = 1; i < 28; i++) {
-          float f = float(i);
-          float r = sqrt(f / 28.) * radius;
-          float a = f * 2.39996 + spin;
-          vec2 offset = vec2(cos(a), sin(a)) * r / resolution;
-          sum += texture2D(tDiffuse, vUv + offset).rgb;
-          weight += 1.;
-        }
-      }
-      vec3 color = sum / weight;
-      color += (hash(vUv * resolution + fract(time) * 91.7) - .5) * .018;
-      // No frame: the surface rises out of the page and sinks back into it.
-      vec2 edge = min(vUv, 1. - vUv) * vec2(resolution.x / resolution.y, 1.);
-      float body = smoothstep(0., .3, edge.y) * smoothstep(0., .22, edge.x);
-      gl_FragColor = vec4(mix(paper, max(color, 0.), body), 1.);
-    }`,
-};
+const lensFragment = `
+precision highp float;
+uniform sampler2D surface;
+uniform vec2 resolution;
+uniform vec2 focus;
+uniform vec3 paper;
+uniform float blur;
+uniform float time;
+uniform int taps;
+in vec2 vUv;
+out vec4 color;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+vec3 toLinear(vec3 c) { return mix(c / 12.92, pow((c + .055) / 1.055, vec3(2.4)), step(vec3(.04045), c)); }
+vec3 toSRGB(vec3 c) { c = max(c, 0.); return mix(c * 12.92, 1.055 * pow(c, vec3(1. / 2.4)) - .055, step(vec3(.0031308), c)); }
+void main() {
+  // Tilt-shift: a band of focus lying along the wall's text direction.
+  vec2 delta = (vUv - focus) * vec2(resolution.x / resolution.y, 1.);
+  float c = cos(${(-ANGLE * SQUASH).toFixed(4)}), s = sin(${(-ANGLE * SQUASH).toFixed(4)});
+  delta = mat2(c, -s, s, c) * delta;
+  float band = length(delta * vec2(.42, 1.55));
+  float amount = smoothstep(.14, .7, band);
+  float radius = amount * blur;
+  vec3 sum = toLinear(texture(surface, vUv).rgb);
+  float weight = 1.;
+  if (radius > .35) {
+    float spin = hash(gl_FragCoord.xy) * 6.2831;
+    float count = float(taps);
+    for (int i = 1; i < 28; i++) {
+      if (i >= taps) break;
+      float f = float(i);
+      float r = sqrt(f / count) * radius;
+      float a = f * 2.39996 + spin;
+      vec2 offset = vec2(cos(a), sin(a)) * r / resolution;
+      sum += toLinear(texture(surface, vUv + offset).rgb);
+      weight += 1.;
+    }
+  }
+  vec3 result = sum / weight;
+  result += (hash(vUv * resolution + fract(time) * 91.7) - .5) * .018;
+  // No frame: the surface rises out of the page and sinks back into it.
+  vec2 edge = min(vUv, 1. - vUv) * vec2(resolution.x / resolution.y, 1.);
+  float body = smoothstep(0., .3, edge.y) * smoothstep(0., .22, edge.x);
+  color = vec4(toSRGB(mix(paper, max(result, 0.), body)), 1.);
+}`;
+
+const quadVertex = `
+in vec3 position;
+out vec2 vUv;
+void main() { vUv = position.xy * .5 + .5; gl_Position = vec4(position, 1.); }`;
 
 export class LcdWallScene {
-  readonly renderer: THREE.WebGLRenderer;
-  private composer: EffectComposer;
-  private lensPass: ShaderPass;
   private scene = new THREE.Scene();
+  private lensScene = new THREE.Scene();
   private camera = new THREE.Camera();
   private geometry = new THREE.BufferGeometry();
   private material: THREE.RawShaderMaterial;
+  private lensMaterial: THREE.RawShaderMaterial;
+  private target = new THREE.WebGLRenderTarget(1, 1, { depthBuffer: false, type: THREE.UnsignedByteType, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false });
   readonly textData: Uint8Array;
   private textTexture: THREE.DataTexture;
   private glyphTexture: THREE.DataTexture;
   private uniforms;
+  private lensUniforms;
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: false, powerPreference: "high-performance" });
-    // No tone mapping, so the faded edges land exactly on the page's paper.
-    this.renderer.toneMapping = THREE.NoToneMapping;
+  constructor() {
     this.textData = new Uint8Array(WALL * MODULE_COLUMNS * WALL * MODULE_ROWS * 4);
     this.textTexture = new THREE.DataTexture(this.textData, WALL * MODULE_COLUMNS, WALL * MODULE_ROWS, THREE.RGBAFormat);
     this.glyphTexture = new THREE.DataTexture(glyphAtlas(), GLYPH_CHARACTERS.length, GLYPH_HEIGHT, THREE.RedFormat);
@@ -234,37 +229,35 @@ export class LcdWallScene {
       text: { value: this.textTexture },
       glyphs: { value: this.glyphTexture },
     };
+    const paper = new THREE.Color("#efeff0");
+    this.lensUniforms = {
+      surface: { value: this.target.texture },
+      resolution: { value: new THREE.Vector2(1, 1) },
+      focus: { value: new THREE.Vector2(.5, .5) },
+      paper: { value: new THREE.Vector3(paper.r, paper.g, paper.b) },
+      blur: { value: 14 },
+      time: { value: 0 },
+      taps: { value: 28 },
+    };
     this.geometry.setAttribute("position", new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
-    this.material = new THREE.RawShaderMaterial({
-      vertexShader: vertex,
-      fragmentShader: surface,
-      glslVersion: THREE.GLSL3,
-      uniforms: this.uniforms,
-      depthTest: false,
-      depthWrite: false,
-    });
-    const quad = new THREE.Mesh(this.geometry, this.material);
-    quad.frustumCulled = false;
-    this.scene.add(quad);
-
-    this.composer = new EffectComposer(this.renderer);
-    this.composer.addPass(new RenderPass(this.scene, this.camera));
-    this.lensPass = new ShaderPass(lens);
-    this.composer.addPass(this.lensPass);
-    this.composer.addPass(new OutputPass());
+    this.material = new THREE.RawShaderMaterial({ vertexShader: vertex, fragmentShader: surface, glslVersion: THREE.GLSL3, uniforms: this.uniforms, depthTest: false, depthWrite: false });
+    this.lensMaterial = new THREE.RawShaderMaterial({ vertexShader: quadVertex, fragmentShader: lensFragment, glslVersion: THREE.GLSL3, uniforms: this.lensUniforms, depthTest: false, depthWrite: false });
+    for (const [scene, material] of [[this.scene, this.material], [this.lensScene, this.lensMaterial]] as const) {
+      const quad = new THREE.Mesh(this.geometry, material);
+      quad.frustumCulled = false;
+      scene.add(quad);
+    }
   }
 
-  /** Sizes in CSS pixels; `dot` is one LCD pixel on screen. */
-  resize(width: number, height: number, ratio: number, dot: number) {
-    this.renderer.setPixelRatio(ratio);
-    this.renderer.setSize(width, height, false);
-    this.composer.setPixelRatio(ratio);
-    this.composer.setSize(width, height);
-    this.uniforms.resolution.value.set(width * ratio, height * ratio);
-    this.uniforms.origin.value.set(width * ratio * 0.5, height * ratio * 0.5);
+  /** `width`/`height` in device pixels; `dot` is one LCD pixel in CSS pixels. */
+  resize(width: number, height: number, ratio: number, dot: number, taps: number) {
+    this.target.setSize(width, height);
+    this.uniforms.resolution.value.set(width, height);
+    this.uniforms.origin.value.set(width * 0.5, height * 0.5);
     this.uniforms.dotSize.value = dot * ratio;
-    this.lensPass.uniforms.resolution.value.set(width * ratio, height * ratio);
-    this.lensPass.uniforms.blur.value = Math.min(17, width / 88) * ratio;
+    this.lensUniforms.resolution.value.set(width, height);
+    this.lensUniforms.blur.value = Math.min(17, width / ratio / 88) * ratio;
+    this.lensUniforms.taps.value = taps;
   }
 
   /** Surface position, in modules, under a CSS-pixel point relative to the canvas centre. */
@@ -281,25 +274,27 @@ export class LcdWallScene {
     this.textTexture.needsUpdate = true;
   }
 
-  draw(time: number, focusX: number, focusY: number, hoverX: number, hoverY: number, hoverAmount: number) {
+  draw(renderer: THREE.WebGLRenderer, time: number, focusX: number, focusY: number, hoverX: number, hoverY: number, hoverAmount: number) {
     this.uniforms.time.value = time;
     this.uniforms.hover.value.set(hoverX, hoverY);
     this.uniforms.hoverAmount.value = hoverAmount;
-    this.lensPass.uniforms.focus.value.set(focusX, 1 - focusY);
+    this.lensUniforms.focus.value.set(focusX, 1 - focusY);
     // The sheen sits up and left of where you look, as from a window.
     const resolution = this.uniforms.resolution.value;
     this.uniforms.light.value.set((focusX - 0.12) * resolution.x, (focusY - 0.3) * resolution.y);
-    this.lensPass.uniforms.time.value = time;
-    this.composer.render();
+    this.lensUniforms.time.value = time;
+    renderer.setRenderTarget(this.target);
+    renderer.render(this.scene, this.camera);
+    renderer.setRenderTarget(null);
+    renderer.render(this.lensScene, this.camera);
   }
 
   dispose() {
-    this.composer.dispose();
-    this.lensPass.dispose();
+    this.target.dispose();
     this.textTexture.dispose();
     this.glyphTexture.dispose();
     this.geometry.dispose();
     this.material.dispose();
-    this.renderer.dispose();
+    this.lensMaterial.dispose();
   }
 }

@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import type { LcdWallScene } from "./lcd-wall-scene";
+import type * as THREE from "three";
+import { LcdWallScene } from "./lcd-wall-scene";
+import { getStage, type Frame } from "./gl/stage";
 import { GLYPH_CHARACTERS, glyphCode } from "./dot-matrix-font";
 import { LedText } from "./led-text";
 
@@ -54,7 +56,8 @@ export function LcdWall() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const band = canvas?.parentElement;
-    if (!canvas || !band) return;
+    const stage = getStage();
+    if (!canvas || !band || !stage) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const fine = matchMedia("(hover: hover) and (pointer: fine)");
     const modules = WALL * WALL;
@@ -64,10 +67,10 @@ export function LcdWall() {
     const level = new Float32Array(modules);
     const brightness = new Float32Array(modules);
     const home: [string, string][] = [];
-    let scene: LcdWallScene | undefined;
-    let loading = false, disposed = false, visible = false, booted = false, contextLost = false;
-    let frame = 0, lastDraw = 0, lastIdle = 0, lastScramble = 0, start = 0;
-    let width = 0, height = 0, dot = 8;
+    const scene = new LcdWallScene();
+    let booted = false;
+    let lastDraw = 0, lastIdle = 0, lastScramble = 0, start = 0;
+    let width = 0, height = 0, dot = 8, pixels = "";
     let pointerX = 0.5, pointerY = 0.5, focusX = 0.5, focusY = 0.5, pointerInside = false;
     let hoverX = 0, hoverY = 0, hoverAmount = 0, hoverKey = "";
     const timers: { at: number; run: () => void }[] = [];
@@ -102,7 +105,6 @@ export function LcdWall() {
     }
 
     const upload = (now: number) => {
-      if (!scene) return;
       const data = scene.textData;
       for (let i = 0; i < chars; i++) {
         const scrambling = settle[i] > now;
@@ -166,9 +168,7 @@ export function LcdWall() {
       }
     };
 
-    const tick = (now: number) => {
-      frame = 0;
-      if (!scene || disposed || contextLost || !visible || document.hidden) return;
+    const step = (now: number) => {
       if (!booted) boot(now);
       for (let i = timers.length - 1; i >= 0; i--) {
         if (timers[i].at <= now) { timers[i].run(); timers.splice(i, 1); }
@@ -184,60 +184,46 @@ export function LcdWall() {
       }
       typeLine(now);
       const follow = 1 - Math.exp(-(now - (lastDraw || now)) / 220);
+      lastDraw = now;
       focusX += ((pointerInside ? pointerX : 0.5) - focusX) * follow;
       focusY += ((pointerInside ? pointerY : 0.5) - focusY) * follow;
       hoverAmount += ((pointerInside ? 1 : 0) - hoverAmount) * follow;
       if (now - lastScramble > 45) { lastScramble = now; upload(now); }
-      if (now - lastDraw > 16) {
-        lastDraw = now;
-        scene.draw((now - start) / 1000, focusX, focusY, hoverX, hoverY, hoverAmount);
-        canvas.dataset.ready = "true";
+    };
+
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      const key = `${frame.width}x${frame.height}`;
+      if (key !== pixels) {
+        pixels = key;
+        width = frame.cssWidth;
+        height = frame.cssHeight;
+        dot = Math.max(5, Math.min(11, width / 136));
+        scene.resize(frame.width, frame.height, frame.width / width, dot, frame.settings.lcd.taps);
       }
-      frame = requestAnimationFrame(tick);
-    };
-
-    const drawStill = () => {
-      if (!scene || contextLost) return;
-      for (let m = 0; m < modules; m++) level[m] = 1;
-      upload(0);
-      scene.draw(0, 0.5, 0.5, 0, 0, 0);
-      canvas.dataset.ready = "true";
-    };
-    const wake = () => {
-      if (reduced.matches) return drawStill();
-      if (!frame && scene && visible && !document.hidden && !disposed) frame = requestAnimationFrame(tick);
-    };
-
-    const resize = () => {
-      const bounds = band.getBoundingClientRect();
-      if (!scene || !bounds.width) return;
-      width = bounds.width;
-      height = bounds.height;
-      dot = Math.max(5, Math.min(11, width / 136));
-      scene.resize(width, height, Math.min(devicePixelRatio || 1, width < 700 ? 1.25 : 1.5), dot);
-      if (reduced.matches) drawStill();
-    };
-
-    const initialize = async () => {
-      if (loading || scene || disposed) return;
-      loading = true;
-      try {
-        const { LcdWallScene } = await import("./lcd-wall-scene");
-        if (disposed) return;
-        scene = new LcdWallScene(canvas);
-        resize();
-        wake();
-      } catch {
-        canvas.dataset.ready = "false";
+      if (reduced.matches) {
+        for (let m = 0; m < modules; m++) level[m] = 1;
+        upload(0);
+        scene.draw(renderer, 0, 0.5, 0.5, 0, 0, 0);
+        return false;
       }
+      step(frame.now);
+      scene.draw(renderer, (frame.now - start) / 1000, focusX, focusY, hoverX, hoverY, hoverAmount);
+      return true;
     };
+    const handle = stage.add({
+      placeholder: canvas,
+      ratio: (_, cssWidth) => Math.min(devicePixelRatio || 1, cssWidth < 700 ? 1.25 : 1.5),
+      fps: settings => settings.lcd.fps,
+      priority: () => pointerInside ? 3 : 1,
+      render,
+    });
 
     const local = (event: PointerEvent) => {
       const bounds = canvas.getBoundingClientRect();
       return [event.clientX - bounds.left, event.clientY - bounds.top] as const;
     };
     const move = (event: PointerEvent) => {
-      if (reduced.matches || !scene || !fine.matches) return;
+      if (reduced.matches || !fine.matches || !width) return;
       const [x, y] = local(event);
       pointerX = x / width;
       pointerY = y / height;
@@ -254,52 +240,25 @@ export function LcdWall() {
     };
     const leave = () => { pointerInside = false; hoverKey = ""; };
     const press = (event: PointerEvent) => {
-      if (reduced.matches || !scene) return;
+      if (reduced.matches || !width) return;
       const [x, y] = local(event);
       const [mx, my] = scene.moduleAt(x - width / 2, y - height / 2, dot);
       ripple(wrap(mx), wrap(my), performance.now());
+      handle.wake();
     };
-    const lost = (event: Event) => {
-      event.preventDefault();
-      contextLost = true;
-      canvas.dataset.ready = "false";
-      cancelAnimationFrame(frame);
-      frame = 0;
-    };
-    const restored = () => { contextLost = false; resize(); wake(); };
-
-    const near = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) void initialize();
-    }, { rootMargin: "600px 0px" });
-    const seen = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) wake();
-      else { cancelAnimationFrame(frame); frame = 0; }
-    }, { threshold: 0.15 });
-    near.observe(band);
-    seen.observe(band);
-    const sizes = new ResizeObserver(resize);
-    sizes.observe(band);
+    const wake = () => handle.wake();
     band.addEventListener("pointermove", move);
     band.addEventListener("pointerleave", leave);
     band.addEventListener("pointerdown", press);
-    canvas.addEventListener("webglcontextlost", lost);
-    canvas.addEventListener("webglcontextrestored", restored);
-    document.addEventListener("visibilitychange", wake);
+    reduced.addEventListener("change", wake);
 
     return () => {
-      disposed = true;
-      cancelAnimationFrame(frame);
-      near.disconnect();
-      seen.disconnect();
-      sizes.disconnect();
       band.removeEventListener("pointermove", move);
       band.removeEventListener("pointerleave", leave);
       band.removeEventListener("pointerdown", press);
-      canvas.removeEventListener("webglcontextlost", lost);
-      canvas.removeEventListener("webglcontextrestored", restored);
-      document.removeEventListener("visibilitychange", wake);
-      scene?.dispose();
+      reduced.removeEventListener("change", wake);
+      handle.remove();
+      scene.dispose();
     };
   }, []);
 

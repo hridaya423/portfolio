@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import type * as THREE from "three";
 import { CloudScene } from "./cloud-scene";
+import { getStage, type Frame, type ViewHandle } from "./gl/stage";
 
 const vertex = `
 in vec3 position;
@@ -73,26 +75,23 @@ export function CloudDivider() {
     const canvas = ref.current;
     const summary = canvas?.closest("summary");
     const details = summary?.closest("details");
-    if (!canvas || !summary || !details) return;
-    const abort = new AbortController();
+    const stage = getStage();
+    if (!canvas || !summary || !details || !stage) return;
     const reduced = matchMedia("(prefers-reduced-motion: reduce)");
     const finePointer = matchMedia("(hover: hover)");
     let scene: CloudScene | undefined;
-    let loading = false, disposed = false, visible = true;
-    let hovered = false, focused = false, frame = 0, previous = 0, time = 0;
+    let handle: ViewHandle | undefined;
+    let hovered = false, focused = false, time = 0;
     let targetX = .6;
     const uniforms = { reveal: { value: 0 }, cursor: { value: .6 }, aspect: { value: 8 }, gust: { value: 0 } };
-    const resize = () => {
-      const bounds = canvas.getBoundingClientRect();
-      scene?.resize(Math.round(bounds.width * Math.min(devicePixelRatio, 1.5)), Math.round(bounds.height * Math.min(devicePixelRatio, 1.5)));
-      uniforms.aspect.value = bounds.width / bounds.height * .48;
-    };
-    const tick = (now: number) => {
-      frame = 0;
-      if (!scene || disposed || !visible || document.hidden) { previous = 0; return; }
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      if (!scene) {
+        scene = new CloudScene(renderer, vertex, fragment, { width: 1, height: 1, depth: 1, pixels: new Float32Array(4) });
+        Object.assign(scene.uniforms, uniforms);
+      }
+      uniforms.aspect.value = frame.cssWidth / frame.cssHeight * .48;
       const active = !details.open && (hovered || focused);
-      const dt = previous ? Math.min((now - previous) / 1000, .05) : 1 / 60;
-      previous = now;
+      const dt = Math.min(frame.delta, .05);
       const still = reduced.matches || (focused && !hovered);
       uniforms.reveal.value = still ? Number(active) : uniforms.reveal.value + (Number(active) - uniforms.reveal.value) * (1 - Math.exp(-dt * (active ? 6 : 3.5)));
       uniforms.cursor.value += (targetX - uniforms.cursor.value) * (1 - Math.exp(-dt * 7));
@@ -100,29 +99,22 @@ export function CloudDivider() {
       uniforms.gust.value += ((still ? 0 : gust) - uniforms.gust.value) * (1 - Math.exp(-dt * 4));
       if (!still) time += dt;
       if (!active && uniforms.reveal.value < .003) uniforms.reveal.value = 0;
-      scene.draw(still ? 0 : time, false);
-      if (!still && (active || uniforms.reveal.value > 0)) frame = requestAnimationFrame(tick);
-      else previous = 0;
+      scene.draw(renderer, still ? 0 : time, false, false);
+      return !still && (active || uniforms.reveal.value > 0);
     };
-    const wake = () => {
-      if (scene && !frame && !disposed) frame = requestAnimationFrame(tick);
-    };
+    const wake = () => handle?.wake();
+    // The divider only exists while it's being hovered, so it claims the live canvas first.
     const activate = () => {
+      if (!handle && !details.open && (hovered || focused)) {
+        handle = stage.add({
+          placeholder: canvas,
+          ratio: () => Math.min(devicePixelRatio, 1.5),
+          priority: () => (hovered || focused) && !details.open ? 50 : uniforms.reveal.value > 0 ? 2 : 0.5,
+          snapshot: false,
+          render,
+        });
+      }
       wake();
-      if (scene || loading || details.open || !(hovered || focused)) return;
-      loading = true;
-      fetch("/materials/cloud-noise.bin", { signal: abort.signal }).then(response => {
-        if (!response.ok) throw new Error("Cloud divider density unavailable");
-        return response.arrayBuffer();
-      }).then(bytes => {
-        if (disposed) return;
-        if (bytes.byteLength !== 64 ** 3 * 4) throw new Error("Invalid cloud density fields");
-        scene = new CloudScene(canvas, vertex, fragment, { width: 1, height: 1, depth: 1, pixels: new Float32Array(4) }, false);
-        Object.assign(scene.uniforms, uniforms);
-        scene.setCloud({ width: 1, height: 1, distance: new Uint8Array([255]) }, bytes);
-        resize();
-        wake();
-      }).catch(() => { loading = false; });
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType === "touch" || !finePointer.matches) return;
@@ -135,30 +127,20 @@ export function CloudDivider() {
     const leave = () => { hovered = false; wake(); };
     const focus = () => { focused = summary.matches(":focus-visible"); activate(); };
     const blur = () => { focused = false; wake(); };
-    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; wake(); });
-    observer.observe(summary);
-    const size = new ResizeObserver(() => { resize(); wake(); });
-    size.observe(canvas);
     summary.addEventListener("pointermove", move);
     summary.addEventListener("pointerleave", leave);
     summary.addEventListener("focus", focus);
     summary.addEventListener("blur", blur);
     details.addEventListener("toggle", wake);
     reduced.addEventListener("change", wake);
-    document.addEventListener("visibilitychange", wake);
     return () => {
-      disposed = true;
-      abort.abort();
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-      size.disconnect();
       summary.removeEventListener("pointermove", move);
       summary.removeEventListener("pointerleave", leave);
       summary.removeEventListener("focus", focus);
       summary.removeEventListener("blur", blur);
       details.removeEventListener("toggle", wake);
       reduced.removeEventListener("change", wake);
-      document.removeEventListener("visibilitychange", wake);
+      handle?.remove();
       scene?.dispose();
     };
   }, []);

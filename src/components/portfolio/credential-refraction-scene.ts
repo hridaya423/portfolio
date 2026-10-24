@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import type { Settings } from "./gl/quality";
 
 const vertex = `
 precision highp float;
@@ -15,6 +16,7 @@ in vec3 position;
 uniform vec2 lightPosition;
 uniform float time;
 uniform float focus;
+uniform float bands;
 out vec2 source;
 out vec2 landing;
 flat out vec3 spectralPower;
@@ -32,21 +34,23 @@ void main() {
     height += amplitude * sin(phase);
     slope += amplitude * frequency * cos(phase) * direction;
   }
-  float wavelength = .40 + float(gl_InstanceID) / 8. * .30;
+  // Fewer wavelength bands on smaller GPUs, each carrying a larger share of the light.
+  float t = float(gl_InstanceID) / (bands - 1.);
+  float wavelength = .40 + t * .30;
   float index = 1.30 + .024 / (wavelength * wavelength);
   vec3 normal = normalize(vec3(-slope, 1.));
   vec3 incident = normalize(vec3(.65, -.35, -1.));
   vec3 direction = refract(incident, normal, 1. / index);
   vec3 centralRay = refract(incident, vec3(0., 0., 1.), 1. / 1.3793);
   landing = source + (direction.xy / -direction.z - centralRay.xy / -centralRay.z) * (.28 + height + (1. - focus) * .12);
-  float t = float(gl_InstanceID) / 8.;
-  spectralPower = exp(-.5 * pow((t - vec3(.80, .46, .16)) / vec3(.25, .20, .18), vec3(2.))) / vec3(4.23, 3.99, 3.34);
+  spectralPower = exp(-.5 * pow((t - vec3(.80, .46, .16)) / vec3(.25, .20, .18), vec3(2.))) / vec3(4.23, 3.99, 3.34) * (9. / bands);
   gl_Position = vec4(landing / vec2(.72, .36), 0., 1.);
 }`;
 
 const photonFragment = `
 precision highp float;
 uniform sampler2D inscription;
+uniform float gain;
 in vec2 source;
 in vec2 landing;
 flat in vec3 spectralPower;
@@ -59,7 +63,7 @@ void main() {
   float sourceArea = abs(dx.x * dy.y - dx.y * dy.x);
   float landingArea = abs(lx.x * ly.y - lx.y * ly.x);
   float density = min(14., sourceArea / max(landingArea, .00000001));
-  color = vec4(spectralPower * mask * density, 1.);
+  color = vec4(spectralPower * mask * density * gain, 1.);
 }`;
 
 const fragment = `
@@ -69,10 +73,13 @@ uniform vec3 paper;
 uniform sampler2D caustics;
 uniform float focus;
 uniform float compact;
+uniform float gain;
+uniform float lodShift;
 in vec2 uv;
 out vec4 color;
+// Blur radii are written for a 2048 target; smaller targets reach them a level sooner.
 vec3 light(vec2 p, float lod) {
-  return textureLod(caustics, p / vec2(1.44, .72) + .5, lod).rgb;
+  return textureLod(caustics, p / vec2(1.44, .72) + .5, max(0., lod - lodShift)).rgb / gain;
 }
 void main() {
   float size = resolution.x * mix(.58, 1.10, compact);
@@ -94,38 +101,60 @@ void main() {
 }`;
 
 export class CredentialRefractionScene {
-  private renderer: THREE.WebGLRenderer;
   private scene = new THREE.Scene();
   private camera = new THREE.Camera();
   private geometry = new THREE.BufferGeometry();
-  private photonGeometry = new THREE.PlaneGeometry(1.44, .72, 256, 128);
+  private photonGeometry: THREE.PlaneGeometry;
   private photonScene = new THREE.Scene();
   private photonMaterial: THREE.RawShaderMaterial;
-  private caustics = new THREE.WebGLRenderTarget(2048, 1024, { type: THREE.HalfFloatType, depthBuffer: false, minFilter: THREE.LinearMipmapLinearFilter, generateMipmaps: true });
+  private caustics: THREE.WebGLRenderTarget;
   private material: THREE.RawShaderMaterial;
   private texture = new THREE.CanvasTexture(document.createElement("canvas"));
-  private uniforms = {
-    resolution: { value: new THREE.Vector2(1, 1) },
-    lightPosition: { value: new THREE.Vector2() },
-    paper: { value: new THREE.Vector3() },
-    inscription: { value: this.texture },
-    caustics: { value: this.caustics.texture },
-    focus: { value: 1 },
-    time: { value: 0 },
-    compact: { value: 0 },
-  };
+  private uniforms;
 
-  constructor(canvas: HTMLCanvasElement) {
-    this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  constructor(private renderer: THREE.WebGLRenderer, { size, bands, grid }: Settings["caustics"]) {
+    // Additive light wants a float target. Many phones can't draw into one, so
+    // those get an 8-bit target with the light scaled down to stay in range.
+    const extensions = renderer.extensions;
+    const floatTarget = extensions.has("EXT_color_buffer_float") || extensions.has("EXT_color_buffer_half_float");
+    this.caustics = new THREE.WebGLRenderTarget(size, size / 2, {
+      type: floatTarget ? THREE.HalfFloatType : THREE.UnsignedByteType,
+      depthBuffer: false,
+      minFilter: THREE.LinearMipmapLinearFilter,
+      generateMipmaps: true,
+    });
+    this.photonGeometry = new THREE.PlaneGeometry(1.44, .72, grid[0], grid[1]);
+    this.uniforms = {
+      resolution: { value: new THREE.Vector2(1, 1) },
+      lightPosition: { value: new THREE.Vector2() },
+      paper: { value: new THREE.Vector3() },
+      inscription: { value: this.texture },
+      caustics: { value: this.caustics.texture },
+      focus: { value: 1 },
+      time: { value: 0 },
+      compact: { value: 0 },
+      bands: { value: bands },
+      gain: { value: floatTarget ? 1 : 1 / 12 },
+      lodShift: { value: Math.log2(2048 / size) },
+    };
     this.geometry.setAttribute("position", new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
     this.material = new THREE.RawShaderMaterial({ vertexShader: vertex, fragmentShader: fragment, glslVersion: THREE.GLSL3, uniforms: this.uniforms, depthTest: false, depthWrite: false });
     const mesh = new THREE.Mesh(this.geometry, this.material);
     mesh.frustumCulled = false;
     this.scene.add(mesh);
     this.photonMaterial = new THREE.RawShaderMaterial({ vertexShader: photonVertex, fragmentShader: photonFragment, glslVersion: THREE.GLSL3, uniforms: this.uniforms, depthTest: false, depthWrite: false, transparent: true, blending: THREE.AdditiveBlending, side: THREE.DoubleSide });
-    const photons = new THREE.InstancedMesh(this.photonGeometry, this.photonMaterial, 9);
+    const photons = new THREE.InstancedMesh(this.photonGeometry, this.photonMaterial, bands);
     photons.frustumCulled = false;
     this.photonScene.add(photons);
+    // Prove the target is drawable before claiming to be ready; a blank slab is worse than the fallback text.
+    renderer.setRenderTarget(this.caustics);
+    const gl = renderer.getContext();
+    const status = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
+    renderer.setRenderTarget(null);
+    if (status !== gl.FRAMEBUFFER_COMPLETE) {
+      this.dispose();
+      throw new Error(`Caustics target incomplete (0x${status.toString(16)})`);
+    }
   }
 
   setInscription(label: string, font: string) {
@@ -147,9 +176,8 @@ export class CredentialRefractionScene {
     this.texture.needsUpdate = true;
   }
 
+  /** Sizes in CSS pixels. */
   resize(width: number, height: number, compact: boolean, surface: string) {
-    const ratio = Math.min(devicePixelRatio, 1.5);
-    this.renderer.setSize(Math.round(width * ratio), Math.round(height * ratio), false);
     this.uniforms.resolution.value.set(width, height);
     this.uniforms.compact.value = compact ? 1 : 0;
     const color = new THREE.Color(surface).convertLinearToSRGB();
@@ -161,7 +189,6 @@ export class CredentialRefractionScene {
     this.uniforms.focus.value = focus;
     this.uniforms.time.value = time;
     this.renderer.setRenderTarget(this.caustics);
-    this.renderer.setClearColor(0x000000, 0);
     this.renderer.render(this.photonScene, this.camera);
     this.renderer.setRenderTarget(null);
     this.renderer.render(this.scene, this.camera);
@@ -174,6 +201,5 @@ export class CredentialRefractionScene {
     this.texture.dispose();
     this.geometry.dispose();
     this.material.dispose();
-    this.renderer.dispose();
   }
 }

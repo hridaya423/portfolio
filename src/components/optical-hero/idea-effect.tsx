@@ -1,14 +1,16 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 import { useReducedMotion } from "motion/react";
+import { getStage, type Frame } from "@/components/portfolio/gl/stage";
 
 const vertexSource = `
-attribute vec2 position;
-varying vec2 uv;
+in vec3 position;
+out vec2 uv;
 void main() {
-  uv = position * .5 + .5;
-  gl_Position = vec4(position, 0., 1.);
+  uv = position.xy * .5 + .5;
+  gl_Position = vec4(position, 1.);
 }`;
 
 const fragmentSource = `
@@ -19,7 +21,8 @@ uniform vec2 lens;
 uniform vec3 color;
 uniform float strength;
 uniform float phase;
-varying vec2 uv;
+in vec2 uv;
+out vec4 fragColor;
 void main() {
   vec2 pixel = uv * size;
   vec2 q = pixel - lens;
@@ -30,14 +33,17 @@ void main() {
   float mag = 1. + strength * envelope * (.075 * rn * rn + ripple);
   vec2 source = (lens + q / mag) / size;
   vec2 split = q / max(length(q), 1.) * .85 / size * strength * envelope;
-  float r = texture2D(ink, source + split).a;
-  float g = texture2D(ink, source).a;
-  float b = texture2D(ink, source - split).a;
+  float r = texture(ink, source + split).a;
+  float g = texture(ink, source).a;
+  float b = texture(ink, source - split).a;
   float alpha = max(r, max(g, b));
   vec3 edge = vec3(r, g, b);
   vec3 chroma = mix(color * alpha, edge, .28 * strength);
-  gl_FragColor = vec4(chroma, alpha);
+  fragColor = vec4(chroma, alpha);
 }`;
+
+const OPENING = 1100;
+const PADDING = 12;
 
 export function IdeaEffect() {
   const word = useRef<HTMLSpanElement>(null);
@@ -65,161 +71,43 @@ export function IdeaEffect() {
     const element = word.current;
     const surface = canvas.current;
     if (!element || !surface || reducedMotion || !painted) return;
-    const gl = surface.getContext("webgl", {
-      alpha: true,
-      premultipliedAlpha: true,
-      antialias: false,
-    });
-    if (!gl) return;
+    const stage = getStage();
+    if (!stage) return;
 
-    const program = gl.createProgram();
-    const buffer = gl.createBuffer();
-    const texture = gl.createTexture();
-    const shaders: WebGLShader[] = [];
-    let frame = 0;
-    let disposed = false;
-    let ready = false;
-    let visible = true;
+    const bitmap = document.createElement("canvas");
+    const texture = new THREE.CanvasTexture(bitmap);
+    texture.minFilter = texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = false;
+    const uniforms = {
+      ink: { value: texture },
+      size: { value: new THREE.Vector2(1, 1) },
+      lens: { value: new THREE.Vector2() },
+      color: { value: new THREE.Vector3() },
+      strength: { value: 0 },
+      phase: { value: 0 },
+    };
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute([-1, -1, 0, 3, -1, 0, -1, 3, 0], 3));
+    // Premultiplied output onto a transparent canvas, as the word sits on the page.
+    const material = new THREE.RawShaderMaterial({ vertexShader: vertexSource, fragmentShader: fragmentSource, glslVersion: THREE.GLSL3, uniforms, depthTest: false, depthWrite: false, blending: THREE.NoBlending });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.frustumCulled = false;
+    const scene = new THREE.Scene().add(mesh);
+    const camera = new THREE.Camera();
+
     let hovering = false;
     let strength = 0;
-    let elapsed = arrived.current ? 1100 : 0;
-    let lastTime = 0;
-    let width = 0;
-    let height = 0;
-    let lensX = 0;
-    let lensY = 0;
-    let targetX = 0;
-    let targetY = 0;
-    const padding = 12;
-
-    function restoreText() {
-      element!.removeAttribute("data-lens-ready");
-      cancelAnimationFrame(frame);
-      frame = 0;
-    }
-
-    function dispose() {
-      disposed = true;
-      restoreText();
-      shaders.forEach((shader) => gl!.deleteShader(shader));
-      gl!.deleteTexture(texture);
-      gl!.deleteBuffer(buffer);
-      gl!.deleteProgram(program);
-    }
-
-    if (!program || !buffer || !texture) {
-      dispose();
-      return;
-    }
-    try {
-      for (const [type, source] of [
-        [gl.VERTEX_SHADER, vertexSource],
-        [gl.FRAGMENT_SHADER, fragmentSource],
-      ] as const) {
-        const shader = gl.createShader(type);
-        if (!shader) throw new Error("Shader allocation failed");
-        shaders.push(shader);
-        gl.shaderSource(shader, source);
-        gl.compileShader(shader);
-        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
-          throw new Error("Shader compilation failed");
-        gl.attachShader(program, shader);
-      }
-      gl.linkProgram(program);
-      if (!gl.getProgramParameter(program, gl.LINK_STATUS))
-        throw new Error("Shader linking failed");
-    } catch {
-      dispose();
-      return;
-    }
-    gl.useProgram(program);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW,
-    );
-    const position = gl.getAttribLocation(program, "position");
-    gl.enableVertexAttribArray(position);
-    gl.vertexAttribPointer(position, 2, gl.FLOAT, false, 0, 0);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    const uniforms = {
-      size: gl.getUniformLocation(program, "size"),
-      lens: gl.getUniformLocation(program, "lens"),
-      color: gl.getUniformLocation(program, "color"),
-      strength: gl.getUniformLocation(program, "strength"),
-      phase: gl.getUniformLocation(program, "phase"),
-    };
-
-    function draw(time: number) {
-      frame = 0;
-      if (
-        !ready ||
-        disposed ||
-        !visible ||
-        document.hidden ||
-        gl!.isContextLost()
-      )
-        return;
-      const delta = lastTime ? Math.min(time - lastTime, 40) : 16;
-      lastTime = time;
-      elapsed = Math.min(1100, elapsed + delta);
-      const opening = elapsed < 1100;
-      const targetStrength = opening
-        ? Math.sin((elapsed / 1100) * Math.PI)
-        : hovering
-          ? 0.8
-          : 0;
-      strength += (targetStrength - strength) * (1 - Math.exp(-delta / 45));
-      lensX += (targetX - lensX) * (1 - Math.exp(-delta / 65));
-      lensY += (targetY - lensY) * (1 - Math.exp(-delta / 65));
-      if (!opening && !hovering && strength < 0.008) strength = 0;
-      gl!.uniform2f(
-        uniforms.lens,
-        opening ? width * (0.2 + (elapsed / 1100) * 0.65) : lensX,
-        opening ? height * 0.52 : lensY,
-      );
-      gl!.uniform1f(uniforms.strength, strength);
-      gl!.uniform1f(uniforms.phase, elapsed / 180);
-      gl!.drawArrays(gl!.TRIANGLES, 0, 3);
-      if (gl!.getError() !== gl!.NO_ERROR) {
-        ready = false;
-        restoreText();
-        return;
-      }
-      // Hand over to the lens once and stay there: swapping back to the DOM text
-      // after every hover shows as a one-pixel jump between the two renderings.
-      if (strength > 0) element!.setAttribute("data-lens-ready", "true");
-      if (!opening) arrived.current = true;
-      const moving =
-        Math.abs(lensX - targetX) + Math.abs(lensY - targetY) > 0.1;
-      if (
-        opening ||
-        Math.abs(targetStrength - strength) > 0.008 ||
-        (hovering && moving)
-      )
-        frame = requestAnimationFrame(draw);
-    }
-
-    function wake() {
-      if (frame || !ready || disposed || !visible || document.hidden) return;
-      lastTime = 0;
-      frame = requestAnimationFrame(draw);
-    }
+    let elapsed = arrived.current ? OPENING : 0;
+    let width = 0, height = 0;
+    let lensX = 0, lensY = 0, targetX = 0, targetY = 0;
+    let rasterized = false;
 
     function rasterize() {
-      if (disposed || gl!.isContextLost()) return;
       const style = getComputedStyle(element!);
       const bounds = element!.getBoundingClientRect();
-      width = bounds.width + padding * 2;
-      height = bounds.height + padding * 2;
+      width = bounds.width + PADDING * 2;
+      height = bounds.height + PADDING * 2;
       const scale = Math.min(window.devicePixelRatio || 1, 2) * 2;
-      const bitmap = document.createElement("canvas");
       bitmap.width = Math.ceil(width * scale);
       bitmap.height = Math.ceil(height * scale);
       const context = bitmap.getContext("2d");
@@ -229,92 +117,93 @@ export function IdeaEffect() {
       context.letterSpacing = style.letterSpacing;
       context.fillStyle = "white";
       const metrics = context.measureText("idea");
-      const baseline =
-        (bounds.height -
-          metrics.fontBoundingBoxAscent -
-          metrics.fontBoundingBoxDescent) /
-          2 +
-        metrics.fontBoundingBoxAscent;
-      context.fillText("idea", padding, padding + baseline);
-      surface!.width = Math.ceil(width * Math.min(devicePixelRatio || 1, 2));
-      surface!.height = Math.ceil(height * Math.min(devicePixelRatio || 1, 2));
-      gl!.viewport(0, 0, surface!.width, surface!.height);
-      gl!.texImage2D(
-        gl!.TEXTURE_2D,
-        0,
-        gl!.RGBA,
-        gl!.RGBA,
-        gl!.UNSIGNED_BYTE,
-        bitmap,
-      );
-      const rgb = style.color
-        .match(/[\d.]+/g)!
-        .slice(0, 3)
-        .map(Number);
-      gl!.uniform3f(uniforms.color, rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
-      gl!.uniform2f(uniforms.size, width, height);
+      const baseline = (bounds.height - metrics.fontBoundingBoxAscent - metrics.fontBoundingBoxDescent) / 2 + metrics.fontBoundingBoxAscent;
+      context.fillText("idea", PADDING, PADDING + baseline);
+      texture.dispose();
+      texture.needsUpdate = true;
+      const rgb = style.color.match(/[\d.]+/g)!.slice(0, 3).map(Number);
+      uniforms.color.value.set(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
+      uniforms.size.value.set(width, height);
       lensX = targetX = width * 0.7;
       lensY = targetY = height * 0.5;
-      ready = true;
-      wake();
+      rasterized = true;
+      handle.wake();
     }
 
+    const render = (renderer: THREE.WebGLRenderer, frame: Frame) => {
+      if (!rasterized) return false;
+      const delta = frame.first ? 16 : Math.min(frame.delta * 1000, 40);
+      elapsed = Math.min(OPENING, elapsed + delta);
+      const opening = elapsed < OPENING;
+      const targetStrength = opening ? Math.sin((elapsed / OPENING) * Math.PI) : hovering ? 0.8 : 0;
+      strength += (targetStrength - strength) * (1 - Math.exp(-delta / 45));
+      lensX += (targetX - lensX) * (1 - Math.exp(-delta / 65));
+      lensY += (targetY - lensY) * (1 - Math.exp(-delta / 65));
+      if (!opening && !hovering && strength < 0.008) strength = 0;
+      uniforms.lens.value.set(opening ? width * (0.2 + (elapsed / OPENING) * 0.65) : lensX, opening ? height * 0.52 : lensY);
+      uniforms.strength.value = strength;
+      uniforms.phase.value = elapsed / 180;
+      renderer.render(scene, camera);
+      // Hand over to the lens once and stay there: swapping back to the DOM text
+      // after every hover shows as a one-pixel jump between the two renderings.
+      if (strength > 0) element.setAttribute("data-lens-ready", "true");
+      if (!opening) arrived.current = true;
+      const moving = Math.abs(lensX - targetX) + Math.abs(lensY - targetY) > 0.1;
+      return opening || Math.abs(targetStrength - strength) > 0.008 || (hovering && moving);
+    };
+
+    const handle = stage.add({
+      placeholder: surface,
+      ratio: () => Math.min(devicePixelRatio || 1, 2),
+      priority: () => hovering ? 4 : 1,
+      snapshot: false,
+      render,
+      // Without the live canvas, the DOM word is the only rendering of "idea".
+      detach: () => element.removeAttribute("data-lens-ready"),
+      fail: () => element.removeAttribute("data-lens-ready"),
+    });
+
+    // On touch there's no hover, so a tap sends the lens across the word again.
+    function pointerDown(event: PointerEvent) {
+      if (event.pointerType === "mouse") return;
+      elapsed = 0;
+      handle.wake();
+    }
     function pointerMove(event: PointerEvent) {
-      if (
-        event.pointerType !== "mouse" ||
-        !matchMedia("(hover: hover) and (pointer: fine)").matches
-      )
-        return;
+      if (event.pointerType !== "mouse" || !matchMedia("(hover: hover) and (pointer: fine)").matches) return;
       const bounds = element!.getBoundingClientRect();
-      targetX = event.clientX - bounds.left + padding;
-      targetY = height - (event.clientY - bounds.top + padding);
+      targetX = event.clientX - bounds.left + PADDING;
+      targetY = height - (event.clientY - bounds.top + PADDING);
       hovering = true;
-      wake();
+      handle.wake();
     }
     function pointerLeave() {
       hovering = false;
-      wake();
-    }
-    function visibilityChange() {
-      if (document.hidden) {
-        cancelAnimationFrame(frame);
-        frame = 0;
-      } else wake();
-    }
-    function contextLost(event: Event) {
-      event.preventDefault();
-      ready = false;
-      restoreText();
+      handle.wake();
     }
     const resize = new ResizeObserver(rasterize);
-    const intersection = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) wake();
-      else {
-        cancelAnimationFrame(frame);
-        frame = 0;
-      }
-    });
+    let disposed = false;
     document.fonts.ready.then(() => {
       if (disposed) return;
       rasterize();
       resize.observe(element);
     });
-    intersection.observe(element);
     document.fonts.addEventListener("loadingdone", rasterize);
     element.addEventListener("pointermove", pointerMove);
     element.addEventListener("pointerleave", pointerLeave);
-    document.addEventListener("visibilitychange", visibilityChange);
-    surface.addEventListener("webglcontextlost", contextLost);
+    element.addEventListener("pointerdown", pointerDown);
     return () => {
+      disposed = true;
       resize.disconnect();
-      intersection.disconnect();
       document.fonts.removeEventListener("loadingdone", rasterize);
       element.removeEventListener("pointermove", pointerMove);
       element.removeEventListener("pointerleave", pointerLeave);
-      document.removeEventListener("visibilitychange", visibilityChange);
-      surface.removeEventListener("webglcontextlost", contextLost);
-      dispose();
+      element.removeEventListener("pointerdown", pointerDown);
+      handle.remove();
+      element.removeAttribute("data-lens-ready");
+      texture.dispose();
+      geometry.dispose();
+      material.dispose();
     };
   }, [reducedMotion, painted]);
 
