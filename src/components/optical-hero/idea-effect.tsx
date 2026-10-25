@@ -103,7 +103,11 @@ export function IdeaEffect() {
     let rasterized = false;
 
     function rasterize() {
+      // Fonts can finish loading while the page is being swapped out; there's nothing to draw then.
+      if (!element!.isConnected) return;
       const style = getComputedStyle(element!);
+      const rgb = style.color.match(/[\d.]+/g)?.slice(0, 3).map(Number);
+      if (!rgb) return;
       const bounds = element!.getBoundingClientRect();
       width = bounds.width + PADDING * 2;
       height = bounds.height + PADDING * 2;
@@ -121,7 +125,6 @@ export function IdeaEffect() {
       context.fillText("idea", PADDING, PADDING + baseline);
       texture.dispose();
       texture.needsUpdate = true;
-      const rgb = style.color.match(/[\d.]+/g)!.slice(0, 3).map(Number);
       uniforms.color.value.set(rgb[0] / 255, rgb[1] / 255, rgb[2] / 255);
       uniforms.size.value.set(width, height);
       lensX = targetX = width * 0.7;

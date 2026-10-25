@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { events, credentials } from "@/data/portfolio";
 import { OpticalHero } from "@/components/optical-hero/hero";
 import {
@@ -12,6 +13,8 @@ import { SiteHeader } from "@/components/portfolio/site-header";
 import { Choreography } from "@/components/portfolio/choreography";
 import { monoFont, portfolioFont, questionFont } from "@/components/portfolio/font";
 import "@/components/portfolio/portfolio.css";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function Page() {
   return (

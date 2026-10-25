@@ -1,4 +1,9 @@
 /* One system for every section: tokens, shell, grid, section heads, links. */
+/* The page itself wears the paper, so overscroll never flashes white. */
+html:has(.portfolio-home),
+html:has(.portfolio-home) body {
+  background-color: #efeff0;
+}
 .portfolio-home {
   --paper: #efeff0;
   --ink: #171818;
