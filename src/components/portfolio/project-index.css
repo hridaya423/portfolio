@@ -1,0 +1,161 @@
+/* Every project at once, in the home grid's language: capture, question, name. */
+.index-section {
+  padding-top: clamp(120px, 11vw, 160px);
+  padding-bottom: clamp(48px, 6vw, 96px);
+}
+.index-head {
+  margin-bottom: clamp(56px, 7vw, 96px);
+}
+.index-head h1 {
+  margin: 0;
+}
+.index-head h1 img {
+  display: block;
+  width: clamp(240px, 26vw, 380px);
+  height: auto;
+}
+.index-lede {
+  max-width: 34ch;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: var(--t-lede);
+  line-height: 1.5;
+}
+
+.sheet {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(56px, 6vw, 88px) clamp(24px, 2.8vw, 40px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+@media (width >= 1100px) {
+  .sheet-item:nth-child(3n + 2) {
+    margin-top: clamp(48px, 5vw, 80px);
+  }
+}
+.sheet-item {
+  position: relative;
+  min-width: 0;
+  scroll-margin-top: 96px;
+}
+.sheet-media {
+  position: relative;
+}
+.sheet-frame {
+  display: block;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #e2e2e1;
+  box-shadow:
+    0 0 0 1px rgb(23 24 24 / 0.08),
+    0 30px 60px -44px rgb(23 24 24 / 0.45);
+  text-decoration: none;
+  transition:
+    transform 600ms var(--ease-out),
+    box-shadow 600ms var(--ease-out);
+}
+.sheet-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 900ms var(--ease-out);
+}
+/* No capture yet: the name stands in the frame on its own. */
+.sheet-plate {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  background: #e6e5e1;
+  color: var(--ink-soft);
+  font-size: clamp(32px, 3vw, 46px);
+  letter-spacing: -0.045em;
+}
+.sheet-media .media-button {
+  width: 40px;
+  height: 40px;
+  bottom: 12px;
+}
+.sheet-media .source-link {
+  right: 12px;
+}
+.sheet-media .source-link[data-stars] {
+  width: auto;
+}
+@media (hover: hover) and (pointer: fine) {
+  .sheet-frame:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 0 0 1px rgb(23 24 24 / 0.1),
+      0 40px 72px -44px rgb(23 24 24 / 0.5);
+  }
+  .sheet-frame:hover img {
+    transform: scale(1.025);
+  }
+  .sheet-title a:hover {
+    text-decoration: underline;
+  }
+}
+
+.sheet-question {
+  margin: 24px 0 4px;
+  color: #6c675d;
+  font-size: clamp(23px, 1.8vw, 27px);
+  line-height: 1.05;
+  transform: rotate(-1.5deg);
+  transform-origin: left bottom;
+  text-wrap: balance;
+}
+.sheet-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 8px;
+}
+.sheet-title h3 {
+  margin: 0;
+  font-size: clamp(24px, 2vw, 30px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+.sheet-title a {
+  text-decoration: none;
+}
+.sheet-description {
+  display: -webkit-box;
+  margin: 10px 0 0;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.55;
+  text-wrap: pretty;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.index-close {
+  padding-top: clamp(96px, 11vw, 160px);
+}
+.portfolio-home .index-close .finale-email {
+  font-size: clamp(24px, 3vw, 44px);
+}
+
+@media (width < 1100px) {
+  .sheet {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@media (width < 700px) {
+  .sheet {
+    grid-template-columns: 1fr;
+  }
+  .sheet-frame {
+    border-radius: 8px;
+  }
+}

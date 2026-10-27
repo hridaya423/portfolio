@@ -102,6 +102,52 @@
 .source-link {
   right: 14px;
 }
+/* With a count worth showing, the button opens into a pill: mark, star, number. */
+.source-link[data-stars] {
+  display: flex;
+  gap: 10px;
+  width: auto;
+  padding: 0 15px 0 12px;
+  border-radius: 22px;
+}
+.star-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-label);
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.star-count svg {
+  color: var(--signal);
+}
+
+.all-projects {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: clamp(72px, 8vw, 112px);
+  padding-block: 22px;
+  border-block: 1px solid var(--rule);
+  font-size: var(--t-h3);
+  line-height: 1.04;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+.all-projects svg {
+  flex: none;
+  width: clamp(24px, 2.4vw, 34px);
+  height: auto;
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .all-projects:hover svg {
+    transform: translate(3px, -3px);
+  }
+}
 /* Launch posts sit beside the work rather than playing over it. */
 .launch-links {
   position: absolute;

@@ -1,10 +1,12 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { ReactNode } from "react";
-import { GitHubLogoIcon } from "@radix-ui/react-icons";
+import { GitHubLogoIcon, StarFilledIcon as StarIcon } from "@radix-ui/react-icons";
 import { ArrowUpRight } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { DATA } from "@/data/resume";
 import { experience, projects } from "@/data/portfolio";
+import { formatStars, getStars, starsFor } from "@/data/github";
 import { questionFont } from "./font";
 import { EmailLink } from "./email-link";
 import { ExperienceLightField } from "./experience-light-field";
@@ -28,7 +30,8 @@ export function SectionHead({
   );
 }
 
-export function Projects() {
+export async function Projects() {
+  const stars = await getStars();
   return (
     <section
       id="projects"
@@ -51,77 +54,91 @@ export function Projects() {
           </h2>
         </header>
         <ol className="project-grid">
-          {projects.map((project, index) => (
-            <li className="project-card" key={project.id} data-lcd-host>
-              <div className="project-media" data-reveal="media">
-                <a
-                  href={project.href}
-                  className="project-frame"
-                  aria-label={`Open ${project.title}`}
-                >
-                  <Image
-                    src={project.image}
-                    alt={project.alt}
-                    width={project.previewWidth}
-                    height={project.previewHeight}
-                    sizes="(min-width: 1280px) 580px, (min-width: 860px) 46vw, 100vw"
-                  />
-                </a>
-                {project.launch && (
-                  <div className="launch-links">
-                    <a
-                      href={project.launch.x}
-                      className="media-button"
-                      aria-label={`${project.title} launch post on X`}
-                    >
-                      <Icons.x width={16} height={16} aria-hidden="true" />
-                    </a>
-                    <a
-                      href={project.launch.linkedin}
-                      className="media-button"
-                      aria-label={`${project.title} launch post on LinkedIn`}
-                    >
-                      <Icons.linkedin width={17} height={17} aria-hidden="true" />
-                    </a>
-                  </div>
-                )}
-                {project.repo && (
+          {projects.map((project, index) => {
+            const starCount = starsFor(stars, project.repo);
+            return (
+              <li className="project-card" key={project.id} data-lcd-host>
+                <div className="project-media" data-reveal="media">
                   <a
-                    href={project.repo}
-                    className="media-button source-link"
-                    aria-label={`${project.title} on GitHub`}
+                    href={project.href}
+                    className="project-frame"
+                    aria-label={`Open ${project.title}`}
                   >
-                    <GitHubLogoIcon width={20} height={20} />
+                    <Image
+                      src={project.image}
+                      alt={project.alt}
+                      width={project.previewWidth}
+                      height={project.previewHeight}
+                      sizes="(min-width: 1280px) 580px, (min-width: 860px) 46vw, 100vw"
+                    />
                   </a>
-                )}
-              </div>
-              <div className="project-question" data-reveal="note">
-                <p className={questionFont.className}>
-                  <span className="sr-only">What if </span>
-                  <span aria-hidden="true">…</span>
-                  {project.question}
+                  {project.launch && (
+                    <div className="launch-links">
+                      <a
+                        href={project.launch.x}
+                        className="media-button"
+                        aria-label={`${project.title} launch post on X`}
+                      >
+                        <Icons.x width={16} height={16} aria-hidden="true" />
+                      </a>
+                      <a
+                        href={project.launch.linkedin}
+                        className="media-button"
+                        aria-label={`${project.title} launch post on LinkedIn`}
+                      >
+                        <Icons.linkedin width={17} height={17} aria-hidden="true" />
+                      </a>
+                    </div>
+                  )}
+                  {project.repo && (
+                    <a
+                      href={project.repo}
+                      className="media-button source-link"
+                      aria-label={`${project.title} on GitHub${starCount ? `, ${starCount} stars` : ""}`}
+                      data-stars={starCount ? "" : undefined}
+                    >
+                      <GitHubLogoIcon width={20} height={20} />
+                      {starCount && (
+                        <span className="star-count" aria-hidden="true">
+                          <StarIcon width={13} height={13} />
+                          {formatStars(starCount)}
+                        </span>
+                      )}
+                    </a>
+                  )}
+                </div>
+                <div className="project-question" data-reveal="note">
+                  <p className={questionFont.className}>
+                    <span className="sr-only">What if </span>
+                    <span aria-hidden="true">…</span>
+                    {project.question}
+                  </p>
+                </div>
+                <div className="project-title" data-reveal="rise">
+                  <h3>{project.title}</h3>
+                  <LcdChip
+                    text={String(index + 1).padStart(2, "0")}
+                    hoverText="->"
+                    columns={2}
+                    dot={2}
+                    className="project-id"
+                  />
+                </div>
+                <p className="project-description" data-reveal="rise">
+                  {project.description}
                 </p>
-              </div>
-              <div className="project-title" data-reveal="rise">
-                <h3>{project.title}</h3>
-                <LcdChip
-                  text={String(index + 1).padStart(2, "0")}
-                  hoverText="->"
-                  columns={2}
-                  dot={2}
-                  className="project-id"
-                />
-              </div>
-              <p className="project-description" data-reveal="rise">
-                {project.description}
-              </p>
-              <a className="text-link" href={project.href} data-reveal="rise">
-                Open {project.title}
-                <ArrowUpRight aria-hidden="true" size={16} />
-              </a>
-            </li>
-          ))}
+                <a className="text-link" href={project.href} data-reveal="rise">
+                  Open {project.title}
+                  <ArrowUpRight aria-hidden="true" size={16} />
+                </a>
+              </li>
+            );
+          })}
         </ol>
+        <Link className="all-projects" href="/projects">
+          <span>View more projects</span>
+          <ArrowUpRight aria-hidden="true" size={18} />
+        </Link>
       </div>
     </section>
   );
