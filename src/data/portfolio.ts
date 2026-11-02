@@ -165,6 +165,19 @@ export const events: PortfolioEvent[] = [
     cloud: "WINNER",
   },
   {
+    id: "problem-day",
+    city: "London",
+    country: "United Kingdom",
+    title: "the PROBLEM day",
+    date: "31 October 2026",
+    description:
+      "Built Myna at Kickstart's PROBLEM day in London: computer use for enterprise. It redacts sensitive data locally before anything leaves the machine, routes each step to the right model, watches how you work to suggest what it can automate, and turns a recording of you doing a task into an automation. It came runner-up.",
+    href: "https://luma.com/mczagntt",
+    award: "Runner-up",
+    label: "the PROBLEM day",
+    cloud: "2ND",
+  },
+  {
     id: "juice",
     city: "Shanghai",
     country: "China",
