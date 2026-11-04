@@ -12,16 +12,19 @@ const motionGate = `if(!matchMedia("(prefers-reduced-motion: reduce)").matches)d
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
   title: {
-    default: DATA.name,
+    default: `${DATA.name}, builder in London`,
     template: `%s | ${DATA.name}`,
   },
   description: DATA.description,
+  applicationName: DATA.name,
+  authors: [{ name: DATA.name, url: DATA.url }],
+  creator: DATA.name,
   openGraph: {
-    title: `${DATA.name}`,
+    title: `${DATA.name}, builder in London`,
     description: DATA.description,
     url: DATA.url,
     siteName: `${DATA.name}`,
-    locale: "en_US",
+    locale: "en_GB",
     type: "website",
   },
   robots: {
@@ -36,9 +39,10 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: `${DATA.name}`,
+    title: `${DATA.name}, builder in London`,
     description: DATA.description,
     card: "summary_large_image",
+    creator: "@AgrawalHridaya",
   },
 };
 

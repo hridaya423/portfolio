@@ -13,12 +13,28 @@ import { SiteHeader } from "@/components/portfolio/site-header";
 import { Choreography } from "@/components/portfolio/choreography";
 import { monoFont, portfolioFont, questionFont } from "@/components/portfolio/font";
 import "@/components/portfolio/portfolio.css";
+import { jsonLd, personNode, websiteNode, PERSON_ID, SITE_URL, WEBSITE_ID } from "@/lib/structured-data";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
+
+const profile = jsonLd([
+  {
+    "@type": "ProfilePage",
+    "@id": `${SITE_URL}/#profile`,
+    url: SITE_URL,
+    name: "Hridya Agrawal, builder in London",
+    isPartOf: { "@id": WEBSITE_ID },
+    mainEntity: { "@id": PERSON_ID },
+    dateModified: "2026-11-04",
+  },
+  personNode(),
+  websiteNode(),
+]);
 
 export default function Page() {
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: profile }} />
       <a className="skip-link" href="#projects">
         Skip to work
       </a>

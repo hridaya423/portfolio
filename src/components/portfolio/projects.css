@@ -205,7 +205,10 @@
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
 }
-.project-card > .text-link {
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
   margin-top: 18px;
 }
 

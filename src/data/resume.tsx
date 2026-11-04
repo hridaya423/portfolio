@@ -4,11 +4,11 @@ import { HomeIcon, NotebookIcon } from "lucide-react";
 export const DATA = {
   name: "Hridya Agrawal",
   initials: "HA",
-  url: "https://hridya.tech",
+  url: "https://www.hridya.tech",
   location: "London, UK",
   locationLink: "https://www.google.com/maps/place/London,+UK",
   description:
-    "I spend most of my free time building things that solve problems I've run into.",
+    "Hridya Agrawal is a builder in London. He makes developer tools, macOS apps and games, such as Lexis, Foundry and Cue, and won 1st at Reinvent the Wheel.",
   summary:
     "",
   avatarUrl: "/me.png",
@@ -131,7 +131,7 @@ export const DATA = {
       previewHeight: 1890,
       question: "a launcher barely touched memory?",
       title: "Foundry",
-      description: "A native macOS launcher for apps, clipboard history, file transforms, window management and AI chat, using 68.9% less warmed memory than Raycast.",
+      description: "A native macOS launcher for apps, clipboard history and windows. It used about 81% less memory than Raycast in my benchmark.",
       image: "/foundry-hero.png",
       href: "https://foundry.hridya.tech",
       repo: "https://github.com/hridaya423/foundry",
@@ -144,7 +144,7 @@ export const DATA = {
       question: "a circuit board could cut its own launch film?",
       title: "silk reel",
       description: "Give it a KiCad board file and it renders a release film of that board, built from its real copper, parts and silkscreen. MP4, GIF, WebM or ProRes with alpha.",
-      image: "/silkreel-hero.png",
+      image: "/projects/silkreel.jpg",
       href: "https://silkreel.hridya.tech",
       repo: "https://github.com/hridaya423/silkreel",
       technologies: ["KiCad", "TypeScript", "Open Source"],

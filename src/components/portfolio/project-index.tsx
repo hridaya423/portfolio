@@ -4,6 +4,7 @@ import { GitHubLogoIcon, StarFilledIcon } from "@radix-ui/react-icons";
 import { DATA } from "@/data/resume";
 import { projectIndex } from "@/data/portfolio";
 import { formatStars, getStars, starsFor } from "@/data/github";
+import { caseStudySlugs } from "@/data/case-studies";
 import { EmailLink } from "./email-link";
 import { questionFont } from "./font";
 import { LcdChip } from "./lcd-chip";
@@ -14,14 +15,14 @@ const links = [
   { label: "About", href: "/#about" },
 ];
 
-function IndexHeader() {
+export function IndexHeader({ label = "PROJECTS" }: { label?: string }) {
   return (
     <header className="site-header" data-shown="true">
       <div className="site-header-inner shell">
         <Link className="site-header-name" href="/">
           {DATA.name}
         </Link>
-        <LcdChip text="PROJECTS" columns={10} dot={1.9} className="site-header-lcd" />
+        <LcdChip text={label} columns={10} dot={1.9} className="site-header-lcd" />
         <nav aria-label="Sections" className="site-header-nav">
           {links.map(({ label, href }) => (
             <Link key={href} href={href}>
@@ -36,6 +37,7 @@ function IndexHeader() {
 
 export async function ProjectIndex() {
   const stars = await getStars();
+  const studies = new Set(caseStudySlugs());
   return (
     <>
       <IndexHeader />
@@ -54,6 +56,7 @@ export async function ProjectIndex() {
             {projectIndex.map((entry, index) => {
               const starCount = starsFor(stars, entry.repo);
               const href = entry.href ?? entry.repo;
+              const story = studies.has(entry.id) ? `/projects/${entry.id}` : undefined;
               return (
                 <li className="sheet-item" key={entry.id} id={entry.id} data-lcd-host>
                   <div className="sheet-media">
@@ -97,7 +100,7 @@ export async function ProjectIndex() {
                   </p>
                   <div className="sheet-title">
                     <h3>
-                      <a href={href}>{entry.title}</a>
+                      {story ? <Link href={story}>{entry.title}</Link> : <a href={href}>{entry.title}</a>}
                     </h3>
                     <LcdChip
                       text={String(index + 1).padStart(2, "0")}
@@ -107,6 +110,11 @@ export async function ProjectIndex() {
                     />
                   </div>
                   <p className="sheet-description">{entry.description}</p>
+                  {story && (
+                    <Link className="sheet-story" href={story}>
+                      Read how it works
+                    </Link>
+                  )}
                 </li>
               );
             })}

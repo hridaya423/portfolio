@@ -127,10 +127,15 @@ export async function Projects() {
                 <p className="project-description" data-reveal="rise">
                   {project.description}
                 </p>
-                <a className="text-link" href={project.href} data-reveal="rise">
-                  Open {project.title}
-                  <ArrowUpRight aria-hidden="true" size={16} />
-                </a>
+                <div className="project-links" data-reveal="rise">
+                  <a className="text-link" href={project.href}>
+                    Open {project.title}
+                    <ArrowUpRight aria-hidden="true" size={16} />
+                  </a>
+                  <Link className="text-link" href={`/projects/${project.id}`}>
+                    How it works
+                  </Link>
+                </div>
               </li>
             );
           })}

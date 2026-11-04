@@ -28,6 +28,15 @@ const moreProjects: IndexEntry[] = [
     repo: gh("cue"),
   },
   {
+    id: "quill",
+    image: { src: "/projects/quill.jpg", width: 3024, height: 1890 },
+    title: "Quill",
+    question: "my draft edited itself while I talked?",
+    description: "A free Mac Markdown editor: hold a key, say the change, and Claude Code, Codex or Cursor rewrites your note in place for you to keep or revert.",
+    href: "https://quill.hridya.tech",
+    repo: gh("quill"),
+  },
+  {
     id: "locus",
     image: { src: "/projects/locus.jpg", width: 1280, height: 900 },
     title: "Locus",
@@ -37,9 +46,11 @@ const moreProjects: IndexEntry[] = [
   },
   {
     id: "gazekeeper",
+    image: { src: "/projects/gazekeeper.jpg", width: 3024, height: 1890 },
     title: "GazeKeeper",
     question: "a break reminder knew not to interrupt?",
     description: "A break reminder for the Mac that holds the break during calls and screen shares, then waits for a pause in your typing.",
+    href: "https://gazekeeper.hridya.tech",
     repo: gh("gazekeeper"),
   },
   {
@@ -79,7 +90,7 @@ const moreProjects: IndexEntry[] = [
     title: "Deep Green",
     question: "a 6 MB network played perfect Wordle?",
     description: "A small neural network that plays Wordle move for move like a certified optimal solver, seeing only the public board.",
-    href: "https://deepgreen-xi.vercel.app",
+    href: "https://deepgreen.hridya.tech",
     repo: gh("deepgreen"),
   },
   {
@@ -104,7 +115,7 @@ const moreProjects: IndexEntry[] = [
     title: "Neurix",
     question: "block code kept going past the beginner demos?",
     description: "A Scratch-style block editor meant for real games, with AI that writes and explains blocks.",
-    href: "https://neurix-xi.vercel.app",
+    href: "https://neurix.hridya.tech",
     repo: gh("neurix"),
   },
 ];
