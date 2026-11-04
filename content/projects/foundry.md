@@ -54,12 +54,11 @@ I have no numbers for Alfred or Spotlight. Foundry imports Alfred and Raycast sn
 - It's one machine and two runs. A second Mac, a Mac mini, isn't measured yet.
 - I didn't record Raycast's settings or extensions. It was my daily install.
 - Run order moves the answer. Foundry's footprint in the Raycast-first run ranged from 41.5 to 115.5 MB.
-- The docs don't say whether the 1.1.0 DMG is signed and notarized.
 - YouTube downloads install `yt-dlp` through Homebrew, and some file conversions need Homebrew tools too.
 
 ## Try Foundry
 
-Download [Foundry.dmg](https://github.com/hridaya423/foundry/releases/latest/download/Foundry.dmg), drag Foundry to Applications and press Cmd+Space. Setup can move Raycast or Alfred to Option+Space.
+Download [Foundry.dmg](https://github.com/hridaya423/foundry/releases/latest/download/Foundry.dmg), drag Foundry to Applications and press Cmd+Space. Since 1.3.0 the app is signed with a Developer ID and notarized by Apple. Setup can move Raycast or Alfred to Option+Space.
 
 To build from source, run `./scripts/build-app.sh` with Swift 6.1 or later (6.2 for the Liquid Glass look). There's no Homebrew formula, and the package has no third-party Swift dependencies.
 

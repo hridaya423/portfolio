@@ -28,6 +28,15 @@ const moreProjects: IndexEntry[] = [
     repo: gh("cue"),
   },
   {
+    id: "perry",
+    image: { src: "/projects/perry.jpg", width: 3024, height: 1890 },
+    title: "Perry",
+    question: "someone could show me where the button is?",
+    description: "A free Mac helper in the notch: ask how to do something and it points at each control in turn, or does the task while you watch.",
+    href: "https://perry.hridya.tech",
+    repo: gh("perry"),
+  },
+  {
     id: "quill",
     image: { src: "/projects/quill.jpg", width: 3024, height: 1890 },
     title: "Quill",
