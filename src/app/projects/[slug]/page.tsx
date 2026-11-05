@@ -8,7 +8,7 @@ import { caseStudySlugs, getCaseStudy, getCaseStudyMeta } from "@/data/case-stud
 import { Footer } from "@/components/portfolio/sections";
 import { IndexHeader } from "@/components/portfolio/project-index";
 import { monoFont, portfolioFont, questionFont } from "@/components/portfolio/font";
-import { caseStudyUrl, jsonLd, PERSON_ID, personNode, SITE_URL, softwareNode, WEBSITE_ID } from "@/lib/structured-data";
+import { caseStudyUrl, isoDateTime, jsonLd, PERSON_ID, personNode, SITE_URL, softwareNode, WEBSITE_ID } from "@/lib/structured-data";
 import "@/components/portfolio/portfolio.css";
 import "@/components/portfolio/case-study.css";
 
@@ -79,8 +79,8 @@ export default async function CaseStudyPage({ params }: Props) {
       url,
       headline: study.headline,
       description: study.summary,
-      datePublished: study.publishedAt,
-      dateModified: study.updatedAt,
+      datePublished: isoDateTime(study.publishedAt),
+      dateModified: isoDateTime(study.updatedAt),
       wordCount: study.words,
       inLanguage: "en-GB",
       ...(study.image ? { image: `${SITE_URL}${study.image}` } : {}),

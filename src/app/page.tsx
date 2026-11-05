@@ -25,7 +25,7 @@ const profile = jsonLd([
     name: "Hridya Agrawal, builder in London",
     isPartOf: { "@id": WEBSITE_ID },
     mainEntity: { "@id": PERSON_ID },
-    dateModified: "2026-11-04",
+    dateModified: "2026-11-04T00:00:00+00:00",
   },
   personNode(),
   websiteNode(),

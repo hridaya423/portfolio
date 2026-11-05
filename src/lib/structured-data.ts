@@ -62,6 +62,12 @@ export function softwareNode(meta: CaseStudyMeta) {
   };
 }
 
+// Google's rich results want a full ISO 8601 datetime with a timezone,
+// so a date-only "2026-11-04" becomes midnight UTC on that day.
+export function isoDateTime(date: string) {
+  return /^\d{4}-\d{2}-\d{2}$/.test(date) ? `${date}T00:00:00+00:00` : date;
+}
+
 // JSON.stringify does not escape "<", so a string containing "</script>"
 // could close the tag. Escape it, as the Next.js JSON-LD guide recommends.
 export function jsonLd(graph: object[]) {
