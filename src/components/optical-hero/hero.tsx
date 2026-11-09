@@ -1,3 +1,4 @@
+import { ArrowDown } from "lucide-react";
 import { portfolioFont } from "@/components/portfolio/font";
 import { DATA } from "@/data/resume";
 import { IdeaEffect } from "./idea-effect";
@@ -73,9 +74,12 @@ export function OpticalHero() {
           <p className="hero-sub hero-intro">
             Software, games, and a few things in between.
           </p>
-          <a className="explore-work hero-intro" href="#projects">
-            Explore my work
-          </a>
+          <p className="hero-action hero-intro">
+            <a className="explore-work" href="#projects">
+              Explore my work
+              <ArrowDown aria-hidden="true" size={16} />
+            </a>
+          </p>
         </div>
       </div>
       <Tray />

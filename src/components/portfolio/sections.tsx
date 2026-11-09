@@ -1,37 +1,30 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { ReactNode } from "react";
+import type { CSSProperties } from "react";
 import { GitHubLogoIcon, StarFilledIcon as StarIcon } from "@radix-ui/react-icons";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { DATA } from "@/data/resume";
-import { experience, projects } from "@/data/portfolio";
+import { experience, projectIndex, projects } from "@/data/portfolio";
+import { caseStudySlugs } from "@/data/case-studies";
 import { formatStars, getStars, starsFor } from "@/data/github";
 import { questionFont } from "./font";
 import { EmailLink } from "./email-link";
 import { ExperienceLightField } from "./experience-light-field";
 import { LcdChip } from "./lcd-chip";
 import { LcdWall } from "./lcd-wall";
-import { LondonClock } from "./london-clock";
+import { SectionHead } from "./section-head";
 
-export function SectionHead({
-  id,
-  children,
-}: {
-  id: string;
-  children: ReactNode;
-}) {
-  return (
-    <header className="section-head">
-      <h2 id={id} className="section-title" data-reveal="words">
-        {children}
-      </h2>
-    </header>
-  );
-}
+export { Footer } from "./footer";
+export { SectionHead };
 
 export async function Projects() {
   const stars = await getStars();
+  const studies = new Set(caseStudySlugs());
+  const featured = new Set(projects.map((project) => project.id));
+  const more = projectIndex
+    .map((entry, index) => ({ ...entry, number: String(index + 1).padStart(2, "0") }))
+    .filter((entry) => !featured.has(entry.id) && studies.has(entry.id));
   return (
     <section
       id="projects"
@@ -140,8 +133,41 @@ export async function Projects() {
             );
           })}
         </ol>
+        {more.length > 0 && (
+          <div className="more-work">
+            <h3 className="more-work-label" data-reveal="rise">
+              <span>And {more.length} more</span>
+              <span aria-hidden="true">
+                {more[0].number}–{more[more.length - 1].number}
+              </span>
+            </h3>
+            <ol
+              className="more-index"
+              style={{ "--rows": Math.ceil(more.length / 2) } as CSSProperties}
+            >
+              {more.map((entry) => (
+                <li key={entry.id} data-reveal="rise">
+                  <Link className="more-row" href={`/projects/${entry.id}`}>
+                    <span className="more-number" aria-hidden="true">
+                      {entry.number}
+                    </span>
+                    <span className="more-title">
+                      <span>{entry.title}</span>
+                    </span>
+                    <span className={`more-question ${questionFont.className}`}>
+                      <span className="sr-only">: what if </span>
+                      <span aria-hidden="true">…</span>
+                      {entry.question}
+                    </span>
+                    <ArrowRight aria-hidden="true" size={16} />
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
         <Link className="all-projects" href="/projects">
-          <span>View more projects</span>
+          <span>View all projects</span>
           <ArrowUpRight aria-hidden="true" size={18} />
         </Link>
       </div>
@@ -194,10 +220,10 @@ export function Experience({
 
 export function About() {
   const socials = [
-    { name: "Email", url: DATA.contact.social.email.url },
-    DATA.contact.social.GitHub,
-    DATA.contact.social.LinkedIn,
-    DATA.contact.social.X,
+    { name: "Email", url: DATA.contact.social.email.url, rel: undefined },
+    { ...DATA.contact.social.GitHub, rel: "me" },
+    { ...DATA.contact.social.LinkedIn, rel: "me" },
+    { ...DATA.contact.social.X, rel: "me" },
   ];
 
   return (
@@ -212,10 +238,16 @@ export function About() {
           <SectionHead id="about-heading">
             Most of my free time goes into building.
           </SectionHead>
-          <p className="finale-lede" data-reveal="rise">
-            Software and games, usually starting with a problem I&rsquo;ve run
-            into. I&rsquo;m {DATA.name}, based in {DATA.location}.
-          </p>
+          <div className="finale-aside" data-reveal="rise">
+            <p className="finale-lede">
+              Software and games, usually starting with a problem I&rsquo;ve run
+              into. I&rsquo;m {DATA.name}, based in {DATA.location}.
+            </p>
+            <Link className="text-link" href="/about">
+              More about me
+              <ArrowRight aria-hidden="true" size={16} />
+            </Link>
+          </div>
         </div>
       </div>
       <LcdWall />
@@ -231,7 +263,7 @@ export function About() {
           <ul className="finale-socials" aria-label="Elsewhere" data-reveal="rise">
             {socials.map((social) => (
               <li key={social.name}>
-                <a href={social.url}>
+                <a href={social.url} rel={social.rel}>
                   {social.name}
                   <ArrowUpRight aria-hidden="true" size={16} />
                 </a>
@@ -241,16 +273,5 @@ export function About() {
         </div>
       </div>
     </section>
-  );
-}
-
-export function Footer() {
-  return (
-    <footer className="portfolio-footer">
-      <div className="shell">
-        <p>© 2026 {DATA.name}</p>
-        <LondonClock />
-      </div>
-    </footer>
   );
 }

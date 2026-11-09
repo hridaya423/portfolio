@@ -7,33 +7,10 @@ import { formatStars, getStars, starsFor } from "@/data/github";
 import { caseStudySlugs } from "@/data/case-studies";
 import { EmailLink } from "./email-link";
 import { questionFont } from "./font";
+import { IndexHeader } from "./index-header";
 import { LcdChip } from "./lcd-chip";
 
-const links = [
-  { label: "Work", href: "/#projects" },
-  { label: "Events", href: "/#hackathons" },
-  { label: "About", href: "/#about" },
-];
-
-export function IndexHeader({ label = "PROJECTS" }: { label?: string }) {
-  return (
-    <header className="site-header" data-shown="true">
-      <div className="site-header-inner shell">
-        <Link className="site-header-name" href="/">
-          {DATA.name}
-        </Link>
-        <LcdChip text={label} columns={10} dot={1.9} className="site-header-lcd" />
-        <nav aria-label="Sections" className="site-header-nav">
-          {links.map(({ label, href }) => (
-            <Link key={href} href={href}>
-              {label}
-            </Link>
-          ))}
-        </nav>
-      </div>
-    </header>
-  );
-}
+export { IndexHeader } from "./index-header";
 
 export async function ProjectIndex() {
   const stars = await getStars();
@@ -41,7 +18,7 @@ export async function ProjectIndex() {
   return (
     <>
       <IndexHeader />
-      <section className="section index-section" aria-labelledby="index-heading">
+      <section id="content" className="section index-section" aria-labelledby="index-heading">
         <div className="shell">
           <header className="index-head">
             <h1 id="index-heading">
@@ -99,9 +76,9 @@ export async function ProjectIndex() {
                     {entry.question}
                   </p>
                   <div className="sheet-title">
-                    <h3>
+                    <h2>
                       {story ? <Link href={story}>{entry.title}</Link> : <a href={href}>{entry.title}</a>}
-                    </h3>
+                    </h2>
                     <LcdChip
                       text={String(index + 1).padStart(2, "0")}
                       hoverText="->"

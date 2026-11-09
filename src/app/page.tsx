@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { events, credentials } from "@/data/portfolio";
+import { latestUpdate } from "@/data/case-studies";
 import { OpticalHero } from "@/components/optical-hero/hero";
 import {
   Projects,
@@ -13,19 +14,19 @@ import { SiteHeader } from "@/components/portfolio/site-header";
 import { Choreography } from "@/components/portfolio/choreography";
 import { monoFont, portfolioFont, questionFont } from "@/components/portfolio/font";
 import "@/components/portfolio/portfolio.css";
-import { jsonLd, personNode, websiteNode, PERSON_ID, SITE_URL, WEBSITE_ID } from "@/lib/structured-data";
+import { feedAlternate, isoDateTime, jsonLd, personNode, websiteNode, PERSON_ID, SITE_TITLE, SITE_URL, WEBSITE_ID } from "@/lib/structured-data";
 
-export const metadata: Metadata = { alternates: { canonical: "/" } };
+export const metadata: Metadata = { alternates: { canonical: "/", types: feedAlternate } };
 
 const profile = jsonLd([
   {
     "@type": "ProfilePage",
     "@id": `${SITE_URL}/#profile`,
     url: SITE_URL,
-    name: "Hridya Agrawal, builder in London",
+    name: SITE_TITLE,
     isPartOf: { "@id": WEBSITE_ID },
     mainEntity: { "@id": PERSON_ID },
-    dateModified: "2026-11-04T00:00:00+00:00",
+    dateModified: isoDateTime(latestUpdate()),
   },
   personNode(),
   websiteNode(),

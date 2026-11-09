@@ -11,9 +11,7 @@ import "lenis/dist/lenis.css";
 const EASE = "power4.out";
 const SOFT = "power2.inOut";
 const ENTER = "top 88%";
-// After this point the CSS fallback may already have shown the hero, so
-// replaying the intro would hide visible content: skip it instead.
-const INTRO_DEADLINE = 1800;
+const INTRO = ".hero-line-inner, .hero-intro, .tray-base, .tray-lip, .tray-navigation";
 
 /**
  * Page-wide choreography over server-rendered markup.
@@ -39,22 +37,15 @@ export function Choreography() {
 
     const pending = (element: Element) =>
       element.getBoundingClientRect().top > innerHeight;
-    const playIntro = performance.now() < INTRO_DEADLINE;
     let disposed = false;
 
-    const context = gsap.context(() => {
-      // Hero: claim the pre-hidden state in the same task, so nothing paints in between.
-      root.classList.add("motion-live");
-      const openLines = () =>
-        document.querySelectorAll(".hero-line").forEach((line) => line.classList.add("is-open"));
-      if (playIntro) {
-        gsap
-          .timeline({ defaults: { ease: EASE }, onComplete: openLines })
-          .fromTo(".hero-line-inner", { yPercent: 112 }, { yPercent: 0, duration: 1.15, stagger: 0.1 }, 0.05)
-          .fromTo(".hero-intro", { y: 14, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 0.9, stagger: 0.08, clearProps: "all" }, 0.5)
-          .fromTo(".tray-base, .tray-lip, .tray-navigation", { y: 28, autoAlpha: 0 }, { y: 0, autoAlpha: 1, duration: 1.3, clearProps: "all" }, 0.3);
-      } else openLines();
+    // The hero intro is CSS, running since first paint; this only marks its end.
+    const intro = Array.from(document.querySelectorAll(INTRO)).flatMap((element) => element.getAnimations());
+    void Promise.allSettled(intro.map((animation) => animation.finished)).then(() =>
+      root.classList.add("intro-done"),
+    );
 
+    const context = gsap.context(() => {
       gsap.to(".optical-tray", {
         yPercent: 8,
         ease: "none",
@@ -183,7 +174,6 @@ export function Choreography() {
       document.querySelectorAll(".is-masking").forEach((media) => media.classList.remove("is-masking"));
       gsap.ticker.remove(raf);
       lenis.destroy();
-      root.classList.remove("motion-live");
     };
   }, []);
 

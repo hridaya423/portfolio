@@ -5,10 +5,10 @@ import { ArrowUpRight } from "lucide-react";
 import { DATA } from "@/data/resume";
 import { projectIndex } from "@/data/portfolio";
 import { caseStudySlugs, getCaseStudy, getCaseStudyMeta } from "@/data/case-studies";
-import { Footer } from "@/components/portfolio/sections";
+import { Footer } from "@/components/portfolio/footer";
 import { IndexHeader } from "@/components/portfolio/project-index";
 import { monoFont, portfolioFont, questionFont } from "@/components/portfolio/font";
-import { caseStudyUrl, isoDateTime, jsonLd, PERSON_ID, personNode, SITE_URL, softwareNode, WEBSITE_ID } from "@/lib/structured-data";
+import { caseStudyUrl, feedAlternate, isoDateTime, jsonLd, PERSON_ID, personNode, shareImage, SITE_URL, softwareNode, WEBSITE_ID } from "@/lib/structured-data";
 import "@/components/portfolio/portfolio.css";
 import "@/components/portfolio/case-study.css";
 
@@ -25,11 +25,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const meta = getCaseStudyMeta(slug);
   if (!meta) return {};
   const url = `/projects/${slug}`;
-  const images = meta.image ? [{ url: meta.image, alt: `${meta.title} interface` }] : undefined;
+  const images = [shareImage(meta)];
   return {
     title: { absolute: meta.headline },
     description: meta.summary,
-    alternates: { canonical: url },
+    alternates: { canonical: url, types: feedAlternate },
     openGraph: {
       type: "article",
       url,
@@ -46,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: meta.headline,
       description: meta.summary,
       creator: "@AgrawalHridaya",
-      images: images?.map((image) => image.url),
+      images: images.map((image) => image.url),
     },
   };
 }
@@ -111,7 +111,7 @@ export default async function CaseStudyPage({ params }: Props) {
     <main className={`portfolio-home ${portfolioFont.variable} ${monoFont.variable} ${questionFont.variable}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: graph }} />
       <IndexHeader label={study.title.toUpperCase().slice(0, 10)} />
-      <article className="case shell">
+      <article className="case shell" id="content">
         <header className="case-head">
           {question && (
             <p className={`case-question ${questionFont.className}`}>
@@ -121,10 +121,17 @@ export default async function CaseStudyPage({ params }: Props) {
             </p>
           )}
           <h1>{study.headline}</h1>
+          <p className="case-byline">
+            By <Link href="/about">{DATA.name}</Link>
+          </p>
           <dl className="case-facts">
             <div>
               <dt>Runs on</dt>
               <dd>{study.platform}</dd>
+            </div>
+            <div>
+              <dt>Status</dt>
+              <dd>{study.status}</dd>
             </div>
             <div>
               <dt>First released</dt>

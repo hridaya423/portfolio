@@ -25,6 +25,19 @@
   text-wrap: balance;
 }
 
+.case-byline {
+  margin: 20px 0 0;
+  color: var(--muted);
+  font-size: 15px;
+}
+.case-byline a {
+  display: inline-block;
+  padding-block: 4px;
+  color: var(--ink);
+  text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 3px) / 100% 1px no-repeat;
+}
+
 .case-facts {
   display: flex;
   flex-wrap: wrap;
@@ -46,10 +59,22 @@
   font-size: 15px;
 }
 .case-facts a {
+  display: inline-block;
+  margin-block: -3px;
+  padding-block: 3px;
   text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(100% - 3px) / 0 1px no-repeat;
+  transition: background-size 420ms var(--ease-out);
 }
-.case-facts a:hover {
-  text-decoration: underline;
+@media (hover: hover) {
+  .case-facts a:hover {
+    background-size: 100% 1px;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .case-byline a:hover {
+    animation: underline-redraw 640ms var(--ease-out);
+  }
 }
 
 .case-links {
@@ -98,18 +123,30 @@
 }
 .case-toc ol {
   display: grid;
-  gap: 10px;
-  margin: 0;
+  gap: 0;
+  margin: -5px 0 0;
   padding: 0;
   list-style: none;
 }
 .case-toc a {
+  display: block;
+  padding-block: 5px;
   color: var(--muted);
   line-height: 1.35;
   text-decoration: none;
+  transition:
+    color 200ms,
+    transform 300ms var(--ease-out);
 }
-.case-toc a:hover {
-  color: var(--ink);
+@media (hover: hover) {
+  .case-toc a:hover {
+    color: var(--ink);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .case-toc a:hover {
+    transform: translateX(3px);
+  }
 }
 
 .case-body {
@@ -153,6 +190,7 @@
   margin-top: 0.35em;
 }
 .case-body a {
+  padding-block: 0.2em;
   color: var(--signal-ink);
   text-decoration: underline;
   text-decoration-color: rgb(173 71 39 / 0.35);
@@ -169,6 +207,10 @@
 .case-body strong {
   color: var(--ink);
   font-weight: 600;
+}
+.case-body picture {
+  display: block;
+  max-width: 100%;
 }
 .case-body img {
   display: block;
@@ -258,21 +300,64 @@
   padding-top: 24px;
   border-top: 1px solid var(--rule);
 }
+.case-end .text-link::before {
+  content: "\2190";
+  transition: transform 300ms var(--ease-out);
+}
 .case-next {
   display: grid;
   gap: 4px;
+  padding-bottom: 6px;
   font-size: var(--t-h3);
   letter-spacing: -0.03em;
   text-align: right;
   text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 100% 100% / 0 1px no-repeat;
+  transition:
+    color 200ms,
+    background-size 500ms var(--ease-out);
 }
 .case-next span {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
   color: var(--faint);
   font-family: var(--font-label);
   font-size: var(--t-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-.case-next:hover {
-  color: var(--signal-ink);
+.case-next span::after {
+  content: "\2192";
+  letter-spacing: 0;
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) {
+  .case-next:hover {
+    color: var(--signal-ink);
+    background-size: 100% 1px;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .case-end .text-link:hover::before {
+    transform: translateX(-3px);
+  }
+  .case-next:hover span::after {
+    transform: translateX(3px);
+  }
+}
+
+.missing .case-head {
+  margin-bottom: 0;
+}
+.missing-lede {
+  max-width: 34ch;
+  margin: 24px 0 0;
+  color: var(--muted);
+  font-size: var(--t-lede);
+  line-height: 1.5;
+}
+
+.missing {
+  min-height: calc(100svh - 120px);
 }

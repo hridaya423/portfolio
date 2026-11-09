@@ -1,26 +1,28 @@
+import { PageTransition } from "@/components/portfolio/page-transition";
 import { ThemeProvider } from "@/components/theme-provider";
-import { TooltipProvider } from "@/components/ui/tooltip";
 import { DATA } from "@/data/resume";
+import { feedAlternate, SITE_TITLE } from "@/lib/structured-data";
 import { cn } from "@/lib/utils";
 import type { Metadata } from "next";
 import "./globals.css";
 
-// Hides hero copy for the intro only when motion is allowed; the choreography
-// claims it with `motion-live`, and a CSS fallback reveals it if scripts fail.
+// Allows the hero's CSS intro only when motion is allowed; it runs from first
+// paint without scripts, and `intro-done` on <html> retires it.
 const motionGate = `if(!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("motion-ok")`;
 
 export const metadata: Metadata = {
   metadataBase: new URL(DATA.url),
   title: {
-    default: `${DATA.name}, builder in London`,
+    default: SITE_TITLE,
     template: `%s | ${DATA.name}`,
   },
   description: DATA.description,
   applicationName: DATA.name,
   authors: [{ name: DATA.name, url: DATA.url }],
   creator: DATA.name,
+  alternates: { types: feedAlternate },
   openGraph: {
-    title: `${DATA.name}, builder in London`,
+    title: SITE_TITLE,
     description: DATA.description,
     url: DATA.url,
     siteName: `${DATA.name}`,
@@ -39,7 +41,7 @@ export const metadata: Metadata = {
     },
   },
   twitter: {
-    title: `${DATA.name}, builder in London`,
+    title: SITE_TITLE,
     description: DATA.description,
     card: "summary_large_image",
     creator: "@AgrawalHridaya",
@@ -63,7 +65,7 @@ export default function RootLayout({
           forcedTheme="light"
           enableSystem={false}
         >
-          <TooltipProvider delayDuration={0}>{children}</TooltipProvider>
+          <PageTransition>{children}</PageTransition>
         </ThemeProvider>
       </body>
     </html>

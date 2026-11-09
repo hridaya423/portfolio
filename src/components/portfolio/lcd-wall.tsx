@@ -14,7 +14,7 @@ const WALL = 9;
 // Everything the page has said, as the modules around the greeting read it.
 const WORDS: [string, string][] = [
   ["LEXIS", "ASK->RUN"],
-  ["FOUNDRY", "-69% RAM"],
+  ["FOUNDRY", "-81% RAM"],
   ["SILKREEL", "PCB->MP4"],
   ["REVISE", "PAST QS"],
   ["LOCUS", "1ST £1K"],

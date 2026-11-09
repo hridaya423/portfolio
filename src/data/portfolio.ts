@@ -148,42 +148,15 @@ export type PortfolioEvent = {
   date: string;
   description: string;
   href: string;
-  game?: { title: string; href: string; repo: string };
-  project?: { title: string; repo: string };
+  game?: { title: string; href?: string; repo: string };
+  project?: { title: string; repo: string; story?: string };
   award?: string;
   // Defaults to the city, for events that weren't a trip.
   label?: string;
   cloud?: string;
+  lead?: boolean;
 };
 export const events: PortfolioEvent[] = [
-  {
-    id: "reinvent-the-wheel",
-    city: "London",
-    country: "United Kingdom",
-    title: "Reinvent the Wheel",
-    date: "16–18 October 2026",
-    description:
-      "Built Locus at Reinvent the Wheel, a Tools for Science hackathon in King's Cross. Ask for public datasets in plain English: it searches 891k of them across 18 repositories, counts case and control samples, and writes the nf-core samplesheets. It won 1st place and the £1,000 grand prize.",
-    href: "https://luma.com/vdq0qw9u",
-    project: { title: "Locus", repo: "https://github.com/hridaya423/locus" },
-    award: "1st place",
-    label: "Reinvent the Wheel",
-    cloud: "1ST",
-  },
-  {
-    id: "moonfire-build-night",
-    city: "London",
-    country: "United Kingdom",
-    title: "Moonfire Build Night",
-    date: "22 October 2026",
-    description:
-      "Built Fineprint at Moonfire's Build Night in London: a 1.2B model, fine-tuned with White Circle's Halo on one H200, that reads terms of service on your own laptop and flags the clauses that cost you money or rights. It won the White Circle track and came 2nd overall.",
-    href: "https://community.venturecafelondon.org/events/103",
-    project: { title: "Fineprint", repo: "https://github.com/hridaya423/fineprint" },
-    award: "White Circle track winner, 2nd overall",
-    label: "Moonfire Build Night",
-    cloud: "WINNER",
-  },
   {
     id: "problem-day",
     city: "London",
@@ -196,6 +169,58 @@ export const events: PortfolioEvent[] = [
     award: "Runner-up",
     label: "the PROBLEM day",
     cloud: "2ND",
+  },
+  {
+    id: "moonfire-build-night",
+    city: "London",
+    country: "United Kingdom",
+    title: "Moonfire Build Night",
+    date: "22 October 2026",
+    description:
+      "Built Fineprint at Moonfire's Build Night in London: a 1.2B model, fine-tuned with White Circle's Halo on one H200, that reads terms of service on your own laptop and flags the clauses that cost you money or rights. It won the White Circle track and came 2nd overall.",
+    href: "https://community.venturecafelondon.org/events/103",
+    project: { title: "Fineprint", repo: "https://github.com/hridaya423/fineprint", story: "fineprint" },
+    award: "White Circle track winner, 2nd overall",
+    label: "Moonfire Build Night",
+    cloud: "WINNER",
+  },
+  {
+    id: "reinvent-the-wheel",
+    city: "London",
+    country: "United Kingdom",
+    title: "Reinvent the Wheel",
+    date: "16–18 October 2026",
+    description:
+      "Built Locus at Reinvent the Wheel, a Tools for Science hackathon in King's Cross. Ask for public datasets in plain English: it searches 891k of them across 18 repositories, counts case and control samples, and writes the nf-core samplesheets. It won 1st place and the £1,000 grand prize.",
+    href: "https://luma.com/vdq0qw9u",
+    project: { title: "Locus", repo: "https://github.com/hridaya423/locus", story: "locus" },
+    award: "1st place",
+    label: "Reinvent the Wheel",
+    cloud: "1ST",
+    lead: true,
+  },
+  {
+    id: "open-sauce",
+    city: "San Francisco",
+    country: "United States",
+    title: "Open Sauce",
+    date: "17–19 July 2026",
+    description: "Open Sauce 2026, at the San Mateo County Event Center in the San Francisco Bay Area.",
+    href: "https://www.opensauce.com/",
+  },
+  {
+    id: "shiba",
+    city: "Tokyo",
+    country: "Japan",
+    title: "Shiba",
+    date: "November 2025",
+    description:
+      "Made Whisper for Shiba: 120 hours building a game, then building an arcade machine for it in Tokyo.",
+    href: "https://shiba.hackclub.com",
+    game: {
+      title: "Whisper",
+      repo: "https://github.com/hridaya423/whisper",
+    },
   },
   {
     id: "juice",
@@ -211,30 +236,6 @@ export const events: PortfolioEvent[] = [
       href: "https://undeadcourier.hridya.tech/",
       repo: "https://github.com/hridaya423/undeadcourier",
     },
-  },
-  {
-    id: "shiba",
-    city: "Tokyo",
-    country: "Japan",
-    title: "Shiba",
-    date: "November 2025",
-    description:
-      "Made Whisper for Shiba: 120 hours building a game, then building an arcade machine for it in Tokyo.",
-    href: "https://shiba.hackclub.com",
-    game: {
-      title: "Whisper",
-      href: DATA.hackathons[1].links[1].href,
-      repo: "https://github.com/hridaya423/whisper",
-    },
-  },
-  {
-    id: "open-sauce",
-    city: "San Francisco",
-    country: "United States",
-    title: "Open Sauce",
-    date: "17–19 July 2026",
-    description: "Open Sauce 2026, at the San Mateo County Event Center in the San Francisco Bay Area.",
-    href: "https://www.opensauce.com/",
   },
 ];
 export const credentials = DATA.achievements.map((credential) => ({

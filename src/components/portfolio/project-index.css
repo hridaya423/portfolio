@@ -97,7 +97,7 @@
     transform: scale(1.025);
   }
   .sheet-title a:hover {
-    text-decoration: underline;
+    background-size: 100% 1px;
   }
 }
 
@@ -117,7 +117,7 @@
   gap: 16px;
   margin-top: 8px;
 }
-.sheet-title h3 {
+.sheet-title h2 {
   margin: 0;
   font-size: clamp(24px, 2vw, 30px);
   font-weight: 400;
@@ -125,7 +125,10 @@
   letter-spacing: -0.04em;
 }
 .sheet-title a {
+  padding-bottom: 0.08em;
   text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px no-repeat;
+  transition: background-size 500ms var(--ease-out);
 }
 .sheet-description {
   display: -webkit-box;
@@ -161,15 +164,32 @@
 }
 
 .sheet-item .sheet-story {
-  display: inline-block;
-  margin-top: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 32px;
+  margin-top: 5px;
   color: var(--signal-ink);
   font-family: var(--font-label);
   font-size: var(--t-label);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   text-decoration: none;
+  background: linear-gradient(currentColor, currentColor) 0 calc(50% + 0.85em) / 0 1px no-repeat;
+  transition: background-size 420ms var(--ease-out);
 }
-.sheet-item .sheet-story:hover {
-  text-decoration: underline;
+.sheet-item .sheet-story::after {
+  content: "\2192";
+  letter-spacing: 0;
+  transition: transform 300ms var(--ease-out);
+}
+@media (hover: hover) {
+  .sheet-item .sheet-story:hover {
+    background-size: 100% 1px;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .sheet-item .sheet-story:hover::after {
+    transform: translateX(3px);
+  }
 }

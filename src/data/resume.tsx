@@ -8,7 +8,7 @@ export const DATA = {
   location: "London, UK",
   locationLink: "https://www.google.com/maps/place/London,+UK",
   description:
-    "Hridya Agrawal is a builder in London. He makes developer tools, macOS apps and games, such as Lexis, Foundry and Cue, and won 1st at Reinvent the Wheel.",
+    "Hridya Agrawal is an AI engineer in London. He builds developer tools, macOS apps and games, such as Lexis, Foundry and Cue, and won 1st place at Reinvent the Wheel.",
   summary:
     "",
   avatarUrl: "/me.png",
@@ -115,7 +115,7 @@ export const DATA = {
       previewHeight: 1890,
       question: "my terminal understood plain English?",
       title: "Lexis",
-      description: "Describe what you need in plain English. Lexis turns it into shell commands for your platform and checks the risk before anything runs.",
+      description: "Describe what you need in plain English. Lexis turns it into a shell command for your platform and checks the risk before anything runs.",
       image: "/lexis-hero.png",
       href: "https://lexis.hridya.tech",
       repo: "https://github.com/hridaya423/lexis",
@@ -194,11 +194,6 @@ export const DATA = {
           type: "repo",
           href: "https://github.com/hridaya423/whisper",
         },
-        {
-          icon: Icons.globe({}),
-          type: "website",
-          href: "https://tc8ckgo4kskk48s0o8cwc0g8.a.selfhosted.hackclub.com/play/019a41d9-ce39-79e2-868f-2ff8eecafea3/",
-        },
       ],
     },
   ],
@@ -276,12 +271,12 @@ export const DATA = {
     {
       id: "oracle",
       issuer: "Oracle",
-      name: "Oracle Gen AI",
+      name: "Oracle Cloud Infrastructure 2024 Generative AI Certified Professional",
       title: "Oracle Gen AI",
       subtitle: "Achieved Oracle Gen AI certification at age 13",
       ageEarned: 13,
       image: "/credential-thumbnails/e.webp",
-      link: "https://t.co/OumPKteDbd",
+      link: "https://catalog-education.oracle.com/ords/certview/sharebadge?id=A9AC24348C60D3C6EDFB9C69A7EE6B961133D05E2EDBA2501E6FE623ECA3E836",
     },
     {
       id: "github",

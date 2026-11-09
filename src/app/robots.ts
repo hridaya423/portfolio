@@ -22,12 +22,12 @@ const crawlers = [
 ];
 
 export default function robots(): MetadataRoute.Robots {
-  // The review routes are section fixtures for visual checks, not pages.
-  const disallow = "/review/";
+  // The review routes are fixtures for visual checks. They stay crawlable
+  // so that crawlers can read their noindex.
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow },
-      ...crawlers.map((userAgent) => ({ userAgent, allow: "/", disallow })),
+      { userAgent: "*", allow: "/" },
+      ...crawlers.map((userAgent) => ({ userAgent, allow: "/" })),
     ],
     sitemap: `${DATA.url}/sitemap.xml`,
   };

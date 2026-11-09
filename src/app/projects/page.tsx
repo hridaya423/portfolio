@@ -2,16 +2,35 @@ import type { Metadata } from "next";
 import { DATA } from "@/data/resume";
 import { projectIndex } from "@/data/portfolio";
 import { caseStudySlugs } from "@/data/case-studies";
-import { Footer } from "@/components/portfolio/sections";
+import { Footer } from "@/components/portfolio/footer";
 import { ProjectIndex } from "@/components/portfolio/project-index";
 import { monoFont, portfolioFont } from "@/components/portfolio/font";
-import { caseStudyUrl, jsonLd, PERSON_ID, SITE_URL, WEBSITE_ID } from "@/lib/structured-data";
+import { caseStudyUrl, feedAlternate, jsonLd, PERSON_ID, SITE_IMAGE, SITE_URL, WEBSITE_ID } from "@/lib/structured-data";
 import "@/components/portfolio/portfolio.css";
+
+const title = `Projects | ${DATA.name}`;
+const description = `Every project ${DATA.name} has built: macOS apps, developer tools, machine learning experiments, games and hackathon winners, each with a write-up.`;
 
 export const metadata: Metadata = {
   title: "Projects",
-  description: `Every project ${DATA.name} has built: macOS apps, developer tools, machine learning experiments, games and hackathon winners, each with a write-up.`,
-  alternates: { canonical: "/projects" },
+  description,
+  alternates: { canonical: "/projects", types: feedAlternate },
+  openGraph: {
+    type: "website",
+    url: "/projects",
+    title,
+    description,
+    siteName: DATA.name,
+    locale: "en_GB",
+    images: [SITE_IMAGE],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    creator: "@AgrawalHridaya",
+    images: [SITE_IMAGE.url],
+  },
 };
 
 export default function ProjectsPage() {

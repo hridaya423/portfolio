@@ -1,3 +1,6 @@
+.certifications-section {
+  overflow-x: clip;
+}
 .certifications-section .section-head {
   margin-bottom: 22px;
 }

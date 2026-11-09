@@ -15,8 +15,13 @@
 .finale-intro .section-title {
   max-width: 14ch;
 }
-.finale-lede {
+.finale-aside {
   grid-column: 9 / 13;
+}
+.finale-aside .text-link {
+  margin-top: 20px;
+}
+.finale-lede {
   margin: 0;
   color: var(--muted);
   font-size: var(--t-lede);
@@ -210,7 +215,7 @@
   .finale-contact {
     display: block;
   }
-  .finale-lede {
+  .finale-aside {
     margin-top: 24px;
   }
   .finale-socials {

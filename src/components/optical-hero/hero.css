@@ -49,7 +49,7 @@
   margin-bottom: -0.06em;
 }
 /* Lines mask only during the intro; afterwards the lens on "idea" can spill. */
-.motion-ok .hero-line:not(.is-open) {
+.motion-ok:not(.intro-done) .hero-line {
   overflow: clip;
 }
 .hero-line-inner {
@@ -61,29 +61,53 @@
   font-size: var(--t-lede);
   line-height: 1.55;
 }
+.hero-action {
+  margin: 14px 0 0;
+}
 .explore-work {
   display: inline-flex;
   align-items: center;
+  gap: 8px;
   min-height: 44px;
-  margin-top: 14px;
   font-size: 16px;
   text-decoration: none;
   background: linear-gradient(currentColor, currentColor) 0 calc(100% - 9px) / 100% 1px no-repeat;
 }
-/* Intro pre-hide: only when motion is allowed, released by the choreography,
-   and released by CSS after a beat if scripts never arrive. */
-.motion-ok:not(.motion-live) .hero-line-inner {
-  transform: translateY(112%);
-  animation: intro-release 0s 2.5s forwards;
+.explore-work svg {
+  transition: transform 300ms var(--ease-out);
 }
-.motion-ok:not(.motion-live) :is(.hero-intro, .tray-base, .tray-lip, .tray-navigation) {
-  opacity: 0;
-  animation: intro-release 0s 2.5s forwards;
+/* The intro runs in CSS from the first paint, so the copy never waits for scripts.
+   It plays once per document: `intro-done` is set when it ends or on the first route change. */
+.motion-ok:not(.intro-done) .hero-line-inner {
+  animation: hero-line-in 1150ms cubic-bezier(0.165, 0.84, 0.44, 1) 50ms backwards;
 }
-@keyframes intro-release {
-  to {
-    transform: none;
-    opacity: 1;
+.motion-ok:not(.intro-done) .hero-line + .hero-line .hero-line-inner {
+  animation-delay: 150ms;
+}
+.motion-ok:not(.intro-done) .hero-intro {
+  animation: hero-rise-in 900ms cubic-bezier(0.165, 0.84, 0.44, 1) 500ms backwards;
+}
+.motion-ok:not(.intro-done) .hero-action {
+  animation-delay: 580ms;
+}
+.motion-ok:not(.intro-done) :is(.tray-base, .tray-lip, .tray-navigation) {
+  animation: tray-rise-in 1300ms cubic-bezier(0.165, 0.84, 0.44, 1) 300ms backwards;
+}
+@keyframes hero-line-in {
+  from {
+    transform: translateY(112%);
+  }
+}
+@keyframes hero-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes tray-rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
   }
 }
 
@@ -191,6 +215,19 @@
   }
   .optical-header a:hover {
     color: var(--ink);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .explore-work:hover {
+    animation: underline-redraw 640ms var(--ease-out);
+  }
+  .explore-work:hover svg {
+    transform: translateY(3px);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .explore-work:hover {
+    background-size: 100% 2px;
   }
 }
 @media (width < 1000px) {

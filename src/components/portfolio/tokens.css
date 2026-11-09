@@ -9,7 +9,7 @@ html:has(.portfolio-home) body {
   --ink: #171818;
   --ink-soft: #2b2d2c;
   --muted: #5f6366;
-  --faint: #8d9194;
+  --faint: #676b6e;
   --rule: rgb(23 24 24 / 0.12);
   /* The LED orange from the tray's display, plus a darker cut for text and focus. */
   --signal: #d8603a;
@@ -90,9 +90,41 @@ html:has(.portfolio-home) body {
 .text-link svg {
   transition: transform 300ms var(--ease-out);
 }
-@media (hover: hover) and (pointer: fine) {
+@keyframes underline-redraw {
+  0% {
+    background-size: 100% 1px;
+    background-position-x: 100%;
+  }
+  42% {
+    background-size: 0% 1px;
+    background-position-x: 100%;
+  }
+  42.01% {
+    background-size: 0% 1px;
+    background-position-x: 0%;
+  }
+  100% {
+    background-size: 100% 1px;
+    background-position-x: 0%;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: reduce) {
+  .text-link:hover {
+    background-size: 100% 2px;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .text-link:hover {
+    animation: underline-redraw 640ms var(--ease-out);
+  }
   .text-link:hover svg {
     transform: translate(2px, -2px);
+  }
+  .text-link:hover svg.lucide-arrow-right {
+    transform: translateX(3px);
+  }
+  .text-link:hover svg.lucide-arrow-down {
+    transform: translateY(3px);
   }
 }
 
@@ -114,7 +146,8 @@ html:has(.portfolio-home) body {
   }
 }
 
-.skip-link {
+.skip-link,
+.portfolio-home .skip-link {
   position: fixed;
   z-index: 100;
   top: 12px;
@@ -127,10 +160,12 @@ html:has(.portfolio-home) body {
   transform: translateY(-160%);
   transition: transform 200ms;
 }
-.skip-link:focus-visible {
+.skip-link:focus-visible,
+.portfolio-home .skip-link:focus-visible {
   transform: none;
   outline: 2px solid #ad4727;
   outline-offset: 2px;
+  border-radius: 6px;
 }
 
 @media (prefers-reduced-motion: reduce) {

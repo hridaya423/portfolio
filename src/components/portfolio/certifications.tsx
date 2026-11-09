@@ -5,7 +5,7 @@ import { useId, useState } from "react";
 import { ArrowRightIcon, GitHubLogoIcon } from "@radix-ui/react-icons";
 import type { Credential } from "@/data/portfolio";
 import { CredentialRefraction } from "./credential-refraction";
-import { SectionHead } from "./sections";
+import { SectionHead } from "./section-head";
 
 const issuerMarks: Record<string, string> = {
   Microsoft: "/issuers/microsoft.svg",
@@ -55,7 +55,7 @@ export function Certifications({ entries }: { entries: Credential[] }) {
             </div>
             <h3>{entry.name.replace(/^Microsoft /, "")}</h3>
             <p className="credential-age">Earned at {entry.ageEarned}</p>
-            <a className="credential-verify" href={entry.href} aria-label={`Verify ${entry.name}`}>Verify credential<ArrowRightIcon aria-hidden="true" /></a>
+            <a className="credential-verify" href={entry.href} aria-label={`Verify credential: ${entry.name}`}>Verify credential<ArrowRightIcon aria-hidden="true" /></a>
             {entry.id === "pega" && <details className="verification-help"><summary>Verification instructions</summary><p>{entry.detail}</p></details>}
           </article>
         </div>)}

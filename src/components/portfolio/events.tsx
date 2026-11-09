@@ -1,10 +1,12 @@
+import Link from "next/link";
 import type { PortfolioEvent } from "@/data/portfolio";
 import { ArrowRight } from "lucide-react";
 import { EventArtwork } from "./event-artwork";
 import { CloudDivider } from "./cloud-divider";
-import { SectionHead } from "./sections";
+import { SectionHead } from "./section-head";
 
 export function Events({ entries }: { entries: PortfolioEvent[] }) {
+  const lead = entries.find((event) => event.lead) ?? entries[0];
   return (
     <section
       id="hackathons"
@@ -20,14 +22,14 @@ export function Events({ entries }: { entries: PortfolioEvent[] }) {
           <p>More events to come.</p>
         ) : (
           <div className="departure-ledger">
-            {entries.map((event, index) => (
+            {entries.map((event) => (
               <details
                 className="trip"
                 data-city={event.city}
                 name="portfolio-events"
                 suppressHydrationWarning
                 key={event.id}
-                open={index === 0}
+                open={event === lead}
               >
                 <summary>
                   <span className="trip-city-label">
@@ -44,7 +46,7 @@ export function Events({ entries }: { entries: PortfolioEvent[] }) {
                 <div className="trip-detail">
                   <EventArtwork
                     text={event.cloud ?? event.city}
-                    initiallyOpen={index === 0}
+                    initiallyOpen={event === lead}
                     title={
                       event.game?.title ?? event.project?.title ?? event.title
                     }
@@ -58,11 +60,17 @@ export function Events({ entries }: { entries: PortfolioEvent[] }) {
                   </div>
                   <p>{event.description}</p>
                   <nav aria-label={`${event.title} links`}>
-                    {event.game && (
+                    {event.game?.href && (
                       <a href={event.game.href}>
                         Play {event.game.title}
                         <ArrowRight size={16} />
                       </a>
+                    )}
+                    {event.project?.story && (
+                      <Link href={`/projects/${event.project.story}`}>
+                        How {event.project.title} works
+                        <ArrowRight size={16} />
+                      </Link>
                     )}
                     {event.project && (
                       <a href={event.project.repo}>

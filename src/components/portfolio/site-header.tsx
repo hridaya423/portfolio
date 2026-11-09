@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { DATA } from "@/data/resume";
 import { LcdChip } from "./lcd-chip";
+import { SiteName } from "./site-name";
 
 const links = [
   { label: "Work", href: "#projects" },
@@ -48,8 +49,8 @@ export function SiteHeader() {
   return (
     <header className="site-header" data-shown={shown} inert={!shown}>
       <div className="site-header-inner shell">
-        <a className="site-header-name" href="#hero">
-          {DATA.name}
+        <a className="site-header-name" href="#hero" aria-label={`${DATA.name}, back to top`}>
+          <SiteName />
         </a>
         <LcdChip text={label} columns={10} dot={1.9} className="site-header-lcd" />
         <nav aria-label="Sections" className="site-header-nav">
