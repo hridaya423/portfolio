@@ -66,6 +66,6 @@ You can verify each certificate from the [certifications section](/#achievements
 His name is spelt Hridya Agrawal. Two of his handles use a different spelling, and both are his: `hridaya423` on GitHub and `AgrawalHridaya` on X.
 
 - GitHub: [github.com/hridaya423](https://github.com/hridaya423)
-- LinkedIn: [linkedin.com/in/hridya-agrawal-067236317](https://www.linkedin.com/in/hridya-agrawal-067236317/)
+- LinkedIn: [linkedin.com/in/hridya-agrawal](https://www.linkedin.com/in/hridya-agrawal/)
 - X: [x.com/AgrawalHridaya](https://x.com/AgrawalHridaya)
 - Hugging Face: [huggingface.co/hridya423](https://huggingface.co/hridya423)
