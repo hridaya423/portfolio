@@ -1,12 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import type { CSSProperties } from "react";
 import { GitHubLogoIcon, StarFilledIcon as StarIcon } from "@radix-ui/react-icons";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import { Icons } from "@/components/icons";
 import { DATA } from "@/data/resume";
-import { experience, projectIndex, projects } from "@/data/portfolio";
-import { caseStudySlugs } from "@/data/case-studies";
+import { experience, projects } from "@/data/portfolio";
 import { formatStars, getStars, starsFor } from "@/data/github";
 import { questionFont } from "./font";
 import { EmailLink } from "./email-link";
@@ -20,11 +18,6 @@ export { SectionHead };
 
 export async function Projects() {
   const stars = await getStars();
-  const studies = new Set(caseStudySlugs());
-  const featured = new Set(projects.map((project) => project.id));
-  const more = projectIndex
-    .map((entry, index) => ({ ...entry, number: String(index + 1).padStart(2, "0") }))
-    .filter((entry) => !featured.has(entry.id) && studies.has(entry.id));
   return (
     <section
       id="projects"
@@ -133,39 +126,6 @@ export async function Projects() {
             );
           })}
         </ol>
-        {more.length > 0 && (
-          <div className="more-work">
-            <h3 className="more-work-label" data-reveal="rise">
-              <span>And {more.length} more</span>
-              <span aria-hidden="true">
-                {more[0].number}–{more[more.length - 1].number}
-              </span>
-            </h3>
-            <ol
-              className="more-index"
-              style={{ "--rows": Math.ceil(more.length / 2) } as CSSProperties}
-            >
-              {more.map((entry) => (
-                <li key={entry.id} data-reveal="rise">
-                  <Link className="more-row" href={`/projects/${entry.id}`}>
-                    <span className="more-number" aria-hidden="true">
-                      {entry.number}
-                    </span>
-                    <span className="more-title">
-                      <span>{entry.title}</span>
-                    </span>
-                    <span className={`more-question ${questionFont.className}`}>
-                      <span className="sr-only">: what if </span>
-                      <span aria-hidden="true">…</span>
-                      {entry.question}
-                    </span>
-                    <ArrowRight aria-hidden="true" size={16} />
-                  </Link>
-                </li>
-              ))}
-            </ol>
-          </div>
-        )}
         <Link className="all-projects" href="/projects">
           <span>View all projects</span>
           <ArrowUpRight aria-hidden="true" size={18} />
