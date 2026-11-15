@@ -64,7 +64,7 @@ export function personNode() {
     name: DATA.name,
     givenName: "Hridya",
     familyName: "Agrawal",
-    alternateName: ["Hridaya Agrawal", "hridaya423", "AgrawalHridaya"],
+    alternateName: ["Hridaya Agrawal", "hridaya423", "hridyaagrawal"],
     url: SITE_URL,
     image: `${SITE_URL}${DATA.avatarUrl}`,
     description: DATA.description,

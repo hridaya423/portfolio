@@ -56,7 +56,7 @@ export const DATA = {
       },
       X: {
         name: "X",
-        url: "https://x.com/AgrawalHridaya",
+        url: "https://x.com/hridyaagrawal",
         icon: Icons.x,
         navbar: true,
       },
@@ -120,7 +120,7 @@ export const DATA = {
       href: "https://lexis.hridya.tech",
       repo: "https://github.com/hridaya423/lexis",
       launch: {
-        x: "https://x.com/AgrawalHridaya/status/2109382312227938700",
+        x: "https://x.com/hridyaagrawal/status/2109382312227938700",
         linkedin: "https://www.linkedin.com/feed/update/urn:li:activity:7515148778547511296/",
       },
       technologies: ["CLI", "Shell"],

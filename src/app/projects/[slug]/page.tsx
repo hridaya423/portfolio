@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       card: "summary_large_image",
       title: meta.headline,
       description: meta.summary,
-      creator: "@AgrawalHridaya",
+      creator: "@hridyaagrawal",
       images: images.map((image) => image.url),
     },
   };

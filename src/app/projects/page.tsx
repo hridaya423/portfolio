@@ -28,7 +28,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title,
     description,
-    creator: "@AgrawalHridaya",
+    creator: "@hridyaagrawal",
     images: [SITE_IMAGE.url],
   },
 };

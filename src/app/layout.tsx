@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     title: SITE_TITLE,
     description: DATA.description,
     card: "summary_large_image",
-    creator: "@AgrawalHridaya",
+    creator: "@hridyaagrawal",
   },
 };
 
