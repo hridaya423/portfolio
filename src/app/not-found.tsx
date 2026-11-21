@@ -9,7 +9,7 @@ import "@/components/portfolio/case-study.css";
 
 export const metadata: Metadata = {
   title: "Page not found",
-  description: "This page does not exist. Go to the projects, the About page or the home page.",
+  description: "This page doesn't exist. Try the projects index, the About page or head back home.",
   robots: { index: false, follow: true },
 };
 
@@ -30,8 +30,8 @@ export default function NotFound() {
             <span aria-hidden="true">…what if </span>
             this page existed?
           </p>
-          <h1>This page does not exist.</h1>
-          <p className="missing-lede">The address is old, or the link is wrong.</p>
+          <h1>This page doesn&rsquo;t exist.</h1>
+          <p className="missing-lede">The link might be mistyped, or the page moved somewhere else.</p>
           <ul className="case-links">
             {links.map((link) => (
               <li key={link.href}>

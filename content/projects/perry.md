@@ -1,114 +1,98 @@
 ---
 title: "Perry"
-headline: "Perry: AI help in your Mac's notch that points at the button, or clicks it"
-summary: "Perry is a free, open-source Mac app in the notch. Ask how to do something and it points at each control in turn, or it does the task while you watch."
+headline: "Perry: a Mac helper in your notch that points at the button, or clicks it for you"
+summary: "A free, open-source macOS app tucked into the notch. Ask how to do something and it highlights each control in turn, or takes over and completes the task while you watch."
 kind: "macOS app"
 platform: "macOS 14 or later, Apple silicon"
 status: "Public beta"
 category: "UtilitiesApplication"
 license: "AGPL-3.0"
 publishedAt: "2026-11-04"
-updatedAt: "2026-11-09"
+updatedAt: "2026-11-21"
 site: "https://perry.hridya.tech"
 repo: "https://github.com/hridaya423/perry"
 image: "/projects/perry.jpg"
 ---
 
-Perry is a free, open-source Mac app that runs in the notch. Ask how to do something in any app, and Perry points at the first control. It waits for you to click that control, then points at the next one. Ask Perry to do the task, and it does the work while you watch, with a stop button in reach.
+Perry is a free, open-source Mac helper that lives in the notch. Ask how to do something in any app and it draws a pointer directly onto the first control, waits for you to click it, then moves to the next one. Ask it to just do the task and it works through it while you watch, with a Stop button always within reach.
 
-Hold Control and Option and talk, or double-tap Control and type. Perry has no account and no subscription. It uses the ChatGPT or Claude plan that you already pay for, or an API key.
+Hold Control + Option to talk, or double-tap Control to type. There's no Perry account or subscription: it runs on the ChatGPT or Claude plan you already pay for, an API key, or a local server such as Ollama.
 
-![The Perry workspace opened from the notch, with a greeting, an "Ask Perry anything" field, and Tasks, Routines, Files, Suggestions and History in the sidebar.](/projects/perry/hero.jpg)
+![The Perry workspace opened from the notch, showing an "Ask Perry anything" input alongside Tasks, Routines, Files, Suggestions and History.](/projects/perry/hero.jpg)
 
-## Show me how, or do it for me
+## Guiding a click, or doing the whole task
 
-Most AI help tells you where a setting is. Then you must find it yourself. Perry draws on your screen.
+When you ask a normal chatbot where a setting lives, you get six lines of menu names that moved two updates ago. In guide mode, Perry points straight at one control on your screen and waits for the UI to change before highlighting the next step. Clicking **Do it for me** at any point hands the rest of the task over to Perry.
 
-In a guide, Perry points at one control and waits. When the screen changes, it points at the next control. Click **Do it for me** at any step, and Perry continues the task from there.
+![A Perry guide step inside the notch: "Step 2, Choose the project folder in the sidebar", with Done and Do it for me buttons.](/projects/perry/guide.jpg)
 
-![A guide step in the notch: "Step 2, Choose the project folder in the sidebar", with Done and Do it for me buttons.](/projects/perry/guide.jpg)
+In task mode, Perry runs in the background while logging every step, and you can pause, take over or stop whenever you want. It can also answer questions about whatever window is in front of you, or watch you perform a task once and save it as a routine.
 
-In a task, Perry works in the background and logs each action. You can pause it, take over or stop it. Perry can also answer a question about the window in front of you. If you show it a task once, it can save that task as a routine.
+![A running Perry task in the notch: "Preparing meeting notes, Writing the outline", with a progress bar and Pause, Take over and Stop controls.](/projects/perry/task.jpg)
 
-![A running task in the notch: "Preparing meeting notes, Writing the outline", with a progress bar and Pause, Take over and Stop buttons.](/projects/perry/task.jpg)
+The core interaction builds on earlier projects: [clicky](https://github.com/farzaa/clicky) showed how good a voice helper that draws on screen feels, and [openclicky](https://github.com/jasonkneen/openclicky) pushed that toward agents. Perry adds a tiered trust model, BYO models, and a faster execution stack.
 
-The idea is not new. [clicky](https://github.com/farzaa/clicky) showed that people want a voice helper that draws on their screen. [openclicky](https://github.com/jasonkneen/openclicky) took the idea into agents. Perry adds a trust model and works with the model you bring.
+## Pairing two desktop drivers
 
-## Two drivers beat one
+Perry plans with your chosen model, drives macOS through [agent-desktop](https://github.com/vercel-labs/agent-desktop), and checks the screen after each step. Whenever `agent-desktop` misses a click or drag, [cua-driver](https://github.com/trycua/cua) handles it without moving your physical mouse cursor.
 
-Perry plans with your model, acts through [agent-desktop](https://github.com/vercel-labs/agent-desktop) and checks the screen after each step. [cua-driver](https://github.com/trycua/cua) does the clicks and drags that agent-desktop misses, and it does not move your cursor.
+I tested that pairing against `cua` on its own using a 32-case torture fixture, three runs each, on a Mac mini:
 
-I tested that pair against cua alone with a torture fixture: 32 hard cases, three runs each, on a Mac mini.
-
-| Driver | Passed | p50 for each action |
+| Driver setup | Passed | Median action latency |
 |---|---|---|
-| cua alone | 65 of 96 | 520 ms |
-| agent-desktop 1.0.2 + cua | 71 of 96 | 229 ms |
-| agent-desktop 1.1.0 + cua | 74 of 96 | 387 ms |
+| `cua` alone | 65 / 96 | 520 ms |
+| `agent-desktop` 1.0.2 + `cua` | 71 / 96 | 229 ms |
+| `agent-desktop` 1.1.0 + `cua` | 74 / 96 | 387 ms |
 
-I stayed on 1.0.2. The newer version passed three more cases but was 100 to 160 ms slower for each call.
+I stayed on `agent-desktop` 1.0.2 because 1.1.0 only passed three extra cases while adding 100–160 ms to every call.
 
-The fixture also found a serious bug. Perry repeated each click that agent-desktop reported as `delivered_unverified`. A button that works reports exactly that status, so a burst of 20 clicks became 40. Now Perry follows the rule of agent-desktop and retries only a click marked `not_delivered`.
+That torture suite also caught a bad retry bug: Perry was repeating any click that `agent-desktop` returned as `delivered_unverified`, which happens to be what working buttons report, turning 20 clicks into 40. Now Perry only retries clicks marked `not_delivered`. A few OS quirks still trip both drivers: buttons that falsely report a press, canvas input sent to background windows getting dropped, and windows sitting in the Stage Manager strip staying unreachable.
 
-Some cases fail in both drivers, and Perry cannot fix them. A button can report a press that did not work. Canvas input in a background window does not arrive. Windows in the Stage Manager strip stay out of reach.
+## Giving Chrome its own lane
 
-## The browser needed its own lane
-
-A click on a web page through the accessibility tree is slow and fragile. So I ran 12 hard web tasks against [browser-harness](https://github.com/browser-use/browser-harness), which drives Chrome over the DevTools protocol. Both sides used Claude Sonnet 5.5 with the same prompt.
-
-The tasks include closed shadow-DOM comboboxes, a virtual list of 10,000 rows and a drag-and-drop kanban board. They also include a canvas chart with peaks 0.1 kW apart, and a layout shift that hides a destructive decoy.
+Clicking through web apps via the macOS accessibility tree is slow and fragile. To see how much it cost, I ran 12 difficult web tasks against [browser-harness](https://github.com/browser-use/browser-harness) (which drives Chrome over the DevTools Protocol), giving both sides Claude Sonnet 5.5 and the exact same prompt. The tasks included closed shadow-DOM comboboxes, a 10,000-row virtual list, a drag-and-drop kanban board, a canvas chart with peaks 0.1 kW apart, and a layout shift hiding a destructive decoy button.
 
 | Setup | Passed | Median time | Total cost |
 |---|---|---|---|
-| browser-harness | 12 of 12 | 20 s | $0.63 |
-| Perry, clicking the screen | 7 of 12 | 38 s | $3.64 |
-| Perry with a browser lane | 11 of 12 | 14 s | $0.72 |
+| `browser-harness` | 12 / 12 | 20 s | $0.63 |
+| Perry (clicking the screen) | 7 / 12 | 38 s | $3.64 |
+| Perry with browser lane | 11 / 12 | 14 s | $0.72 |
 
-The browser lane is a Swift port of browser-harness: 17 `browser.*` tools over one WebSocket to Chrome.
+On one invoice task, screen-clicking Perry took 313 seconds scrolling manually while `browser-harness` set the scroll offset from JavaScript and finished in 31 seconds. Porting `browser-harness` to Swift as 17 `browser.*` tools over one WebSocket to Chrome brought Perry up to 11/12 at a fifth of the cost. The single miss was a checkout flow that Perry refuses on purpose.
 
-Before the lane, one invoice task took Perry 313 s, because it scrolled through the screen. browser-harness did the same task in 31 s, because it set the scroll position from JavaScript. With the lane, the one miss was the checkout task, which Perry refuses on purpose.
+## What Perry won't touch
 
-## What Perry will not touch
+Every action gets sorted into a tier before it runs:
 
-Each action gets a tier before it runs.
-
-| Tier | Examples | What Perry does |
+| Tier | Examples | Behaviour |
 |---|---|---|
-| Green | Move the pointer, highlight, read a window | Goes ahead |
+| Green | Move pointer, highlight, read a window | Goes ahead |
 | Yellow | Type, click, create a file | Goes ahead and logs it |
-| Orange | Send a message, move to Trash, overwrite | Asks once |
-| Red | Empty the Trash, buy something, use credentials | Asks and shows the full path |
+| Orange | Send a message, move to Trash, overwrite a file | Asks once |
+| Red | Empty Trash, make a purchase, touch credentials | Asks and shows the full path |
 
-Perry blocks banking, password manager and checkout windows at every tier. It refuses to capture them at all. Perry treats text on a page as content, never as an instruction.
+Banking sites, password managers and checkout windows are blocked at every tier; Perry refuses to capture them at all, and treats all text on a page strictly as content rather than instructions.
 
-The rules only work if tests cover them. My first version of `browser.connect` fell back to "the first running browser". It turned on remote debugging in my real Chrome on the Mac mini. I turned it off again. Now Perry only touches the browser you name or the browser in front, and a test covers that rule.
+Rules like that only hold if tests guard them. My first version of `browser.connect` fell back to "the first running browser" and turned on remote debugging in my personal Chrome window on the Mac mini. I shut that back off, locked Perry to only the browser you name or the frontmost browser, and wrote a test for it.
 
-## Small models need bigger pictures
+## Grounding with small local models
 
-Before I set the defaults, I measured how well small local models find click targets. The models got 60 samples from ScreenSpot-Pro (Word, Excel, VS Code, PyCharm, DaVinci and macOS) on an M4 Pro.
-
-Image detail mattered more than model size.
+Before picking defaults, I checked how well small vision models locate UI click targets across 60 ScreenSpot-Pro samples (Word, Excel, VS Code, PyCharm, DaVinci Resolve and macOS) on an M4 Pro. Image resolution mattered more than parameter count:
 
 | Model | Image tokens | Targets found |
 |---|---|---|
-| Holo-3.1-4B | 2048 | 31 of 60 |
-| Holo-3.1-9B | 1024 | 20 of 60 |
-| Holo-3.1-9B | 2048 | 30 of 60 |
+| `Holo-3.1-4B` | 2048 | 31 / 60 |
+| `Holo-3.1-9B` | 1024 | 20 / 60 |
+| `Holo-3.1-9B` | 2048 | 30 / 60 |
 
-At 2048 image tokens, the 9B model found one target fewer than the 4B model and took 1.7 times as long for each step.
+At 2048 image tokens, the 9B model found one fewer target than the 4B model while taking 1.7x longer per step. Cloud models stay the default for now (without one configured, Perry replies in text), though local servers like Ollama also work.
 
-Cloud models stay the default. Without a cloud model, Perry answers in text. Local servers such as Ollama also work.
+## Limits
 
-## Limits of Perry
+Perry is a public beta (`0.1.0`) for Apple silicon Macs on macOS 14 or later—bug reports go in [Issues](https://github.com/hridaya423/perry/issues). Background drags don't reach Chrome yet, and after a rapid burst of 50 scrolls Chrome stopped answering the accessibility API for about a minute. The download is 132 MB because it bundles a pinned Codex runtime to support ChatGPT subscriptions.
 
-- Perry is a public beta, version 0.1.0. Report problems in [Issues](https://github.com/hridaya423/perry/issues).
-- It runs only on Apple silicon Macs with macOS 14 or later.
-- Background drags do not reach Chrome yet.
-- After a burst of 50 scrolls, Chrome stopped answering the accessibility API for about a minute.
-- The DMG is 132 MB. It bundles a pinned Codex runtime for ChatGPT plans.
+## Try it
 
-## Try Perry
-
-Download Perry-0.1.0.dmg from the [latest release](https://github.com/hridaya423/perry/releases/latest) and drag Perry to Applications. Perry explains Accessibility, Screen Recording and Microphone access before macOS asks for each one. The app is signed and notarized, and later versions arrive through the built-in updater.
+Download `Perry-0.1.0.dmg` from the [latest release](https://github.com/hridaya423/perry/releases/latest) and drag it to Applications. Perry explains Accessibility, Screen Recording and Microphone access before macOS prompts for each one, ships signed and notarized, and pulls updates through its built-in updater.
 
 Site: [perry.hridya.tech](https://perry.hridya.tech). Source: [github.com/hridaya423/perry](https://github.com/hridaya423/perry) (AGPL-3.0).

@@ -23,7 +23,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/cue-site.png", width: 3024, height: 1890 },
     title: "Cue",
     question: "paste knew what the field wanted?",
-    description: "A macOS clipboard that reads the field you're in and pastes only the part that fits, like just the email from a whole message.",
+    description: "A Mac clipboard that looks at the field you're pasting into and pulls out just the part that belongs there, like the email address buried inside a chat message.",
     href: "https://cue.hridya.tech",
     repo: gh("cue"),
   },
@@ -32,7 +32,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/perry.jpg", width: 3024, height: 1890 },
     title: "Perry",
     question: "someone could show me where the button is?",
-    description: "A free Mac helper in the notch: ask how to do something and it points at each control in turn, or does the task while you watch.",
+    description: "A free Mac helper tucked into the notch. Ask how to do something and it points to each button as you go, or takes over and finishes the task while you watch.",
     href: "https://perry.hridya.tech",
     repo: gh("perry"),
   },
@@ -41,7 +41,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/quill.jpg", width: 3024, height: 1890 },
     title: "Quill",
     question: "my draft edited itself while I talked?",
-    description: "A free Mac Markdown editor: hold a key, say the change, and Claude Code, Codex or Cursor rewrites your note in place for you to keep or revert.",
+    description: "A free Mac Markdown editor built around voice edits. Hold a key, say what should change, and Claude Code, Codex or Cursor rewrites your draft in place for you to keep or revert.",
     href: "https://quill.hridya.tech",
     repo: gh("quill"),
   },
@@ -50,7 +50,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/locus.jpg", width: 1280, height: 900 },
     title: "Locus",
     question: "finding the right dataset took minutes, not days?",
-    description: "Ask for public omics datasets in plain English. It searches 891k of them, counts case and control samples, and writes the nf-core samplesheets. 1st place at Reinvent the Wheel.",
+    description: "Describe the omics study you need in plain English. Locus searches 891k public datasets, counts case and control samples in code, and outputs nf-core samplesheets. 1st place at Reinvent the Wheel.",
     repo: gh("locus"),
   },
   {
@@ -58,7 +58,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/gazekeeper.jpg", width: 3024, height: 1890 },
     title: "GazeKeeper",
     question: "a break reminder knew not to interrupt?",
-    description: "A break reminder for the Mac that holds the break during calls and screen shares, then waits for a pause in your typing.",
+    description: "A Mac break reminder that reads the room. It holds off during calls and screen shares, then waits for a natural pause in your typing.",
     href: "https://gazekeeper.hridya.tech",
     repo: gh("gazekeeper"),
   },
@@ -66,7 +66,7 @@ const moreProjects: IndexEntry[] = [
     id: "fineprint",
     title: "Fineprint",
     question: "the terms came with a translator?",
-    description: "Reads terms of service on your own laptop and flags the clauses that cost you money or rights, with a 1.2B model fine-tuned for it. White Circle track winner and 2nd overall at Moonfire Build Night.",
+    description: "A fine-tuned 1.2B model running locally on your laptop that scans terms of service for clauses that cost you money or rights. White Circle track winner and 2nd overall at Moonfire Build Night.",
     repo: gh("fineprint"),
   },
   {
@@ -74,7 +74,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/waypoint.jpg", width: 1505, height: 1045 },
     title: "Waypoint",
     question: "directions lived in your glasses?",
-    description: "London walking and bus directions for Even G2 glasses: walk to the stop, follow the ride, get a reminder before yours.",
+    description: "Hands-free London walking and bus directions for Even G2 smart glasses: walk to the stop, follow the ride, and get a nudge before yours comes up.",
     repo: gh("waypoint-g2"),
   },
   {
@@ -82,7 +82,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/indict.jpg", width: 1536, height: 1024 },
     title: "Indict",
     question: "the model guessed the bugs and mechanics proved them?",
-    description: "Runs several vulnerability-hunting engines over a repository and writes one report. The model proposes, mechanics decide.",
+    description: "Runs six vulnerability-hunting engines over a repo and only calls a bug verified once a sandboxed proof of concept actually hits the reported line.",
     repo: gh("indict"),
   },
   {
@@ -90,7 +90,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/devingoal.jpg", width: 1024, height: 576 },
     title: "/goal for Devin",
     question: "an agent couldn't stop until the work was proven?",
-    description: "Keeps Devin working until an independent judge checks the outcome against the real repository, not until the model feels done.",
+    description: "Stops Devin from quitting early by checking every completion claim in a separate read-only judge session against the actual repository.",
     repo: gh("devingoal"),
   },
   {
@@ -98,7 +98,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/deepgreen.jpg", width: 2000, height: 1250 },
     title: "Deep Green",
     question: "a 6 MB network played perfect Wordle?",
-    description: "A small neural network that plays Wordle move for move like a certified optimal solver, seeing only the public board.",
+    description: "A 6.2 MB neural network running in your browser that matches an exact optimal Wordle solver move for move, seeing nothing but the public board.",
     href: "https://deepgreen.hridya.tech",
     repo: gh("deepgreen"),
   },
@@ -107,7 +107,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/usage-dash.jpg", width: 1024, height: 709 },
     title: "usage-dash",
     question: "every machine's agent usage fit on one screen?",
-    description: "One dashboard for coding-agent usage across every machine you own, on the web and in the menu bar.",
+    description: "Pulls coding-agent token and cost usage from every machine you own over SSH into one web dashboard and Mac menu-bar popover.",
     repo: gh("usage-dash"),
   },
   {
@@ -115,7 +115,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/hermes-g2.jpg", width: 1774, height: 887 },
     title: "Hermes G2",
     question: "your own agent lived in your glasses?",
-    description: "A private client for a self-hosted Hermes agent, built for Even G2 glasses.",
+    description: "A private Even G2 glasses client for talking to and approving actions from my self-hosted Hermes agent, without ever putting the API key on the device.",
     repo: gh("hermes-even-g2"),
   },
   {
@@ -123,7 +123,7 @@ const moreProjects: IndexEntry[] = [
     image: { src: "/projects/neurix.jpg", width: 2000, height: 1250 },
     title: "Neurix",
     question: "block code kept going past the beginner demos?",
-    description: "A Scratch-style block editor meant for real games, with AI that writes and explains blocks.",
+    description: "A Scratch-style block editor where AI generates and explains editable blocks instead of dumping raw code you can't tweak.",
     href: "https://neurix.hridya.tech",
     repo: gh("neurix"),
   },
@@ -164,7 +164,7 @@ export const events: PortfolioEvent[] = [
     title: "the PROBLEM day",
     date: "31 October 2026",
     description:
-      "Built Myna at Kickstart's PROBLEM day in London: computer use for enterprise. It redacts sensitive data locally before anything leaves the machine, routes each step to the right model, watches how you work to suggest what it can automate, and turns a recording of you doing a task into an automation. It came runner-up.",
+      "Built Myna with my team at Kickstart's PROBLEM day in London: an enterprise computer-use agent that redacts sensitive data locally before anything leaves your machine, routes each step to the right model, watches how you work to spot automatable tasks, and turns a screen recording into a repeatable workflow. We finished runner-up.",
     href: "https://luma.com/mczagntt",
     award: "Runner-up",
     label: "the PROBLEM day",
@@ -177,7 +177,7 @@ export const events: PortfolioEvent[] = [
     title: "Moonfire Build Night",
     date: "22 October 2026",
     description:
-      "Built Fineprint at Moonfire's Build Night in London: a 1.2B model, fine-tuned with White Circle's Halo on one H200, that reads terms of service on your own laptop and flags the clauses that cost you money or rights. It won the White Circle track and came 2nd overall.",
+      "Built Fineprint in three hours with Mukesh Agrawal at Moonfire Build Night in London. We fine-tuned a 1.2B model with White Circle's Halo on a single H200 so it can scan terms of service locally on your laptop and flag costly clauses. It won the White Circle track and came 2nd overall.",
     href: "https://community.venturecafelondon.org/events/103",
     project: { title: "Fineprint", repo: "https://github.com/hridaya423/fineprint", story: "fineprint" },
     award: "White Circle track winner, 2nd overall",
@@ -191,7 +191,7 @@ export const events: PortfolioEvent[] = [
     title: "Reinvent the Wheel",
     date: "16–18 October 2026",
     description:
-      "Built Locus at Reinvent the Wheel, a Tools for Science hackathon in King's Cross. Ask for public datasets in plain English: it searches 891k of them across 18 repositories, counts case and control samples, and writes the nf-core samplesheets. It won 1st place and the £1,000 grand prize.",
+      "Built Locus with a team at Reinvent the Wheel, a Tools for Science hackathon in King's Cross. Describe the biological dataset you need in plain English: it searches 891k public datasets across 18 repositories, counts case and control samples in code, and outputs nf-core samplesheets. We took 1st place and the £1,000 grand prize.",
     href: "https://luma.com/vdq0qw9u",
     project: { title: "Locus", repo: "https://github.com/hridaya423/locus", story: "locus" },
     award: "1st place",
@@ -205,7 +205,8 @@ export const events: PortfolioEvent[] = [
     country: "United States",
     title: "Open Sauce",
     date: "17–19 July 2026",
-    description: "Open Sauce 2026, at the San Mateo County Event Center in the San Francisco Bay Area.",
+    description:
+      "Spent a weekend at Open Sauce 2026 at the San Mateo County Event Center in the Bay Area, taking in hardware builds, demos and talks.",
     href: "https://www.opensauce.com/",
   },
   {
@@ -215,7 +216,7 @@ export const events: PortfolioEvent[] = [
     title: "Shiba",
     date: "November 2025",
     description:
-      "Made Whisper for Shiba: 120 hours building a game, then building an arcade machine for it in Tokyo.",
+      "Spent 120 hours building Whisper for Hack Club's Shiba, then flew to Tokyo to build a real arcade cabinet for it and show it to locals.",
     href: "https://shiba.hackclub.com",
     game: {
       title: "Whisper",
@@ -229,7 +230,7 @@ export const events: PortfolioEvent[] = [
     title: "Juice",
     date: "April 2025",
     description:
-      "Made Undead Courier for Juice: 100 hours building a game, then showing it at a gaming pop-up café in Shanghai.",
+      "Spent 100 hours building Undead Courier for Hack Club's Juice, then took it to a gaming pop-up café in Shanghai for people to play.",
     href: "https://juice.hackclub.com",
     game: {
       title: "Undead Courier",

@@ -1,75 +1,58 @@
 ---
 title: "Waypoint"
-headline: "Waypoint: London bus guidance on Even G2 glasses (prototype)"
-summary: "Waypoint is a prototype that guides London walks and bus rides on Even G2 glasses. It detects boarding and stops with no taps. It is not yet tested on glasses."
+headline: "Waypoint: hands-free London bus guidance for Even G2 smart glasses"
+summary: "A prototype Even Hub app for Even G2 glasses that guides London walks and bus rides, detects boarding and alighting from GPS movement, and nudges you before your stop."
 kind: "Smart-glasses app"
 platform: "Even G2 glasses"
 status: "Prototype"
 category: "TravelApplication"
 license: "Apache-2.0"
 publishedAt: "2026-10-03"
-updatedAt: "2026-11-09"
+updatedAt: "2026-11-21"
 repo: "https://github.com/hridaya423/waypoint-g2"
 image: "/projects/waypoint.jpg"
 ---
 
-Waypoint is an Even Hub app that guides London walks and bus rides on Even G2 smart glasses. You walk to the stop, follow the ride, get a reminder before your stop, then walk to the destination. Waypoint is for a G2 wearer in London who wants the phone to stay in a pocket. It detects from your movement that you boarded, so you never tap.
+Waypoint is a prototype Even Hub app for Even G2 smart glasses that handles London walks and bus rides without making you pull your phone out of your pocket. It guides you to the stop, detects from your movement that you've boarded, counts down stops along the ride, nudges you before yours, and switches back to walking directions once you step off.
 
-![A 576 by 288 simulator frame in green on black. It shows a walk step, "Continue to Trafalgar Square, 60 m", beside a street map drawn from OpenStreetMap data.](/projects/waypoint/map-walk.png)
+I haven't tested Waypoint on physical G2 glasses yet; everything here runs against the official Even Hub simulator and scripted GPS replays.
 
-## How Waypoint knows you boarded the bus
+![A 576×288 green-on-black simulator frame showing a walking prompt ("Continue to Trafalgar Square, 60 m") beside a live street map drawn from OpenStreetMap data.](/projects/waypoint/map-walk.png)
 
-The journey engine in `src/journey.ts` is plain TypeScript. It does not depend on React, the network or the glasses SDK, and each rule below is in that file.
+## Figuring out when you got on the bus
 
-Waypoint treats you as on the bus only when all of these conditions are true:
+The journey engine in `src/journey.ts` is plain TypeScript with no dependencies on React, the network or the glasses SDK. To treat you as boarded without any tap, all four conditions have to hold:
 
-- The stop is part of a validated TfL bus stop sequence.
-- A location fix is within 25 m of the boarding stop, with an accuracy of 20 m or better.
-- At least 3 movement samples then span 12 seconds and 90 m, at 5 to 25 m/s, with gaps of 8 seconds or less.
-- The destination is more than 100 m away.
+- Your boarding stop belongs to a validated TfL bus stop sequence.
+- You got a GPS fix within 25 m of that stop with 20 m accuracy or better.
+- At least three movement samples then span 12 seconds and 90 m at 5–25 m/s, with gaps of 8 seconds or less.
+- The destination is still more than 100 m away.
 
-A regression with jogging is the reason for the lower limit of 5 m/s. Waypoint detects the final walk from several samples at walking speed that move at least 30 m away from the bus route.
+That 5 m/s floor came from a regression where jogging looked like boarding a slow bus. Detecting the final walk works in reverse: several walking-speed fixes moving at least 30 m off the bus route switch the HUD back to street directions. If Waypoint ever guesses wrong, undoing the guess disables automatic inference for the rest of that leg, and rail legs stay manual. Every threshold here is an uncalibrated assumption until I take it onto real buses.
 
-If Waypoint guesses wrong, you can undo the guess. An undo turns off further inference for that leg. Rail is always manual.
+## Why TfL stop IDs needed reconciling
 
-Each threshold is a field assumption that I have not calibrated.
+Early on, TfL's Journey API gave a boarding stop ID of `490013767A`, while the line sequence endpoint called the exact same physical stop `490013767C`. Rather than trusting raw IDs, Waypoint only reconciles two stops if they sit within 20 m of each other, share the same non-empty stop letter, and match on ordered intermediate stop names, stop count and route geometry. A mutation-checked regression test guards that rule.
 
-## Why Waypoint reconciles TfL stop IDs
+## Fitting a 576×288 HUD over four tiles
 
-The TfL Journey API gave a boarding ID of `490013767A`. The line sequence called the same physical stop `490013767C`.
+One canvas in `src/renderHud.ts` renders both the phone preview and the glasses HUD. Because the G2 screen is 576×288 pixels while the Even SDK limits a single image transfer to 288×144, `src/glasses.ts` cuts each frame into four tiles, skips unchanged tiles, and merges pending updates. Since tiles arrive one after another, you can occasionally catch a split frame mid-transition.
 
-Waypoint now accepts a match only when the two stops are within 20 m and share the same non-empty stop letter. The ordered intermediate stop names, the count and the route geometry must also agree. A mutation-checked regression test covers this rule.
+Touch gestures had a small surprise too: a small interactive widget caught taps fine but ignored swipes, so Waypoint places an invisible blank text container over the full 576×288 display to receive swipes cleanly.
 
-## How Waypoint draws one display for the phone and the glasses
+![A contact sheet of Waypoint simulator screens walking through an entire trip: route selection, walking step, boarding, riding with stops remaining, press stop, get off and arrived.](/projects/waypoint/glasses-contact-sheet.png)
 
-One canvas in `src/renderHud.ts` feeds both the phone preview and the glasses. The G2 display is 576 by 288 pixels, but the SDK limits one image to 288 by 144.
+## Tested in simulation, untested on real hardware
 
-So `src/glasses.ts` sends four tiles. It skips tiles that did not change and merges updates that are still pending. The tiles arrive one after another, so you can see a mixed frame for a moment.
+The repo has 38 automated tests, 22 simulator HUD cases, and a full-trip rehearsal that feeds 31 synthetic GPS fixes through the engine from start to arrival with zero taps. That confirms the state machine follows a scripted journey, not that noisy real-world GPS in central London will cooperate.
 
-A blank text container that covers the full display captures touch. A small container received taps but not swipes.
+Everything tied to physical hardware is still unchecked: wake and display behaviour, locked-phone backgrounding, Bluetooth reconnects, the microphone, stop-reminder timing, battery life, daylight legibility and real GPS drift. TfL stop predictions also don't identify your specific vehicle, underground alerts aren't guaranteed, new routes require a connection, and there's no voice destination entry or disruption rerouting yet. It's London-only, and hitting anonymous TfL access plus the public Overpass API from a terminal has already turned up 429, 406 and timeout responses.
 
-![A contact sheet of Waypoint simulator frames: route choice, walk step, boarding, riding with stops left, press stop, get off and arrived.](/projects/waypoint/glasses-contact-sheet.png)
+Google Maps, Apple Maps and Citymapper are obviously far more complete on a phone. Waypoint isn't trying to replace them; it's an experiment in seeing how quiet transit directions can get when they live on glasses.
 
-## What the Waypoint tests show
+## Try the simulator
 
-Waypoint has 38 automated tests and 22 simulator HUD cases. A rehearsal also sends 31 synthetic GPS fixes through the real engine, from walk to arrival, with no taps.
-
-The rehearsal shows that the engine follows a scripted journey. It does not show that detection works in the real world.
-
-## Limits of Waypoint
-
-- I have not tested Waypoint on physical G2 glasses. Wake and display behaviour, phone lock, Bluetooth reconnect, the microphone, stop-reminder timing, battery, legibility and location accuracy are all untested.
-- Stop predictions do not identify your vehicle, and Waypoint does not guarantee underground alerts. New routes need a connection.
-- Waypoint covers London only. It has no voice destinations and no rerouting after disruption.
-- Anonymous TfL access and the public Overpass service are pilot dependencies. From a terminal, I saw 429, 406 and timeout responses.
-
-## Waypoint compared with Google Maps, Apple Maps and Citymapper
-
-On a phone, all three are more complete and cover many more places. Waypoint does not replace them. It adds stop-by-stop bus reminders and automatic boarding and alighting detection on glasses, in London.
-
-## Try Waypoint
-
-You need Node 22.18 or later. Waypoint needs no API keys and no backend.
+Needs Node 22.18 or later, with no API keys or backend:
 
 ```sh
 git clone https://github.com/hridaya423/waypoint-g2
@@ -78,6 +61,6 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173/?rehearsal=full-trip` and press "Advance journey" for a demo without GPS. `npm run sim` starts the official Even Hub simulator on Apple silicon Macs.
+Open `http://localhost:5173/?rehearsal=full-trip` and click **Advance journey** to step through a trip without GPS. On Apple silicon Macs, `npm run sim` launches the official Even Hub simulator.
 
 Source: [github.com/hridaya423/waypoint-g2](https://github.com/hridaya423/waypoint-g2) (Apache-2.0).

@@ -1,71 +1,55 @@
 ---
 title: "Deep Green"
-headline: "Deep Green: a 6 MB Wordle network that matches the optimal solver"
-summary: "A 6.2 MB neural network that picks the same Wordle guess as a certified optimal solver on all 5,022 test words. No search. It runs in your browser."
+headline: "Deep Green: a 6 MB neural network that plays certified-optimal Wordle"
+summary: "A 6.2 MB neural network running in your browser that matches an exact optimal Wordle solver move for move across all 5,022 test words, with zero search."
 kind: "Web app"
 platform: "Web"
 status: "Open source"
 category: "GameApplication"
 license: "Apache-2.0"
 publishedAt: "2026-09-23"
-updatedAt: "2026-11-09"
+updatedAt: "2026-11-21"
 site: "https://deepgreen.hridya.tech"
 repo: "https://github.com/hridaya423/deepgreen"
 image: "/projects/deepgreen.jpg"
 ---
 
-Deep Green is a 6.2 MB neural network that plays Wordle in your browser. On its benchmark of 5,022 words, it makes the same guess as a certified optimal solver at each position in the census. It uses no search and no lookup table. Deep Green is for anyone who wants to know how small a network can be and still match an exact solver.
+How small can a neural network get and still match an exact game-tree solver move for move? Deep Green is a 6.2 MB network running in TypeScript in your browser that plays Wordle with zero tree search and no lookup tables. Across its entire 5,022-word benchmark, it picks the exact same guess as a certified optimal solver at every reachable board position.
 
-![The Deep Green Challenge screen with the word CRANE typed in and a Solve my word button.](/projects/deepgreen/challenge.png)
+![The Deep Green Challenge screen with CRANE entered and a Solve my word button.](/projects/deepgreen/challenge.png)
 
-The Challenge tab takes any of the 5,022 words, in normal or hard mode, and shows how the network solves it.
+In the Challenge tab you can type any of the 5,022 words (normal or hard mode) and watch the network solve it live.
 
-## One forward pass for each guess
+## One forward pass, board only
 
-Deep Green sees only the public board: the guesses so far and the colours that each guess got. It scores each word in the vocabulary and plays the word with the highest score.
+Deep Green never sees candidate lists or hidden solver state. Its only input is the public board: the guesses played so far and the tile colours they got back.
 
-The network has 1,550,400 parameters. Embeddings for letters, colours and positions feed row mixers, then a board layer with a turn gate. A bilinear scorer then compares the board with each candidate word. The weights are 6,203,736 bytes in float32, and the browser runs them in TypeScript.
+The network has 1,550,400 parameters (`6,203,736` bytes in `float32`). Letter, colour and position embeddings feed into row mixers, followed by a board layer with a turn gate. At the end, a bilinear scorer scores every word in the vocabulary against the board state and plays the top word in a single forward pass.
 
-## Where the right answers come from
+To get optimal ground truth, I used Alex Selby's exact Wordle solver (vendored in the repo) to build an optimal strategy tree for both normal and hard modes. I trained the network on that tree with behaviour cloning followed by rounds of DAgger. The strategy tree trains and verifies the weights, then never ships in the app.
 
-I used the exact solver by Alex Selby, vendored in the repository, to build an optimal strategy tree for each mode. The network trained on that tree by behaviour cloning, plus rounds of DAgger. The tree trains and scores the network but never plays.
+## What "certified" actually covers
 
-## What "certified" means
+Every reachable position in the benchmark census was checked exhaustively: the network's chosen move equals the optimal tree's move everywhere. The public proof receipt (`web/model/proof.json`) records that exact action parity, with the largest floating-point logit difference against the NumPy reference measuring `6.26e-07`. A separate firewall audit passed 9 checks confirming the model only reads the public board and never touches sealed evaluation data, and the release carries a hash seal with a clean-room reproduction gate.
 
-At each position in the census of the benchmark, the choice of the network equals the choice of the optimal tree. The public proof receipt (`web/model/proof.json`) records this as exact action parity. The largest logit difference against the NumPy reference is 6.26e-07.
-
-A separate firewall audit checked that the network sees only the public board and never reads sealed evaluation data. It passed 9 checks. The release has a hash seal, and a clean-room reproduction gate passed.
-
-## Deep Green never loses on its list
-
-I played each word in the list as the answer. The totals come from the verification report. I divided each total by 5,022 to get the means.
+Playing all 5,022 words in `OpenWordle-v1` as the secret answer (totals taken from the verification report and divided by 5,022 for the mean):
 
 | Mode | Losses | Total guesses | Mean guesses | Worst case |
 |---|---|---|---|---|
 | Normal | 0 | 18,742 | 3.732 | 6 |
 | Hard | 0 | 20,278 | 4.038 | 6 |
 
-In normal mode, the number of words solved in 1 to 6 guesses is 1, 77, 1,873, 2,463, 532 and 76.
+In normal mode, solves break down as 1 word in 1 guess, 77 in 2, 1,873 in 3, 2,463 in 4, 532 in 5, and 76 in 6.
 
-The benchmark is OpenWordle-v1: five-letter lemmas from SCOWL and WordNet 3.0, a uniform prior, and a loss scored as 7. It is not the New York Times list.
+## Word lists and limits
 
-## Limits of Deep Green
+`OpenWordle-v1` is a frozen dictionary of 5,022 five-letter lemmas from SCOWL and WordNet 3.0 under a uniform prior (losses scored as 7). That certification says nothing about the New York Times answer list or today's puzzle—which is why the Assist tab stamps suggestions for live games as `EXHIBITION`.
 
-- The certification covers one frozen list of 5,022 words. It says nothing about the New York Times answers or the puzzle of today.
-- The Assist tab suggests a guess for a real game. A real game cannot be certified, so the page labels those suggestions EXHIBITION.
-- The means above are over all 5,022 words as answers. They do not compare with the classic figures for 2,315 answers.
+Because the word sets differ, you shouldn't compare the means directly against classic Wordle figures either. On the 2,315-word NYT list, Cunanan and Thielscher (IJCAI 2023) proved `SALET` optimal at 3.421 guesses in normal mode (I haven't run Deep Green on that list). Talon Townsend's `wordle-neural-solver`—another board-only network, 2.9M parameters—reports 99.56% wins across 14,855 words. Traditional search solvers prove optimality by walking the tree; Deep Green compresses that policy into 6 MB of weights and one forward pass.
 
-## Deep Green compared with SALET, wordle-neural-solver and search-based solvers
+## Try it
 
-On the classic list of 2,315 answers, Cunanan and Thielscher (IJCAI 2023) prove that SALET is the optimal opener. Its mean is 3.421 guesses in normal mode. I have not run Deep Green on that list, so I cannot say how near it gets.
-
-wordle-neural-solver by Talon Townsend is also a board-only network, with 2.9M parameters. The author reports 99.56% wins on a set of 14,855 words. The word sets differ, so those numbers do not compare with mine.
-
-Search-based solvers can prove optimality on a list. Deep Green imitates the optimal tree in one forward pass, in 6 MB.
-
-## Try Deep Green
-
-Open [deepgreen.hridya.tech](https://deepgreen.hridya.tech). The About page shows a live solve and the proof status. To run Deep Green locally:
+Open [deepgreen.hridya.tech](https://deepgreen.hridya.tech) (the About page runs a live solve and displays the proof receipt), or serve it locally:
 
 ```sh
 uv sync --extra dev

@@ -1,53 +1,47 @@
 ---
-title: "About Hridya Agrawal"
-description: "Hridya Agrawal is an AI engineer in London. He builds voice agents for banks at Silver Suits AI, and ships Mac apps and developer tools such as Lexis, Foundry and Perry."
-updatedAt: "2026-11-09"
+title: "About"
+description: "I'm Hridya Agrawal, an AI engineer in London building voice agents for banks at Silver Suits AI, plus Mac apps, developer tools and games in my own time."
+updatedAt: "2026-11-21"
 ---
 
-Hridya Agrawal is an AI engineer in London. He builds voice agents for banks at Silver Suits AI. In his own time he ships Mac apps, developer tools and games, and he writes up how each one works.
+I'm Hridya Agrawal, an AI engineer living in London. During the week I work at [Silver Suits AI](https://www.silversuits.ai), building autonomous voice agents for banks. Most of my spare time goes into Mac apps, developer tools, small-model experiments and the occasional game, along with write-ups explaining how each one works and where it breaks.
 
 ## Work
 
-- **Silver Suits AI, AI Engineer, April 2026 to now.** He builds autonomous voice agents for banking and finance. The calling infrastructure of the company has handled more than 10,000 calls for banks such as SIDBI and SBI.
-- **Hack Club, volunteer, August 2025 to now.** He reviews projects and orders for fraud, and he handles bans and appeals.
-- **Shawbrook Bank, work experience, 6 to 10 July 2026.** He built a mortgage calculator and packaged it in a container.
+At [Silver Suits AI](https://www.silversuits.ai) (since April 2026), I work on autonomous voice agents for banking and finance. Our calling stack has handled more than 10,000 calls for banks including SIDBI and SBI.
 
-## Projects
+Outside that, I've volunteered with [Hack Club](https://hackclub.com) since August 2025, reviewing project submissions and orders for fraud, catching inflated hours, and handling bans and appeals. In July 2026 (6–10 July) I also spent a week of work experience at [Shawbrook Bank](https://www.shawbrook.co.uk), building a mortgage calculator and containerising it with Docker.
 
-Each project has a write-up with the method, the numbers and the limits.
+## Things I've built
 
-- [Lexis](/projects/lexis) turns plain English into one shell command, with a small model that runs on your computer.
-- [Foundry](/projects/foundry) is a native macOS launcher. It used about 81% less memory than Raycast in his benchmark.
-- [Perry](/projects/perry) is a Mac helper in the notch. It points at each control in turn, or it does the task.
-- [Cue](/projects/cue) is a Mac clipboard that pastes only the part of a clip that fits the field.
-- [Quill](/projects/quill) is a Mac Markdown editor. You say a change, and a coding agent edits the note in place.
-- [silk reel](/projects/silkreel) turns a KiCad board file into a 12-second film of that board.
-- [Locus](/projects/locus) searches 891,000 public omics datasets from a plain-English question.
-- [Fineprint](/projects/fineprint) flags costly clauses in terms of service with a 1.2B model on your laptop.
-- [Revise with the Past](/projects/revise) builds GCSE practice papers from real past exam questions.
-- [Deep Green](/projects/deepgreen) is a 6.2 MB neural network that plays Wordle like an exact optimal solver.
-- [GazeKeeper](/projects/gazekeeper) is a Mac break reminder that waits for a pause in your work.
-- [Indict](/projects/indict) hunts for vulnerabilities and accepts a finding only when a sandboxed proof runs.
-- [/goal for Devin](/projects/devingoal) keeps a Devin agent at work until a separate judge checks the repository.
-- [usage-dash](/projects/usage-dash) shows coding-agent usage from every machine you own on one dashboard.
-- [Waypoint](/projects/waypoint) and [Hermes G2](/projects/hermes-g2) are prototypes for Even G2 smart glasses.
-- [Neurix](/projects/neurix) is a Scratch-style block editor with an AI that writes blocks you can edit.
+Every project below has its own write-up with the approach, real measurements, and what still doesn't work well.
 
-## Awards
+- [Lexis](/projects/lexis): turns plain English in your terminal into a shell command using a small local model, with ordinary code checking risk before anything runs.
+- [Foundry](/projects/foundry): a native Swift launcher for macOS that used about 81% less memory than Raycast in my benchmarks.
+- [Perry](/projects/perry): a Mac helper in the notch that points to each button as you go, or takes over and finishes the task while you watch.
+- [Cue](/projects/cue): a Mac clipboard that reads the field you're pasting into and pulls out just the part that fits, like an email address from a chat message.
+- [Quill](/projects/quill): a Mac Markdown editor where you hold a key, say what should change, and your coding agent edits the draft in place.
+- [silk reel](/projects/silkreel): turns a KiCad board file into a 12-second film built from its real copper, parts and silkscreen.
+- [Locus](/projects/locus): searches 891,000 public omics datasets from a plain-English question, counts case and control samples in code, and writes `nf-core` samplesheets.
+- [Fineprint](/projects/fineprint): runs a fine-tuned 1.2B model locally in Chrome to flag clauses in terms of service that cost you money or rights.
+- [Revise with the Past](/projects/revise): crops real GCSE past-paper questions into custom practice papers and checks photographed answers against the mark scheme.
+- [Deep Green](/projects/deepgreen): a 6.2 MB neural network running in your browser that matches an exact optimal Wordle solver move for move.
+- [GazeKeeper](/projects/gazekeeper): a Mac break reminder that holds off during calls and screen shares, then waits for a pause in your typing.
+- [Indict](/projects/indict): runs six vulnerability-hunting engines over a repo and only calls a bug verified once a sandboxed proof of concept hits the reported line.
+- [/goal for Devin](/projects/devingoal): keeps Devin working until a separate read-only judge session checks the repository and agrees the goal is done.
+- [usage-dash](/projects/usage-dash): pulls coding-agent usage from every machine you own over SSH into one web dashboard and Mac menu-bar popover.
+- [Waypoint](/projects/waypoint) and [Hermes G2](/projects/hermes-g2): prototypes for Even G2 smart glasses (London bus directions, and a private bridge to my self-hosted Hermes agent).
+- [Neurix](/projects/neurix): a Scratch-style block editor where AI generates and explains editable blocks instead of dumping raw code.
 
-- **1st place, Reinvent the Wheel, London, 16 to 18 October 2026.** His team built Locus and won the £1,000 grand prize.
-- **White Circle track winner and 2nd overall, Moonfire Build Night, London, 22 October 2026.** He built Fineprint with Mukesh Agrawal in three hours.
-- **Runner-up, the PROBLEM day, London, 31 October 2026.** His team built Myna, a computer-use agent for enterprise.
+## Hackathons and trips
 
-## Events
+October 2026 was a busy month in London. My team won 1st place and the £1,000 grand prize at Reinvent the Wheel (16–18 October) with Locus. A few days later, Mukesh Agrawal and I built Fineprint in three hours at Moonfire Build Night (22 October), winning the White Circle track and placing 2nd overall. On 31 October, my team finished runner-up at Kickstart's PROBLEM day with Myna, an enterprise computer-use agent.
 
-- **Juice, Shanghai, April 2025.** He built the game Undead Courier in 100 hours and showed it at a gaming pop-up café.
-- **Shiba, Tokyo, November 2025.** He built the game Whisper in 120 hours, then built an arcade machine for it.
-- **Open Sauce, San Francisco Bay Area, 17 to 19 July 2026.**
+Before that, a couple of Hack Club programmes took me much further afield: I spent 100 hours building Undead Courier for Juice and showed it at a gaming pop-up café in Shanghai (April 2025), then spent 120 hours on Whisper for Shiba before flying to Tokyo (November 2025) to build an arcade cabinet for it. In July 2026 (17–19 July) I spent a weekend at Open Sauce in the San Francisco Bay Area.
 
 ## Certifications
 
-He passed seven certification exams at age 11 and two more at age 13.
+I went through a phase of sitting cloud and platform exams early on: seven at age 11, and two more at 13.
 
 - Microsoft Azure Fundamentals (AZ-900), age 11
 - Microsoft Azure Data Fundamentals (DP-900), age 11
@@ -59,11 +53,11 @@ He passed seven certification exams at age 11 and two more at age 13.
 - Oracle Cloud Infrastructure 2024 Generative AI Certified Professional, age 13
 - GitHub Foundations, age 13
 
-You can verify each certificate from the [certifications section](/#achievements) of the home page.
+You can verify each badge from the [certifications section](/#achievements) on the home page.
 
-## Names and profiles
+## Elsewhere
 
-His name is spelt Hridya Agrawal. His GitHub handle uses a different spelling and is also his: `hridaya423`. On X he is `hridyaagrawal`.
+My name is spelt Hridya Agrawal. My GitHub handle (`hridaya423`) has an extra *a* in it (same person, old account). On X I'm `hridyaagrawal`.
 
 - GitHub: [github.com/hridaya423](https://github.com/hridaya423)
 - LinkedIn: [linkedin.com/in/hridya-agrawal](https://www.linkedin.com/in/hridya-agrawal/)

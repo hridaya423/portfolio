@@ -1,61 +1,49 @@
 ---
 title: "Indict"
-headline: "Indict: LLM vulnerability hunting where a sandbox decides"
-summary: "Indict runs six vulnerability-hunting engines over a repo and marks a finding verified only after a sandboxed proof of concept reaches the reported line."
+headline: "Indict: LLM vulnerability hunting where a sandbox has the final word"
+summary: "A CLI that runs six vulnerability-hunting engines over a git repository and only marks a finding verified once a sandboxed proof of concept actually hits the reported line."
 kind: "Command-line tool"
 platform: "Python"
 status: "Hackathon build"
 category: "SecurityApplication"
 license: "Apache-2.0"
 publishedAt: "2026-09-20"
-updatedAt: "2026-11-09"
+updatedAt: "2026-11-21"
 repo: "https://github.com/hridaya423/indict"
 image: "/projects/indict.jpg"
 ---
 
-Indict is a command-line tool that runs six vulnerability-hunting engines over a git repository and writes one report. A finding counts as verified only if a proof of concept ran in a sandbox and reached the reported line. Indict is for security researchers and maintainers who want proof for the bugs that a language model finds.
+I built Indict for the AI Tinkerers and Superlinked hackathon on 20 September 2026, where judges checked reported vulnerabilities by hand and weighted them by severity. I didn't place, and I built parts of the harness ahead of the day, so it isn't a one-day project.
 
-I built Indict for the AI Tinkerers and Superlinked hackathon on 20 September 2026. Judges scored valid vulnerabilities, weighted by significance and checked by hand. I have no placing to report. I prepared before the day, so Indict is not a one-day build.
+The problem it tries to solve is simple: ask an LLM to audit a codebase and you'll drown in plausible-sounding false positives. Indict runs six vulnerability-hunting engines over a git repo and writes one report, refusing to mark any bug as **verified** until a proof of concept runs inside a locked-down Docker sandbox and proves it hit the exact line.
 
-## The model proposes, mechanics decide
+## Models suggest, the sandbox decides
 
-Language models suggest candidate bugs. Mechanical checks accept or reject them. The pipeline runs ten steps: ingest, recon, sweep, rank, engines, consensus, adjudicate, proof of concept, chain and report.
+A full run moves through ten stages: `ingest`, `recon`, `sweep`, `rank`, `engines`, `consensus`, `adjudicate`, `poc`, `chain` and `report`.
 
-1. Six engines produce candidates. They are a semgrep and bandit sweep, an LLM call-chain hunter, LLM-generated taint rules, a data-flow explorer, git-history variant analysis, and LLM-written fuzz harnesses.
-2. The consensus step removes duplicates.
-3. An adversarial falsifier tries to reject each candidate that remains. It must cite concrete mechanical evidence, such as "file does not exist". Indict refuses a rejection without that evidence, and each rejection goes into a ledger with its reason.
-4. Each candidate that remains gets a proof of concept. It runs in a Docker sandbox with no network, a read-only filesystem, and limits on CPU and memory. The sandbox traces execution.
-5. A finding is "verified" only if the traced run reached the reported line and a probe string such as `VULN_CONFIRMED_PROTOTYPE_POLLUTION` fired. The probe output comes from the sandbox, so the model cannot fake it.
+Six engines generate candidates in parallel: a `semgrep` and `bandit` sweep, an LLM call-chain hunter, LLM-generated taint rules, a data-flow explorer, git-history variant analysis, and LLM-written fuzz harnesses. A consensus pass deduplicates overlaps across engines.
 
-Two later steps use verified results. The chain step combines verified pairs into one chained proof of concept. The learn step turns a verified bug into a semgrep rule. Indict stores the rule only if it hits within 10 lines of the known-bad line.
+Next, an adversarial falsifier tries to knock out each remaining candidate, with one strict rule: it has to cite concrete mechanical evidence (such as a missing file or unreachable symbol). Unsupported dismissals get rejected, and every accepted dismissal goes into a ledger with its reason.
 
-None of the bug-finding ideas is new. The variant engine reads git history for fixes and looks for the same mistake in other places, which is the Big Sleep idea. The other engines borrow from vulnhuntr, IRIS and RepoAudit. My addition is the gate.
+Whatever survives gets a proof of concept executed inside a Docker sandbox with no network, a read-only filesystem, strict CPU and memory limits, and execution tracing turned on. A bug only upgrades to **verified** when tracing confirms execution reached the reported line *and* the sandbox prints a probe string such as `VULN_CONFIRMED_PROTOTYPE_POLLUTION`. Because that output comes from the sandbox runtime, the model can't fake it.
 
-## What I measured for Indict
+Two optional stages follow verification: `chain` attempts to combine verified pairs into a single chained exploit, and `learn` converts a confirmed bug into a `semgrep` rule, storing it only if it matches within 10 lines of the known vulnerable line.
 
-I ran a calibration set of 5 known CVEs: lodash, minimist, moment, pyyaml and requests. Indict found 5 of 5 again, and a proof of concept verified each one. The false-positive rate was 0.0. I turned the learned rules off for this run, so earlier results could not leak in.
+None of the individual hunting ideas are new—scanning git history for past fixes to spot unpatched siblings is Google's Big Sleep idea, the other engines borrow from `vulnhuntr`, `IRIS` and `RepoAudit`, and deterministic tools like `semgrep`, `bandit`, `gosec` and `osv-scanner` do the static work. Indict's piece is putting one shared mechanical gate in front of all of them.
 
-That set proves little. The bugs are already public. The run shows that the pipeline works, and it says nothing about new bugs.
+## Calibration vs real repositories
 
-On real targets at the hackathon, most findings ended as "adjudicated", not verified. An adjudicated finding survived the falsifier but has no working proof of concept. On one target, 18 findings gave 2 verified.
+On a calibration set of 5 known CVEs (`lodash`, `minimist`, `moment`, `pyyaml` and `requests`), with learned rules turned off so nothing leaked from previous runs, Indict rediscovered and verified 5 of 5 with a 0.0 false-positive rate.
 
-I have not reported a finding to a maintainer, and no maintainer has confirmed one. I do not list unpatched issues here.
+Public CVEs only prove the plumbing works, not that it finds fresh zero-days. On live repos at the hackathon, most candidates stalled at **adjudicated** (survived the falsifier, no working proof of concept): on one target, 18 findings produced 2 verified bugs. I haven't reported any finding to a maintainer or had one externally confirmed, and I don't list unpatched bugs here.
 
-## Limits of Indict
+## Limits
 
-- Indict needs Docker, semgrep, and either API keys or a local 30B model. The local model can crash a laptop.
-- The proof-of-concept probes match a bug class, and this method cannot prove some classes.
-- The hackathon model endpoint served only 8k tokens of context, so I set `INDICT_MAX_TOKENS=4096` and `INDICT_MAX_FILE_LINES=400`.
-- Docker image builds must run one at a time, and they can push the host into swap.
-- Learned rules are global, so a rule from one repository applies to the next.
+Running Indict locally takes Docker, `semgrep`, and either API keys or a local 30B model (which can easily crash a laptop). Proof-of-concept probes only cover certain bug classes, leaving plenty of flaws outside what the sandbox can prove automatically. Because the hackathon endpoint capped context at 8k tokens, I set `INDICT_MAX_TOKENS=4096` and `INDICT_MAX_FILE_LINES=400`. Docker image builds also have to run serially and can still push a machine into swap, and rules written by the `learn` step apply globally across future repos rather than staying scoped per project.
 
-## Indict compared with Semgrep, vulnhuntr, RepoAudit and IRIS
+## Running it
 
-Semgrep, bandit, gosec and osv-scanner are established tools that use no model. Indict runs semgrep and bandit inside its sweep. Vulnhuntr, RepoAudit and IRIS each implement one technique that Indict borrows. Indict adds one shared gate for all of them.
-
-## Try Indict
-
-There is no hosted demo. Install Indict from source:
+There's no hosted demo; install from source:
 
 ```sh
 uv sync
@@ -68,12 +56,12 @@ cp .env.example .env
 ./indict --no-llm calibrate/smoke/vulnapp
 ```
 
-The last command is an offline smoke test. For a real scan, add model keys to `.env` and run this command:
+That last line runs an offline smoke test. For a real scan, add model keys to `.env`:
 
 ```sh
 ./indict <git-url-or-path> --engines sweep,hunter --models deepseek,glm --passes 2 --workers 6
 ```
 
-`bash calibrate/demo.sh` is a 5-second demo, and `./indict --board` opens the dashboard at `127.0.0.1:8404`.
+`bash calibrate/demo.sh` runs a 5-second demo, and `./indict --board` opens the local dashboard at `127.0.0.1:8404`.
 
 Source: [github.com/hridaya423/indict](https://github.com/hridaya423/indict) (Apache-2.0).

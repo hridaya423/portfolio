@@ -1,73 +1,62 @@
 ---
 title: "Foundry"
-headline: "Foundry: a native Mac launcher with 81% less memory than Raycast"
-summary: "Foundry is a free, open-source Swift launcher for macOS 14 or later. It used about 81% less memory than Raycast in my benchmark. It has no extension store."
+headline: "Foundry: a native Mac launcher that uses 81% less memory than Raycast"
+summary: "A free, open-source macOS launcher written in pure Swift. Apps, files, clipboard history and snippets, using roughly 81% less RAM than Raycast in my benchmarks."
 kind: "macOS app"
 platform: "macOS 14 or later"
 status: "Open source"
 category: "DesktopEnhancementApplication"
 license: "MIT"
 publishedAt: "2026-06-12"
-updatedAt: "2026-11-09"
+updatedAt: "2026-11-21"
 site: "https://foundry.hridya.tech"
 repo: "https://github.com/hridaya423/foundry"
 image: "/foundry-hero.png"
 ---
 
-Foundry is a free, open-source launcher for macOS 14 or later, written in native Swift. It opens apps, finds files, keeps clipboard history and expands snippets. It is for Mac users who want a launcher in the style of Raycast that stays small. In my benchmark, Foundry held about 81% less memory than Raycast.
+One afternoon I checked Activity Monitor and noticed Raycast sitting idle at more than 600 MB of memory. I liked using it, so I wanted to see how small a native macOS launcher could stay if I wrote it in pure Swift with no third-party dependencies.
 
-![The Foundry site: the tagline "The app you never open. Opens everything." beside a launcher panel with search, clipboard history, window management and AI chat rows.](/foundry-hero.png)
+Foundry is what came out of that: a free, open-source launcher for macOS 14 and newer that covers apps, file search, clipboard history, snippet expansion and window management, while using around 81% less memory than Raycast in my benchmarks.
 
-## 59 to 115 MB against 591 to 620 MB
+![The Foundry site: "The app you never open. Opens everything." alongside a launcher panel showing search, clipboard history, window management and AI chat.](/foundry-hero.png)
 
-Foundry 1.1.0 held 59 to 115 MB with its panel hidden. Raycast 2.5.3.0 held 591 to 620 MB. Both ran on one MacBook Pro (Apple M4 Pro, macOS 27.0, on AC power) on 29 September 2026.
+## 59–115 MB against 591–620 MB
 
-I ran the benchmark twice, once with each launcher first, because the order changed the result.
+On 29 September 2026, I measured Foundry 1.1.0 against Raycast 2.5.3.0 on the same MacBook Pro (Apple M4 Pro, macOS 27.0, plugged into AC power). Launch order actually shifted the numbers, so I ran the test twice and swapped which app went first:
 
-| Run order | Foundry p50 | Raycast p50 | Foundry uses |
+| Run order | Foundry p50 | Raycast p50 | Difference |
 |---|---|---|---|
 | Foundry first | 59.3 MB | 591.3 MB | 90.0% less |
 | Raycast first | 115.2 MB | 620.2 MB | 81.4% less |
 
-The headline takes the worse run and rounds down, so it says 81%, not 90%. An older test (Foundry 1.0 against Raycast 2.1.2.0, 29 August 2026) gave 68.9%. The newer test replaces it.
+For the headline I used the worse run and rounded down, so it says 81% instead of 90%. An earlier August test (Foundry 1.0 against Raycast 2.1.2.0) measured 68.9%, and this run replaces it.
 
-Each launcher ran alone, with 5 warmup panel cycles and 30 measured cycles. The runner then waited 2 seconds and took 15 memory samples, one second apart, with the panel hidden.
+Each app ran alone for 5 warmup panel cycles and 30 measured cycles. The script then waited 2 seconds and recorded 15 memory samples, one second apart, with the panel hidden. Memory here is the Summary Footprint from macOS's `footprint` tool across the app and its child processes, including the WebKit helpers Raycast spawns after launch. I kept resident set size only as a cross-check because RSS counts shared pages more than once.
 
-"Memory" is the Summary Footprint from the macOS `footprint` tool, for the app and its child processes. For Raycast, that includes the WebKit helpers that did not run before Raycast started. I kept resident set size only as a cross-check, because it counts shared pages more than once.
+On disk, `du -sk` puts Foundry 1.1.0 at 16,152 KB versus Raycast 2.5.3 at 224,088 KB (a 13.8x ratio). The runner lives in `scripts/benchmark-launchers.swift` and the raw logs are in `docs/benchmarks/`.
 
-The exact flags are in `scripts/benchmark-launchers.swift`, and the raw data is in `docs/benchmarks/`. On disk, Foundry 1.1.0 is 16,152 KB and Raycast 2.5.3 is 224,088 KB (`du -sk`), a ratio of 13.8.
+## Keeping search responsive
 
-## Why the panel never opens blank
+In `Sources/Foundry/Commands/Search/CommandSearchCoordinator.swift`, every keystroke increments a `generation` counter and cancels the previous search task. Fast providers run first; slower ones run at `.utility` priority so a cancelled query never delays the next keypress. Before results hit the UI, the coordinator checks the generation ID and drops anything stale.
 
-Foundry searches in stages, and each keystroke cancels the search before it. Each keystroke increases a `generation` counter and cancels the previous task.
+When you press the hotkey, the panel paints a cached home snapshot immediately before running a query, so it never flashes blank. Providers also precompute normalised text and a character mask up front, letting a cheap `probableMatch` check throw out impossible rows before scoring begins.
 
-The new task runs the fast providers first, then the slow providers at `.utility` priority. A cancelled search therefore cannot delay the next keystroke. Before a result reaches the panel, the coordinator checks the generation of that result and drops a stale one.
+In an in-process test on an Apple M4 (version 1.2.0, 132 samples), the search engine took 16.82 ms at p50 and 35.6 ms at p95. That measures engine work only, not the full time to a drawn frame.
 
-The panel paints a cached home snapshot the moment it opens, before a search runs. The providers skip work too. Each provider computes normalized text and a character mask in advance. A cheap `probableMatch` check then rejects impossible candidates before scoring starts.
+## Where Raycast and Tinycast beat it
 
-In an in-process test on an Apple M4, the search engine took 16.82 ms p50 and 35.6 ms p95 over 132 samples (version 1.2.0). That is engine time only, not the time to a drawn frame. The code is in `Sources/Foundry/Commands/Search/CommandSearchCoordinator.swift`.
+Foundry has no extension store, and it isn't trying to rebuild Raycast's ecosystem. An earlier Foundry release build also took longer to register its window on hotkey than Raycast (99.9–104.4 ms versus 17.5–17.9 ms, measured up to window registration rather than first painted frame).
 
-## Foundry compared with Raycast, Tinycast, Alfred and Spotlight
+Tinycast 0.11.3 is lighter still: 13.6 MB on disk and about 40 MB in memory on battery, where Foundry measured 60.5–120.0 MB. A diagnostic Foundry build that kept its panel mapped opened 3.4–3.8x faster than Tinycast, though that build isn't what ships today.
 
-Raycast has an extension store, and Foundry does not. Raycast also opened its panel faster than an earlier Foundry release build. From hotkey to window registered, Raycast took 17.5 to 17.9 ms and Foundry took 99.9 to 104.4 ms. Those timings stop at window registration, not at the first drawn frame.
+I haven't timed Alfred or Spotlight. Foundry can import Alfred and Raycast snippets along with Raycast quicklinks, and onboarding can take over Cmd+Space from Spotlight if you want it to.
 
-Tinycast 0.11.3 is lighter than Foundry. It is 13.6 MB on disk and holds about 40 MB of memory on battery, where Foundry measured 60.5 to 120.0 MB. A staged Foundry build that keeps its panel mapped opened 3.4 to 3.8 times faster than Tinycast. That is a diagnostic build, not the build you download.
+A few things the benchmark doesn't cover: it's one machine and two runs (I haven't tested a second Mac yet), the Raycast numbers come from my daily install rather than a clean profile with extensions logged, run order noticeably swings Foundry's footprint (41.5 to 115.5 MB in the Raycast-first run), and a couple of built-in utilities rely on Homebrew tools (`yt-dlp` for YouTube downloads and some file conversions).
 
-I have no numbers for Alfred or Spotlight. Foundry imports Alfred and Raycast snippets and Raycast quicklinks. With your consent, it takes Cmd+Space from Spotlight.
+## Try it
 
-Foundry does not aim to match each Raycast extension. It aims to make common Mac actions dependable.
+Download [Foundry.dmg](https://github.com/hridaya423/foundry/releases/latest/download/Foundry.dmg), drag it to Applications, and press Cmd+Space. Releases since 1.3.0 are Developer ID signed and notarized by Apple, and setup can move Raycast or Alfred to Option+Space.
 
-## What the benchmark does not cover
-
-- The benchmark is one machine and two runs. I have not measured a second Mac, a Mac mini, yet.
-- I did not record the settings or extensions of Raycast. It was my daily install.
-- Run order changes the answer. The footprint of Foundry in the Raycast-first run ranged from 41.5 to 115.5 MB.
-- YouTube downloads install `yt-dlp` through Homebrew, and some file conversions need Homebrew tools too.
-
-## Try Foundry
-
-Download [Foundry.dmg](https://github.com/hridaya423/foundry/releases/latest/download/Foundry.dmg), drag Foundry to Applications and press Cmd+Space. Since version 1.3.0, the app has a Developer ID signature and Apple notarization. Setup can move Raycast or Alfred to Option+Space.
-
-To build from source, run `./scripts/build-app.sh` with Swift 6.1 or later (6.2 for the Liquid Glass look). There is no Homebrew formula, and the package has no third-party Swift dependencies.
+To build from source, run `./scripts/build-app.sh` with Swift 6.1 or newer (6.2 for Liquid Glass). There's no Homebrew formula and no third-party Swift dependencies.
 
 Site: [foundry.hridya.tech](https://foundry.hridya.tech). Source: [github.com/hridaya423/foundry](https://github.com/hridaya423/foundry) (MIT).

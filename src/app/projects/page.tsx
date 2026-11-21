@@ -9,7 +9,7 @@ import { caseStudyUrl, feedAlternate, jsonLd, PERSON_ID, SITE_IMAGE, SITE_URL, W
 import "@/components/portfolio/portfolio.css";
 
 const title = `Projects | ${DATA.name}`;
-const description = `Every project ${DATA.name} has built: macOS apps, developer tools, machine learning experiments, games and hackathon winners, each with a write-up.`;
+const description = `Mac apps, developer tools, small-model experiments, games and hackathon builds by ${DATA.name}, each with a write-up of how it works.`;
 
 export const metadata: Metadata = {
   title: "Projects",
